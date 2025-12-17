@@ -1,4 +1,4 @@
-import 'package:crypto_app_task/core/widgets/gradient_button.dart';
+import 'package:BitDo/core/widgets/gradient_button.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -176,7 +176,7 @@ class _SignupScreenState extends State<SignupScreen> {
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: const Color(0xFFF5F6FA), // Light grey background
-      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none, // No border line by default
@@ -194,9 +194,7 @@ class _SignupScreenState extends State<SignupScreen> {
       height: 32,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(
-            0xFFD0D5DD,
-          ), // Greyish disabled look initially
+          backgroundColor: const Color(0xFFD0D5DD),
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 16),

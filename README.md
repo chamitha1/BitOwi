@@ -1,4 +1,4 @@
-# crypto_app_task
+# BitDo
 
 A new Flutter project.
 

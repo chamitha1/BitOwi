@@ -1,6 +1,6 @@
 {
-    "name": "crypto_app_task",
-    "short_name": "crypto_app_task",
+    "name": "BitDo",
+    "short_name": "BitDo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
