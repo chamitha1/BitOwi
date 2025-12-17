@@ -1,4 +1,5 @@
 import 'package:crypto_app_task/onboarding_screen.dart';
+import 'package:crypto_app_task/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class CryptoApp extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const OnboardingScreen(),
+      home: const SignupScreen(),
     );
   }
 }
