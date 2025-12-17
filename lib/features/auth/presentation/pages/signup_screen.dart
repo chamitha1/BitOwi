@@ -1,3 +1,4 @@
+import 'package:crypto_app_task/core/widgets/gradient_button.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -65,6 +66,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       _isPasswordVisible
                           ? Icons.visibility
                           : Icons.visibility_off_outlined,
+                      color: Colors.grey[600],
                     ),
                     onPressed: () => setState(
                       () => _isPasswordVisible = !_isPasswordVisible,
@@ -82,8 +84,10 @@ class _SignupScreenState extends State<SignupScreen> {
                   hint: "Re-Enter Password",
                   prefixIcon: Icons.lock_outline,
                   suffixIcon: Icon(
-                    Icons.visibility_off_outlined,
-                    color: Colors.grey[400],
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off_outlined,
+                    color: Colors.grey[600],
                   ),
                 ),
               ),
@@ -133,6 +137,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 ],
               ),
               const SizedBox(height: 24),
+
+              GradientButton(text: "Sign Up", onPressed: () {}),
             ],
           ),
         ),
