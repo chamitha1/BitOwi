@@ -1,5 +1,5 @@
 import 'package:BitDo/features/auth/presentation/pages/signup_screen.dart';
-import 'package:BitDo/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:BitDo/features/onboarding/presentation/pages/onboarding_screen.dart';
 
 import 'package:flutter/material.dart';
 
