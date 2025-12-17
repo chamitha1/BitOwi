@@ -175,11 +175,11 @@ class _SignupScreenState extends State<SignupScreen> {
       suffix: suffix,
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: const Color(0xFFF5F6FA), // Light grey background
+      fillColor: const Color(0xFFF5F6FA), 
       contentPadding: const EdgeInsets.symmetric(vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none, // No border line by default
+        borderSide: BorderSide.none, 
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

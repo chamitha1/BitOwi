@@ -40,8 +40,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF2F5599);
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -66,7 +64,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // 2. PAGE VIEW (Images & Text)
             Expanded(
               child: PageView.builder(
                 controller: _controller,
