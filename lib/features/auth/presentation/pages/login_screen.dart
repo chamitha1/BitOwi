@@ -10,17 +10,34 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  TextEditingController? _emailController;
+
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
   final Color _primaryBlue = const Color(0XFF1D5DE5);
 
+  static const List<String> _emailDomains = <String>[
+    'gmail.com',
+    'hotmail.com',
+    'outlook.com',
+    'yahoo.com',
+    'icloud.com',
+    'live.com',
+  ];
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _emailController?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF6F9FF),
+      backgroundColor: const Color(0xFFF6F9FF),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -28,18 +45,17 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 30),
-
-              Text(
+              const Text(
                 'Welcome Back to Sign in',
                 style: TextStyle(
                   fontSize: 24,
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w700,
-                  color: const Color(0XFF151E2F),
+                  color: Color(0XFF151E2F),
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
+              const Text(
                 'Your account is protected with encrypted login and advanced authentication.',
                 style: TextStyle(
                   fontSize: 16,
@@ -52,8 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
 
               _buildLabel('Email'),
-              _textField(
-                controller: _emailController,
+              _emailAutocompleteField(
                 hint: 'Enter your email',
                 iconPath: 'assets/icons/login/sms.png',
               ),
@@ -76,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 24,
                     child: Checkbox(
                       value: _rememberMe,
-                      onChanged: (v) => setState(() => _rememberMe = v!),
+                      onChanged: (v) => setState(() => _rememberMe = v ?? false),
                       activeColor: _primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
@@ -85,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
+                  const Text(
                     'Remind me',
                     style: TextStyle(
                       fontSize: 12,
@@ -96,8 +111,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Spacer(),
                   GestureDetector(
                     onTap: () {
+                      // TODO: forgot password
                     },
-                    child: Text(
+                    child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
                         fontFamily: 'Inter',
@@ -124,6 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
+                    final email = (_emailController?.text ?? '').trim();
+                    final pass = _passwordController.text;
+
+                    debugPrint('Email: $email');
+                    debugPrint('Pass: $pass');
+
+                    // call login API
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
@@ -133,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: Text(
+                  child: const Text(
                     'Login',
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -150,8 +173,8 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 children: [
                   Expanded(child: Divider(color: Colors.grey.shade300)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       'or continue with',
                       style: TextStyle(
@@ -169,7 +192,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               Row(
                 children: [
-                  // Pass your asset paths here
                   _socialButton('assets/images/login/tbay_logo.png'),
                   const SizedBox(width: 14),
                   _socialButton('assets/images/login/cardgoal_logo.png'),
@@ -181,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: RichText(
                   text: TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontFamily: 'Inter',
                       color: Color(0XFF151E2F),
@@ -191,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const TextSpan(text: "Don't have an account? "),
                       TextSpan(
                         text: 'Sign up',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 14,
                           color: Color(0XFF1D5DE5),
@@ -216,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               Center(
                 child: RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     style: TextStyle(
                       fontSize: 14,
                       color: Color(0XFF28A6FF),
@@ -224,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontFamily: 'Inter',
                     ),
                     children: [
-                      const TextSpan(text: "Terms & Condition"),
+                      TextSpan(text: "Terms & Condition"),
                       TextSpan(
                         text: " and ",
                         style: TextStyle(
@@ -233,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const TextSpan(text: "Privacy Policy"),
+                      TextSpan(text: "Privacy Policy"),
                     ],
                   ),
                 ),
@@ -246,14 +268,170 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // helper widgets
+  Widget _emailAutocompleteField({
+    required String hint,
+    required String iconPath,
+  }) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue value) {
+        final raw = value.text;
+        final input = raw.trim();
+
+        if (input.isEmpty) return const Iterable<String>.empty();
+        if (_emailDomains.any((d) => input.toLowerCase() == '${_localPart(input).toLowerCase()}@$d')) {
+          return const Iterable<String>.empty();
+        }
+
+        final atIndex = input.indexOf('@');
+
+        if (atIndex < 0) {
+          
+          if (input.isEmpty) return const Iterable<String>.empty();
+          return _emailDomains.map((d) => '$input@$d');
+        }
+
+        final local = input.substring(0, atIndex);
+        final typedDomain = input.substring(atIndex + 1).toLowerCase();
+
+        if (local.isEmpty) return const Iterable<String>.empty();
+
+        final matches = _emailDomains.where((d) => d.toLowerCase().startsWith(typedDomain));
+        return matches.map((d) => '$local@$d');
+      },
+      onSelected: (String selection) {
+        _emailController?.text = selection;
+        _emailController?.selection = TextSelection.fromPosition(
+          TextPosition(offset: selection.length),
+        );
+      },
+      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+        if (_emailController != controller) {
+          _emailController?.dispose();
+          _emailController = controller;
+        }
+
+        return TextField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          decoration: _inputDecoration(
+            hint: hint,
+            iconPath: iconPath,
+          ),
+          onSubmitted: (_) => onFieldSubmitted(),
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 6,
+            borderRadius: BorderRadius.circular(12),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 220, maxWidth: 600),
+              child: ListView.separated(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: options.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, i) {
+                  final opt = options.elementAt(i);
+                  return InkWell(
+                    onTap: () => onSelected(opt),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      child: Text(
+                        opt,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          color: Color(0XFF151E2F),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _localPart(String emailLike) {
+    final idx = emailLike.indexOf('@');
+    if (idx < 0) return emailLike;
+    return emailLike.substring(0, idx);
+  }
+
+  InputDecoration _inputDecoration({
+    required String hint,
+    required String iconPath,
+    bool isPassword = false,
+    String? suffixIconPath,
+  }) {
+    return InputDecoration(
+      filled: true,
+      fillColor: const Color(0XFFFFFFFF),
+      hintText: hint,
+      hintStyle: const TextStyle(
+        color: Color(0XFF717F9A),
+        fontSize: 16,
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w400,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0XFFDAE0EE), width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: _primaryBlue, width: 1.5),
+      ),
+      prefixIcon: Padding(
+        padding: const EdgeInsets.all(13.5),
+        child: Image.asset(
+          iconPath,
+          width: 24,
+          height: 24,
+          fit: BoxFit.contain,
+          color: const Color(0XFF717F9A),
+        ),
+      ),
+      suffixIcon: isPassword && suffixIconPath != null
+          ? IconButton(
+              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              icon: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  suffixIconPath,
+                  width: 20,
+                  height: 20,
+                  fit: BoxFit.contain,
+                  color: _obscurePassword
+                      ? const Color(0XFF2E3D5B)
+                      : const Color.fromARGB(255, 145, 176, 250),
+                ),
+              ),
+            )
+          : null,
+    );
+  }
 
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 14,
           fontFamily: 'Inter',
           fontWeight: FontWeight.w400,
@@ -266,70 +444,18 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _textField({
     required TextEditingController controller,
     required String hint,
-    required String iconPath, 
+    required String iconPath,
     bool isPassword = false,
     String? suffixIconPath,
   }) {
     return TextField(
       controller: controller,
       obscureText: isPassword ? _obscurePassword : false,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0XFFFFFFFF),
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: Color(0XFF717F9A),
-          fontSize: 16,
-          fontFamily: 'Inter',
-          fontWeight: FontWeight.w400,
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0XFFDAE0EE), width: 1.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: _primaryBlue, width: 1.5),
-        ),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(
-            13.5,
-          ),
-          child: Image.asset(
-            iconPath,
-            width: 24, 
-            height: 24,
-            fit: BoxFit.contain,
-            color: Color(0XFF717F9A),
-          ),
-        ),
-
-     
-        suffixIcon: isPassword && suffixIconPath != null
-            ? IconButton(
-                onPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
-                icon: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset(
-                    suffixIconPath,
-                    width: 20,
-                    height: 20,
-                    fit: BoxFit.contain,
-                  
-                    color: _obscurePassword
-                        ? Color(0XFF2E3D5B)
-                        : const Color.fromARGB(255, 145, 176, 250),
-                  ),
-                ),
-              )
-            : null,
+      decoration: _inputDecoration(
+        hint: hint,
+        iconPath: iconPath,
+        isPassword: isPassword,
+        suffixIconPath: suffixIconPath,
       ),
     );
   }
@@ -344,7 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Color(0Xff343558).withOpacity(0.05),
+              color: const Color(0Xff343558).withOpacity(0.05),
               spreadRadius: 2,
               blurRadius: 20,
               offset: const Offset(0, 4),
@@ -353,12 +479,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: InkWell(
           onTap: () {
+            // TODO: social login
           },
           borderRadius: BorderRadius.circular(12),
           child: Center(
             child: Image.asset(
               imagePath,
-              height: 24, 
+              height: 24,
               fit: BoxFit.contain,
             ),
           ),
