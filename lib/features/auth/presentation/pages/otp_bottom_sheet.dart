@@ -86,7 +86,6 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       ),
     );
 
-    // Theme for when a box is focused (optional: make border blue)
     final focusedPinTheme = defaultPinTheme.copyDecorationWith(
       border: Border.all(color: const Color(0xFF2F5599)),
     );
@@ -101,10 +100,9 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
         ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Wrap content height
+        mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 16),
-          // 1. The Shield Icon
           Image.asset(
             "assets/icons/verify_email/shield.png",
             height: 64,
@@ -112,7 +110,6 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
           ),
           const SizedBox(height: 24),
 
-          // 2. Title
           const Text(
             "Enter Verification Code",
             style: TextStyle(
@@ -124,7 +121,6 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
           ),
           const SizedBox(height: 8),
 
-          // 3. Subtitle with obfuscated email
           Text(
             "Verification code has been send to\n$_obfuscatedEmail",
             textAlign: TextAlign.center,
@@ -138,23 +134,17 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
           ),
           const SizedBox(height: 32),
 
-          // 4. Pinput Fields (The 4 boxes)
           Pinput(
             length: 4,
             controller: _pinController,
             defaultPinTheme: defaultPinTheme,
             focusedPinTheme: focusedPinTheme,
-            // submittedPinTheme: submittedPinTheme, // Optional different style when filled
             pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
             showCursor: true,
-            onCompleted: (pin) {
-              // Optional: Automatically submit when 4 digits are entered
-              // widget.onVerified();
-            },
+            onCompleted: (pin) {},
           ),
           const SizedBox(height: 32),
 
-          // 5. Verify Button (Using your Gradient style)
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -169,8 +159,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
               ),
               child: ElevatedButton(
                 onPressed: () {
-                  // Add logic to check if PIN is correct here
-                  // If correct:
+                  //correct pin
                   widget.onVerified();
                 },
                 style: ElevatedButton.styleFrom(
@@ -194,7 +183,6 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
 
           const SizedBox(height: 24),
 
-          // 6. Resend OTP Timer
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -210,8 +198,8 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
               GestureDetector(
                 onTap: _canResend
                     ? () {
-                        // Add logic to actually resend the OTP API call here
-                        startTimer(); // Restart timer
+                        //resend pin
+                        startTimer();
                       }
                     : null,
                 child: Text(
@@ -234,7 +222,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
                 ),
             ],
           ),
-          // Add bottom padding for safer areas on newer phones
+
           SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 16),
         ],
       ),

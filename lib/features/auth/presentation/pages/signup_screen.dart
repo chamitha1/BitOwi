@@ -89,29 +89,23 @@ class _SignupScreenState extends State<SignupScreen> {
                       bottom: 8.0,
                     ),
                     child: _verifyButton(
-                      text: "Verify",
+                      text: _isEmailVerified ? "Verified" : "Verify",
+                      isVerified: _isEmailVerified,
                       isEnabled: _isEmailPopulated,
                       onPressed: () {
                         if (_isEmailPopulated) {
-                          // Close keyboard first
                           FocusScope.of(context).unfocus();
 
-                          // SHOW THE BOTTOM SHEET
                           showModalBottomSheet(
                             context: context,
-                            isScrollControlled:
-                                true, // Allows the sheet to rise with keyboard
-                            backgroundColor: Colors
-                                .transparent, // Let the sheet define its own corners
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
                             barrierColor: Color(0xffECEFF5).withOpacity(0.7),
                             builder: (context) => OtpBottomSheet(
-                              email: _emailController
-                                  .text, // Pass the actual email typed
+                              email: _emailController.text,
                               onVerified: () {
-                                // Close the bottom sheet
                                 Navigator.pop(context);
 
-                                // Update state in parent screen
                                 setState(() {
                                   _isEmailVerified = true;
                                 });
@@ -378,39 +372,71 @@ class _SignupScreenState extends State<SignupScreen> {
     required String text,
     required VoidCallback onPressed,
     required bool isEnabled,
+    bool isVerified = false,
   }) {
     return Container(
       margin: const EdgeInsets.only(right: 8),
       height: 30,
       decoration: BoxDecoration(
-        gradient: isEnabled
+        color: isVerified
+            ? const Color(0xff2ECC71)
+            : (isEnabled ? null : const Color(0XFFB9C6E2)),
+
+        gradient: (isEnabled && !isVerified)
             ? const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [Color(0xFF1D5DE5), Color(0xFF174AB7)],
               )
             : null,
-        color: isEnabled ? null : const Color(0XFFB9C6E2),
+
         borderRadius: BorderRadius.circular(8),
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           foregroundColor: Colors.white,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: isVerified ? 8 : 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+
+          disabledBackgroundColor: Colors.transparent,
+          disabledForegroundColor: Colors.white,
         ),
-        onPressed: isEnabled ? onPressed : null,
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Inter',
-            color: Color(0XFFFFFFFF),
-          ),
-        ),
+
+        onPressed: (isEnabled && !isVerified) ? onPressed : null,
+
+        child: isVerified
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    "assets/icons/sign_up/check_circle.png",
+                    width: 20,
+                    height: 20,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    text,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Inter',
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: 'Inter',
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }
