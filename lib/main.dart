@@ -1,3 +1,4 @@
+import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'features/onboarding/presentation/pages/onboarding_screen.dart';

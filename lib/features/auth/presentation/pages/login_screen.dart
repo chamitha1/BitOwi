@@ -1,5 +1,6 @@
 import 'package:BitDo/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:BitDo/features/auth/presentation/pages/signup_screen.dart';
+import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -153,7 +154,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     debugPrint('Email: $email');
                     debugPrint('Pass: $pass');
 
-                    // call login API
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
