@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../wallet/presentation/pages/deposit_screen.dart';
 
 class WalletCard extends StatefulWidget {
   const WalletCard({super.key});
@@ -99,6 +100,14 @@ class _WalletCardState extends State<WalletCard> {
                 child: _walletActionButton(
                   "Deposit",
                   "assets/icons/home/deposit.png",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DepositScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 16),
@@ -179,36 +188,39 @@ class _WalletCardState extends State<WalletCard> {
     );
   }
 
-  Widget _walletActionButton(String text, String iconPath) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: Color(0xff1D5DE5),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1D5DE5).withOpacity(0.3),
-            offset: const Offset(0, 4),
-            blurRadius: 24,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(iconPath, width: 20, height: 20),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              fontFamily: 'Inter',
+  Widget _walletActionButton(String text, String iconPath, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xff1D5DE5),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1D5DE5).withOpacity(0.3),
+              offset: const Offset(0, 4),
+              blurRadius: 24,
+              spreadRadius: 0,
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(iconPath, width: 20, height: 20),
+            const SizedBox(width: 8),
+            Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

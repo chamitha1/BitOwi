@@ -66,10 +66,12 @@
       - assets/images/onboarding/
       - assets/images/login/
       - assets/images/home/
+      - assets/images/deposit/
       - assets/icons/login/
       - assets/icons/sign_up/
       - assets/icons/verify_email/
       - assets/icons/home/
+      - assets/icons/deposit/
       
 
     # An image asset can refer to one or more resolution-specific "variants", see
