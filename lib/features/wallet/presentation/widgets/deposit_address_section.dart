@@ -41,9 +41,9 @@ class DepositAddressSection extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
+                margin: const EdgeInsets.symmetric(horizontal: 5),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 25,
+                  horizontal: 18,
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(

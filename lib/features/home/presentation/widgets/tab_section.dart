@@ -111,8 +111,8 @@ class _TabSectionState extends State<TabSection> {
           const SizedBox(height: 20),
 
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            padding: const EdgeInsets.all(20),
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsetsGeometry.fromLTRB(10, 18, 10, 18),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               border: Border.all(width: 0.72, color: const Color(0xffECEFF5)),
@@ -152,7 +152,7 @@ class _TabSectionState extends State<TabSection> {
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: 12,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
