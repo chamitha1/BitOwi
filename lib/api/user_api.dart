@@ -4,21 +4,6 @@ import 'package:BitDo/features/auth/presentation/pages/signup_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/src/extensions/dynamic_extensions.dart';
 import 'package:BitDo/constants/sms_constants.dart';
-// Future<Map<String, dynamic>> sendOtp(String email) async {
-//   try {
-//     final res = await ApiClient.dio.post(
-//       '/cuser/public/send_email_code',
-//       data: {
-//         'email': email,
-//         'type': 'register',
-//       },
-//     );
-//     return res.data;
-//   } catch (e) {
-//     print(e);
-//     rethrow;
-//   }
-// }
 
 //Login API
 Future<LoginScreen> login({
@@ -116,18 +101,3 @@ Future<bool> verifyOtp({
   }
 }
 
-// Future<LoginScreen> login({
-//   required String loginName,
-//   required String loginPwd,
-// }) async {
-//   try {
-//     final res = await HttpUtil.post('/cuser/public/login', {
-//       'loginName': loginName,
-//       'loginPwd': loginPwd,
-//     });
-//     return login.fromJson(CommonUtils.removeNullKeys(res));
-//   } catch (e) {
-//     e.printError();
-//     rethrow;
-//   }
-// }
