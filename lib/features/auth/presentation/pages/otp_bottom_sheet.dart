@@ -282,12 +282,23 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
+              // GestureDetector(
+              //   onTap: (_canResend && !_isResending) ? _resend : null,
+              //   child: Text(
+              //     _isResending ? "Resending..." : "Resend OTP",
+              //     style: TextStyle(
+              //       color: _canResend ? const Color(0xff6545D0) : Colors.grey,
+              //       fontWeight: FontWeight.w400,
+              //       fontSize: 14,
+              //     ),
+              //   ),
+              // ),
               GestureDetector(
                 onTap: (_canResend && !_isResending) ? _resend : null,
                 child: Text(
                   _isResending ? "Resending..." : "Resend OTP",
-                  style: TextStyle(
-                    color: _canResend ? const Color(0xff6545D0) : Colors.grey,
+                  style: const TextStyle(
+                    color: Color(0xFF1D5DE5),
                     fontWeight: FontWeight.w400,
                     fontSize: 14,
                   ),
