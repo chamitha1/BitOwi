@@ -33,6 +33,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String? _emailErrorText;
   String? _passwordErrorText;
+  String? _verifiedOtp; // Store captured OTP
 
   bool _sendingOtp = false;
   bool _signingUp = false;
@@ -163,7 +164,9 @@ class _SignupScreenState extends State<SignupScreen> {
             //   smsCode: pin,
             // );
 
-            return true; // TEMP
+            // Store the OTP entered by the user
+            _verifiedOtp = pin;
+            return true; // Proceed with this OTP
           },
 
           // ✅ resend api
@@ -214,7 +217,7 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       final token = await userApi.signup(
         email: _emailController.text.trim(),
-        smsCode: "8888",
+        smsCode: _verifiedOtp ?? "", // Use captured OTP
         loginPwd: _passController.text.trim(),
         inviteCode: _inviteController.text.trim().isEmpty
             ? null
