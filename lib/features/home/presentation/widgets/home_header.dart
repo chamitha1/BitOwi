@@ -1,32 +1,37 @@
+import 'package:BitDo/features/auth/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:BitDo/core/storage/storage_service.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<UserController>();
+
     return Row(
       children: [
-        CircleAvatar(
+        const CircleAvatar(
           radius: 22,
-          backgroundImage: const AssetImage("assets/images/home/avatar.png"),
+          backgroundImage: AssetImage("assets/images/home/avatar.png"),
           backgroundColor: Color(0xffD9D9D9),
         ),
         const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Hi, Jonathan",
-              style: TextStyle(
+            Obx(() => Text(
+              "Hi, ${controller.userName.value}",
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
                 color: Color(0XFF332C3B),
                 fontFamily: 'Inter',
               ),
-            ),
+            )),
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 text: 'Welcome to  ',
                 style: TextStyle(
                   fontFamily: 'Poppins',
@@ -34,7 +39,7 @@ class HomeHeader extends StatelessWidget {
                   fontSize: 14,
                   color: Color(0xff83869D),
                 ),
-                children: const <TextSpan>[
+                children: <TextSpan>[
                   TextSpan(
                     text: 'BitDo',
                     style: TextStyle(

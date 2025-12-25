@@ -1,4 +1,5 @@
 import 'package:BitDo/config/api_client.dart';
+import 'package:BitDo/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitDo/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:BitDo/features/auth/presentation/pages/signup_screen.dart';
 import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
@@ -40,7 +41,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     _passwordController.dispose();
-    _emailController?.dispose();
     super.dispose();
   }
 
@@ -80,10 +80,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      // Inject dependency before navigation
+      Get.put(UserController());
+
+      Get.offAll(() => const HomeScreen());
     } catch (e) {
       // ignore: avoid_print
       print('Login error: $e');
@@ -399,7 +399,6 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
         if (_emailController != controller) {
-          _emailController?.dispose();
           _emailController = controller;
         }
 

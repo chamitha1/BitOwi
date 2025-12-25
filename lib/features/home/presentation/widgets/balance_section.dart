@@ -1,6 +1,9 @@
 import 'package:BitDo/features/wallet/presentation/pages/balance_history_page.dart';
 import 'package:BitDo/features/wallet/presentation/pages/transaction_history_page.dart';
 import 'package:flutter/material.dart';
+import 'package:BitDo/api/account_api.dart';
+import 'package:BitDo/models/account_detail_res.dart';
+import 'package:BitDo/core/storage/storage_service.dart';
 
 class BalanceSection extends StatefulWidget {
   const BalanceSection({super.key});
@@ -11,6 +14,15 @@ class BalanceSection extends StatefulWidget {
 
 class _BalanceSectionState extends State<BalanceSection> {
   bool _hideSmallAssets = false;
+  AccountDetailAssetRes? _balanceData;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,34 +105,121 @@ class _BalanceSectionState extends State<BalanceSection> {
           ),
           child: Column(
             children: [
-              _assetItem(
-                icon: "assets/images/home/bitcoin.png",
-                name: "Bit Coin",
-                total: "1,378,378,489",
-                frozen: "1,273,473,438",
-                usdtVal: "1,133,483,432",
-              ),
-              const Divider(height: 32, color: Color(0xFFF1F5F9)),
-              _assetItem(
-                icon: "assets/images/home/eth.png",
-                name: "Ethereum",
-                total: "3,378,483,426",
-                frozen: "2,435,489,238",
-                usdtVal: "2,178,754,326",
-              ),
-              const Divider(height: 32, color: Color(0xFFF1F5F9)),
-              _assetItem(
-                icon: "assets/images/home/binance.png",
-                name: "Binance",
-                total: "4,437,483,483",
-                frozen: "2,782,739,293",
-                usdtVal: "2,657,594,358",
-              ),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (_errorMessage != null)
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        "Error: $_errorMessage",
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      TextButton(
+                        onPressed: _fetchBalance,
+                        child: const Text("Retry"),
+                      )
+                    ],
+                  ),
+                )
+              else if (_balanceData != null)
+                ..._buildAssetList(),
             ],
           ),
         ),
       ],
     );
+  }
+
+  List<Widget> _buildAssetList() {
+    if (_balanceData == null) return [];
+
+    final list = _balanceData!.accountList.where((item) {
+      if (_hideSmallAssets) {
+        return item.microFlag != '1';
+      }
+      return true;
+    }).toList();
+
+    if (list.isEmpty) {
+      return [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Center(
+            child: Text(
+              "No assets found",
+              style: TextStyle(color: Color(0xff454F63)),
+            ),
+          ),
+        )
+      ];
+    }
+
+    return List.generate(list.length, (index) {
+      final item = list[index];
+      return Column(
+        children: [
+          _assetItem(
+            icon: item.icon,
+            name: item.currency,
+            total: item.usableAmount,
+            frozen: item.frozenAmount,
+            usdtVal: item.totalAsset, 
+          ),
+          if (index < list.length - 1)
+            const Divider(height: 32, color: Color(0xFFF1F5F9)),
+        ],
+      );
+    });
+  }
+
+  Widget _buildNetworkImage(String url) {
+    if (url.isEmpty) {
+        return Container(
+            width: 24,
+            height: 24,
+            decoration: const BoxDecoration(
+                color: Color(0xFFF0F0F0),
+                shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.currency_bitcoin, size: 16, color: Colors.grey),
+        );
+    }
+    return Image.network(
+        url,
+        width: 24,
+        height: 24,
+        errorBuilder: (context, error, stackTrace) {
+            return Container(
+                width: 24,
+                height: 24,
+                decoration: const BoxDecoration(
+                    color: Color(0xFFF0F0F0),
+                    shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.error_outline, size: 16, color: Colors.grey),
+            );
+        },
+    );
+  }
+
+  Future<void> _fetchBalance() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final res = await AccountApi.getBalanceAccount(
+        assetCurrency: await StorageService.getCurrency(),
+      );
+
+      _balanceData = res;
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Widget _assetItem({
@@ -135,7 +234,7 @@ class _BalanceSectionState extends State<BalanceSection> {
       children: [
         Row(
           children: [
-            Image.asset(icon, width: 24, height: 24),
+            _buildNetworkImage(icon),
             const SizedBox(width: 8),
             Text(
               name,

@@ -1,8 +1,12 @@
 import 'package:BitDo/models/account_detail_res.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../wallet/presentation/pages/deposit_screen.dart';
 import '../../../wallet/presentation/pages/withdrawal_page.dart';
 import 'package:BitDo/api/account_api.dart';
+import 'package:BitDo/core/storage/storage_service.dart';
+import 'package:BitDo/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitDo/core/storage/storage_service.dart';
 
 class WalletCard extends StatefulWidget {
   const WalletCard({super.key});
@@ -14,6 +18,7 @@ class WalletCard extends StatefulWidget {
 class _WalletCardState extends State<WalletCard> {
   String _selectedCurrency = "USD";
   bool _isObscured = false;
+  late String _userName;
 
   @override
   void initState() {
@@ -197,14 +202,27 @@ class _WalletCardState extends State<WalletCard> {
 
     try {
       final res = await AccountApi.getBalanceAccount(
-        assetCurrency: _selectedCurrency, // Use selected currency
+        assetCurrency:
+            await StorageService.getCurrency(), 
       );
 
       print("Total Amount: ${res.totalAmount}");
       print("Total Asset: ${res.totalAsset}");
       print("Account List length: ${res.accountList.length}");
 
-      setState(() => _balanceData = res);
+      setState(() {
+        _balanceData = res;
+      });
+
+      if (res.accountList.isNotEmpty) {
+        final accNum = res.accountList.first.accountNumber;
+        await StorageService.saveAccountNumber(accNum);
+
+        // Update reactive state
+        try {
+          Get.find<UserController>().setUserName(accNum);
+        } catch (_) {}
+      }
     } catch (e) {
       print("Fetch Balance ERROR!- $e");
       setState(() => _errorMessage = e.toString());

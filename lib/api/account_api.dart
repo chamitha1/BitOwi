@@ -10,7 +10,7 @@ class AccountApi {
         '/account/balance_account',
         data: {'accountType': '4', 'assetCurrency': assetCurrency},
       );
-
+      print(res.data);
       return AccountDetailAssetRes.fromJson(res.data as Map<String, dynamic>);
     } catch (e) {
       print("GetBalanceAccount erroe: $e");

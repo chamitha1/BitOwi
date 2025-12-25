@@ -65,7 +65,7 @@ class UserApi {
 
       final data = response.data as Map<String, dynamic>;
       if (data['code'] == 200 ||
-          data['code'] == '200' || // Sometimes string
+          data['code'] == '200' || 
           data['errorCode'] == 'Success' ||
           data['errorCode'] == 'SUCCESS') {
         return true;
