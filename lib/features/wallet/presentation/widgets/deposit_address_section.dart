@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class DepositAddressSection extends StatelessWidget {
   final String address;
 
-  const DepositAddressSection({
-    super.key,
-    required this.address,
-  });
+  const DepositAddressSection({super.key, required this.address});
 
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: address));
@@ -50,11 +49,19 @@ class DepositAddressSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Image.asset(
-                "assets/icons/deposit/qr.png",
-                width: 200,
-                fit: BoxFit.contain,
-              ),
+              if (address.isNotEmpty)
+                QrImageView(
+                  data: address,
+                  version: QrVersions.auto,
+                  size: 200,
+                  backgroundColor: Colors.white,
+                )
+              else
+                Image.asset(
+                  "assets/icons/deposit/qr.png",
+                  width: 200,
+                  fit: BoxFit.contain,
+                ),
               const SizedBox(height: 18),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -91,10 +98,10 @@ class DepositAddressSection extends StatelessWidget {
                     const SizedBox(width: 10),
                     InkWell(
                       onTap: () => _copyToClipboard(context),
-                      child: Image.asset(
-                        "assets/icons/deposit/copy.png",
-                        width: 20,
-                        height: 20,
+                      child: SvgPicture.asset(
+                        "assets/icons/deposit/copy.svg",
+                        width: 18,
+                        height: 18,
                       ),
                     ),
                   ],

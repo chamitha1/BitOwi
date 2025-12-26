@@ -1,5 +1,6 @@
 import 'package:BitDo/config/api_client.dart';
 import 'package:BitDo/models/account_detail_res.dart';
+import 'package:BitDo/models/chain_symbol_list_res.dart';
 
 class AccountApi {
   static Future<AccountDetailAssetRes> getBalanceAccount({
@@ -34,6 +35,39 @@ class AccountApi {
       // return AccountDetailAssetRes.fromJson(res.data as Map<String, dynamic>);
     } catch (e) {
       print("GetBalanceAccount erroe: $e");
+      rethrow;
+    }
+  }
+
+  static Future<List<ChainSymbolListRes>> getChainSymbolList({
+    String chargeFlag = '',
+    String withdrawFlag = '',
+  }) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/chain_symbol/list_front',
+        data: {"chargeFlag": chargeFlag, "withdrawFlag": withdrawFlag},
+      );
+      List<ChainSymbolListRes> list = (res.data['data'] as List<dynamic>)
+          .map((item) => ChainSymbolListRes.fromJson(item))
+          .toList();
+      return list;
+    } catch (e) {
+      print("getChainSymbolList error: $e");
+      rethrow;
+    }
+  }
+
+  //Deposit Address
+  static Future<String> getChainAddress(String symbol) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/xaccount/get_chain_address',
+        data: {"symbol": symbol},
+      );
+      return res.data['data']["address"];
+    } catch (e) {
+      print("getChainAddress error: $e");
       rethrow;
     }
   }
@@ -402,41 +436,7 @@ class AccountApi {
   //   // }
   // }
 
-  // /// 📝TODO
-  // static Future<List<ChainSymbolListRes>> getChainSymbolList({
-  //   String chargeFlag = '',
-  //   String withdrawFlag = '',
-  // }) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post('/core/v1/chain_symbol/list_front', {
-  //   //     "chargeFlag": chargeFlag,
-  //   //     "withdrawFlag": withdrawFlag,
-  //   //   });
-  //   //   List<ChainSymbolListRes> list = (res as List<dynamic>)
-  //   //       .map(
-  //   //         (item) =>
-  //   //             ChainSymbolListRes.fromJson(CommonUtils.removeNullKeys(item)),
-  //   //       )
-  //   //       .toList();
-  //   //   return list;
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
-
-  // /// 📝TODO
-  // static Future<String> getChainAddress(String symbol) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post('/core/v1/xaccount/get_chain_address', {
-  //   //     "symbol": symbol,
-  //   //   });
-  //   //   return res["address"];
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
+  ///
 
   // /// /📝TODO
   // static Future<WithdrawRuleDetailRes> getWithdrawRuleDetail(

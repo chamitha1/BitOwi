@@ -1,5 +1,7 @@
+import 'package:BitDo/features/wallet/presentation/controllers/deposit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import '../widgets/coin_selector_card.dart';
 import 'transaction_history_page.dart';
 import '../widgets/deposit_address_section.dart';
@@ -10,7 +12,7 @@ class DepositScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String depositAddress = "498P4J49pd4784H378DSp49";
+    final controller = Get.put(DepositController());
 
     return Scaffold(
       backgroundColor: const Color(0xffF6F9FF),
@@ -82,7 +84,12 @@ class DepositScreen extends StatelessWidget {
                   children: [
                     const CoinSelectorCard(),
                     const SizedBox(height: 16),
-                    const DepositAddressSection(address: depositAddress),
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                         return const Center(child: CircularProgressIndicator());
+                      }
+                      return DepositAddressSection(address: controller.depositAddress.value);
+                    }),
                     const SizedBox(height: 35),
                     const FriendlyReminderCard(),
                     const SizedBox(height: 35),
@@ -121,7 +128,7 @@ class DepositScreen extends StatelessWidget {
                           child: InkWell(
                             onTap: () {
                               Clipboard.setData(
-                                const ClipboardData(text: depositAddress),
+                                ClipboardData(text: controller.depositAddress.value),
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
