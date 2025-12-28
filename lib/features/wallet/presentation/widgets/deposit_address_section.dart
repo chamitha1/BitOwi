@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 
 class DepositAddressSection extends StatelessWidget {
   final String address;
+  final ScreenshotController? screenshotController;
 
-  const DepositAddressSection({super.key, required this.address});
+  const DepositAddressSection({
+    super.key, 
+    required this.address,
+    this.screenshotController,
+  });
 
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: address));
@@ -50,12 +56,27 @@ class DepositAddressSection extends StatelessWidget {
           child: Column(
             children: [
               if (address.isNotEmpty)
-                QrImageView(
-                  data: address,
-                  version: QrVersions.auto,
-                  size: 200,
-                  backgroundColor: Colors.white,
-                )
+                if (screenshotController != null)
+                   Screenshot(
+                      controller: screenshotController!,
+                      child: Container(
+                        color: Colors.white, // Ensure white background for screenshot
+                        padding: const EdgeInsets.all(10), 
+                        child: QrImageView(
+                          data: address,
+                          version: QrVersions.auto,
+                          size: 200,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                   )
+                else
+                  QrImageView(
+                    data: address,
+                    version: QrVersions.auto,
+                    size: 200,
+                    backgroundColor: Colors.white,
+                  )
               else
                 Image.asset(
                   "assets/icons/deposit/qr.png",

@@ -1,6 +1,11 @@
+import 'dart:typed_data';
 import 'package:BitDo/api/account_api.dart';
 import 'package:BitDo/models/chain_symbol_list_res.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gal/gal.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:screenshot/screenshot.dart';
 
 class DepositController extends GetxController {
   var isLoading = false.obs;
@@ -52,5 +57,36 @@ class DepositController extends GetxController {
   void onCoinSelected(ChainSymbolListRes coin) {
     selectedCoin.value = coin;
     fetchAddress();
+  }
+
+  final ScreenshotController screenshotController = ScreenshotController();
+
+  Future<void> saveQrCode(BuildContext context) async {
+    if (depositAddress.isEmpty) return;
+
+    try {
+      // Check for access permissions
+      final hasAccess = await Gal.hasAccess();
+      if (!hasAccess) {
+        await Gal.requestAccess();
+      }
+
+      final Uint8List? image = await screenshotController.capture();
+      if (image != null) {
+        await Gal.putImageBytes(
+          image,
+          name: "deposit_qr_${selectedCoin.value?.symbol ?? 'code'}",
+        );
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("QR Code saved to gallery!")),
+        );
+      }
+    } catch (e) {
+      print("Error saving image: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving image: $e")),
+      );
+    }
   }
 }

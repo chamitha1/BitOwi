@@ -88,7 +88,10 @@ class DepositScreen extends StatelessWidget {
                       if (controller.isLoading.value) {
                          return const Center(child: CircularProgressIndicator());
                       }
-                      return DepositAddressSection(address: controller.depositAddress.value);
+                      return DepositAddressSection(
+                        address: controller.depositAddress.value,
+                        screenshotController: controller.screenshotController,
+                      );
                     }),
                     const SizedBox(height: 35),
                     const FriendlyReminderCard(),
@@ -98,7 +101,9 @@ class DepositScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              controller.saveQrCode(context);
+                            },
                             child: Container(
                               height: 52,
                               decoration: BoxDecoration(
