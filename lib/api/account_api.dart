@@ -1,6 +1,8 @@
 import 'package:BitDo/config/api_client.dart';
+import 'package:BitDo/models/account.dart';
 import 'package:BitDo/models/account_detail_res.dart';
 import 'package:BitDo/models/chain_symbol_list_res.dart';
+import 'package:BitDo/models/withdraw_rule_detail_res.dart';
 
 class AccountApi {
   static Future<AccountDetailAssetRes> getBalanceAccount({
@@ -296,18 +298,18 @@ class AccountApi {
   // }
 
   /// 📝TODO
-  // static Future<Account> getDetailAccount(String currency) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post('/core/v1/account/detailByUser', {
-  //   //     'accountType': '4',
-  //   //     'currency': currency,
-  //   //   });
-  //   //   return Account.fromJson(CommonUtils.removeNullKeys(res));
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
+  static Future<Account> getDetailAccount(String currency) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/account/detailByUser',
+        data: {'accountType': '4', 'currency': currency},
+      );
+      return Account.fromJson(res.data['data']);
+    } catch (e) {
+      print("getDetailAccount error: $e");
+      rethrow;
+    }
+  }
 
   // /// 📝TODO
   // static Future<PageInfo<Jour>> getJourPageList(
@@ -439,38 +441,39 @@ class AccountApi {
   ///
 
   // /// /📝TODO
-  // static Future<WithdrawRuleDetailRes> getWithdrawRuleDetail(
-  //   String symbol,
-  // ) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post('/core/v1/withdraw_rule/detail_front', {
-  //   //     "symbol": symbol,
-  //   //   });
-  //   //   return WithdrawRuleDetailRes.fromJson(CommonUtils.removeNullKeys(res));
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
+  static Future<WithdrawRuleDetailRes> getWithdrawRuleDetail(
+    String symbol,
+  ) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/withdraw_rule/detail_front',
+        data: {"symbol": symbol},
+      );
+      return WithdrawRuleDetailRes.fromJson(res.data['data']);
+    } catch (e) {
+      print("getWithdrawRuleDetail error: $e");
+      rethrow;
+    }
+  }
 
   /// 📝TODO
   static Future<void> withdrawCheck(Map<String, dynamic> params) async {
-    // try {
-    //   await HttpUtil.post('/core/v1/withdraw/check', params);
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+    try {
+      await ApiClient.dio.post('/withdraw/check', data: params);
+    } catch (e) {
+      print("withdrawCheck error: $e");
+      rethrow;
+    }
   }
 
   /// 📝TODO
   static Future<void> createWithdraw(Map<String, dynamic> params) async {
-    // try {
-    //   await HttpUtil.post('/core/v1/withdraw/create', params);
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+    try {
+      await ApiClient.dio.post('/withdraw/create', data: params);
+    } catch (e) {
+      print("createWithdraw error: $e");
+      rethrow;
+    }
   }
 
   /// 📝TODO
