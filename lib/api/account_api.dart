@@ -8,7 +8,7 @@ class AccountApi {
   }) async {
     try {
       final res = await ApiClient.dio.post(
-        '/account/balance_account',
+        '/core/v1/account/balance_account',
         data: {'accountType': '4', 'assetCurrency': assetCurrency},
       );
       print("Get Balance Response ${res.data}");
@@ -45,7 +45,7 @@ class AccountApi {
   }) async {
     try {
       final res = await ApiClient.dio.post(
-        '/chain_symbol/list_front',
+        '/core/v1/chain_symbol/list_front',
         data: {"chargeFlag": chargeFlag, "withdrawFlag": withdrawFlag},
       );
       List<ChainSymbolListRes> list = (res.data['data'] as List<dynamic>)
@@ -62,7 +62,7 @@ class AccountApi {
   static Future<String> getChainAddress(String symbol) async {
     try {
       final res = await ApiClient.dio.post(
-        '/xaccount/get_chain_address',
+        '/core/v1/xaccount/get_chain_address',
         data: {"symbol": symbol},
       );
       return res.data['data']["address"];
