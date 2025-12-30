@@ -56,7 +56,7 @@ class HomeHeader extends StatelessWidget {
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: 'BitDo',
+                    text: 'BitOwi',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
