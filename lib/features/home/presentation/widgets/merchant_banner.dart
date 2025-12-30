@@ -1,4 +1,4 @@
-import 'package:BitDo/features/merchant/presentation/pages/become_merchant_page.dart';
+import 'package:BitOwi/features/merchant/presentation/pages/become_merchant_page.dart';
 import 'package:flutter/material.dart';
 
 class MerchantBanner extends StatelessWidget {

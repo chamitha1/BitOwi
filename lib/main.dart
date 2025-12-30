@@ -9,11 +9,11 @@ import 'l10n/translations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(const BitDo());
+  runApp(const BitOwi());
 }
 
-class BitDo extends StatelessWidget {
-  const BitDo({super.key});
+class BitOwi extends StatelessWidget {
+  const BitOwi({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,13 @@
-import 'package:BitDo/api/user_api.dart';
-import 'package:BitDo/constants/sms_constants.dart';
-import 'package:BitDo/core/widgets/gradient_button.dart';
-import 'package:BitDo/features/auth/presentation/pages/login_screen.dart';
-import 'package:BitDo/features/auth/presentation/pages/otp_bottom_sheet.dart';
-import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
+import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/gradient_button.dart';
+import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
+import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
+import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:BitDo/core/storage/storage_service.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -104,7 +104,9 @@ class _SignupScreenState extends State<SignupScreen> {
       return false;
     }
     if (pass.length < 6) {
-      setState(() => _passwordErrorText = "Password must be at least 6 characters");
+      setState(
+        () => _passwordErrorText = "Password must be at least 6 characters",
+      );
       return false;
     }
     if (confirm.isEmpty) {
@@ -187,7 +189,6 @@ class _SignupScreenState extends State<SignupScreen> {
           },
         ),
       );
-
     } catch (e) {
       if (!mounted) return;
       _toast("OTP send failed: $e");
@@ -228,18 +229,18 @@ class _SignupScreenState extends State<SignupScreen> {
       print('Signup response: $resData');
 
       if (resData['code'] == 200 || resData['code'] == '200') {
-         final tokenData = resData['data'] as Map<String, dynamic>;
-         final token = tokenData['token'] as String? ?? '';
-         
-         await StorageService.saveToken(token);
-         await StorageService.saveUserName(_emailController.text.trim());
-         
-         if (!mounted) return;
+        final tokenData = resData['data'] as Map<String, dynamic>;
+        final token = tokenData['token'] as String? ?? '';
 
-         Navigator.pushReplacement(
+        await StorageService.saveToken(token);
+        await StorageService.saveUserName(_emailController.text.trim());
+
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
-         );
+        );
       } else {
         _toast("Signup failed: ${resData['errorMsg']}");
       }
@@ -294,7 +295,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     bottom: 8.0,
                   ),
                   child: _verifyButton(
-                    text: _isEmailVerified ? "Verified" : (_sendingOtp ? "Sending..." : "Verify"),
+                    text: _isEmailVerified
+                        ? "Verified"
+                        : (_sendingOtp ? "Sending..." : "Verify"),
                     isEnabled: _isEmailPopulated && !_sendingOtp,
                     isVerified: _isEmailVerified,
                     onPressed: _openOtpSheet,
@@ -512,7 +515,9 @@ class _SignupScreenState extends State<SignupScreen> {
         final typedDomain = input.substring(atIndex + 1).toLowerCase();
         if (local.isEmpty) return const Iterable<String>.empty();
 
-        final matches = _emailDomains.where((d) => d.toLowerCase().startsWith(typedDomain));
+        final matches = _emailDomains.where(
+          (d) => d.toLowerCase().startsWith(typedDomain),
+        );
         return matches.map((d) => '$local@$d');
       },
       onSelected: (String selection) {
@@ -645,7 +650,9 @@ class _SignupScreenState extends State<SignupScreen> {
               padding: const EdgeInsets.only(right: 4.0),
               child: IconButton(
                 onPressed: enabled
-                    ? () => setState(() => _isPasswordVisible = !_isPasswordVisible)
+                    ? () => setState(
+                        () => _isPasswordVisible = !_isPasswordVisible,
+                      )
                     : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),

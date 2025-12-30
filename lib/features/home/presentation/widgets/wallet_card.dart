@@ -1,4 +1,4 @@
-import 'package:BitDo/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../wallet/presentation/pages/deposit_screen.dart';
@@ -12,7 +12,6 @@ class WalletCard extends StatefulWidget {
 }
 
 class _WalletCardState extends State<WalletCard> {
-
   final BalanceController controller = Get.put(BalanceController());
 
   bool _isObscured = false;
@@ -85,7 +84,8 @@ class _WalletCardState extends State<WalletCard> {
                       MaterialPageRoute(
                         builder: (context) => WithdrawalPage(
                           symbol: controller.selectedAsset?.currency ?? '',
-                          accountNumber: controller.selectedAsset?.accountNumber ?? '',
+                          accountNumber:
+                              controller.selectedAsset?.accountNumber ?? '',
                         ),
                       ),
                     );
@@ -115,11 +115,10 @@ class _WalletCardState extends State<WalletCard> {
       }
 
       final asset = controller.selectedAsset;
-    
+
       final totalAmount = asset?.totalAmount ?? '0.00';
       final totalAsset = asset?.totalAsset ?? '0.00';
-      final totalAssetCurrency =
-          asset?.totalAssetCurrency ?? 'USDT'; 
+      final totalAssetCurrency = asset?.totalAssetCurrency ?? 'USDT';
 
       return Column(
         children: [
@@ -264,7 +263,6 @@ class _WalletCardState extends State<WalletCard> {
 
   Widget _buildNetworkImage(String url) {
     if (url.isEmpty || !url.startsWith('http')) {
-    
       return Container(
         width: 24,
         height: 24,

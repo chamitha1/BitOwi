@@ -1,6 +1,6 @@
 {
-    "name": "BitDo",
-    "short_name": "BitDo",
+    "name": "BitOwi",
+    "short_name": "BitOwi",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

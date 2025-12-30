@@ -1,12 +1,12 @@
-import 'package:BitDo/constants/sms_constants.dart';
-import 'package:BitDo/features/auth/presentation/pages/otp_bottom_sheet.dart';
-import 'package:BitDo/features/wallet/presentation/controllers/withdraw_controller.dart';
-import 'package:BitDo/features/wallet/presentation/pages/balance_history_page.dart';
-import 'package:BitDo/features/wallet/presentation/pages/transaction_history_page.dart';
-import 'package:BitDo/features/wallet/presentation/widgets/success_dialog.dart';
-import 'package:BitDo/core/storage/storage_service.dart';
+import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
+import 'package:BitOwi/features/wallet/presentation/controllers/withdraw_controller.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/transaction_history_page.dart';
+import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:BitDo/features/wallet/presentation/pages/qr_scanner_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/qr_scanner_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:get/get.dart';
@@ -26,8 +26,8 @@ class WithdrawalPage extends StatefulWidget {
 }
 
 class _WithdrawalPageState extends State<WithdrawalPage> {
-  // final TextEditingController _addressController = TextEditingController(); 
-  // final TextEditingController _amountController = TextEditingController(); 
+  // final TextEditingController _addressController = TextEditingController();
+  // final TextEditingController _amountController = TextEditingController();
   final WithdrawController controller = Get.put(WithdrawController());
 
   double _fee = 0.00;
@@ -100,7 +100,7 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, 
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: const Color(0xFF000000).withOpacity(0.4),
       builder: (context) => OtpBottomSheet(
@@ -109,8 +109,8 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
         bizType: SmsBizType.withdraw,
 
         onVerifyPin: (pin) async {
-           controller.emailController.text = pin;
-           return await controller.finalizeWithdrawal(pin);
+          controller.emailController.text = pin;
+          return await controller.finalizeWithdrawal(pin);
         },
 
         onResend: () async {
@@ -162,7 +162,7 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: controller.addrController, 
+                      controller: controller.addrController,
                       onChanged: (_) => setState(() {}),
                       decoration: InputDecoration(
                         filled: true,
@@ -215,7 +215,9 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                               onTap: () async {
                                 var status = await Permission.camera.request();
                                 if (status.isGranted) {
-                                  final result = await Get.to(() => const QrScannerPage());
+                                  final result = await Get.to(
+                                    () => const QrScannerPage(),
+                                  );
                                   if (result != null && result is String) {
                                     controller.updateAddressFromScan(result);
                                   }
@@ -276,7 +278,7 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: controller.amountController, 
+                      controller: controller.amountController,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
@@ -379,7 +381,7 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: controller.tradeController, 
+                      controller: controller.tradeController,
                       onChanged: (_) => setState(() {}),
                       obscureText: _isPasswordObscure,
                       decoration: InputDecoration(

@@ -1,5 +1,5 @@
-import 'package:BitDo/features/merchant/presentation/widgets/reminder_card.dart';
-import 'package:BitDo/features/merchant/presentation/widgets/step_card.dart';
+import 'package:BitOwi/features/merchant/presentation/widgets/reminder_card.dart';
+import 'package:BitOwi/features/merchant/presentation/widgets/step_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -20,11 +20,11 @@ class BecomeMerchantPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
-                      width: 40, 
+                      width: 40,
                       height: 40,
                       decoration: const BoxDecoration(
-                         shape: BoxShape.circle,
-                         color: Colors.transparent, 
+                        shape: BoxShape.circle,
+                        color: Colors.transparent,
                       ),
                       child: Image.asset(
                         'assets/icons/withdrawal/back_arrow.png',
@@ -53,7 +53,7 @@ class BecomeMerchantPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-                    const SizedBox(height: 24), 
+                    const SizedBox(height: 24),
 
                     Container(
                       width: 100,
@@ -83,7 +83,7 @@ class BecomeMerchantPage extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w700,
-                        fontSize: 26, 
+                        fontSize: 26,
                         color: Color(0xFF151E2F),
                       ),
                     ),
@@ -104,7 +104,8 @@ class BecomeMerchantPage extends StatelessWidget {
 
                     const StepCard(
                       title: "KYC Verification",
-                      description: "Your identity helps us keep the platform secure",
+                      description:
+                          "Your identity helps us keep the platform secure",
                       iconPath: "assets/icons/merchant_details/id_card.svg",
                       stepNumber: "1",
                       iconBackgroundColor: Color(0xFFE9F6FF),
@@ -112,7 +113,8 @@ class BecomeMerchantPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     const StepCard(
                       title: "Deposit Fund",
-                      description: "Deposit minimum 1000 USDT to activate merchant account",
+                      description:
+                          "Deposit minimum 1000 USDT to activate merchant account",
                       iconPath: "assets/icons/merchant_details/money.svg",
                       stepNumber: "2",
                       iconBackgroundColor: Color(0xFFF4E9FE),
@@ -129,8 +131,10 @@ class BecomeMerchantPage extends StatelessWidget {
                       height: 56,
                       child: ElevatedButton(
                         onPressed: () {
-                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Starting KYC Verification...")),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Starting KYC Verification..."),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(

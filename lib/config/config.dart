@@ -1,5 +1,5 @@
 class AppConfig {
-  static const String appName = 'BitDo';
+  static const String appName = 'BitOwi';
 
   static const bool isBuildApk = bool.fromEnvironment("dart.vm.product");
 

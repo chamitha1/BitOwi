@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:BitDo/constants/sms_constants.dart';
+import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
@@ -93,9 +93,9 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
     final pin = _pinController.text.trim();
 
     if (pin.length != widget.otpLength) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter valid OTP")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter valid OTP")));
       return;
     }
 
@@ -114,9 +114,9 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("OTP verification failed: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("OTP verification failed: $e")));
     } finally {
       if (mounted) setState(() => _isVerifying = false);
     }
@@ -148,9 +148,9 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Resend failed: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Resend failed: $e")));
     } finally {
       if (mounted) setState(() => _isResending = false);
     }

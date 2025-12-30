@@ -1,6 +1,6 @@
 import 'dart:typed_data';
-import 'package:BitDo/api/account_api.dart';
-import 'package:BitDo/models/chain_symbol_list_res.dart';
+import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/models/chain_symbol_list_res.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gal/gal.dart';
@@ -77,16 +77,16 @@ class DepositController extends GetxController {
           image,
           name: "deposit_qr_${selectedCoin.value?.symbol ?? 'code'}",
         );
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("QR Code saved to gallery!")),
         );
       }
     } catch (e) {
       print("Error saving image: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving image: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error saving image: $e")));
     }
   }
 }

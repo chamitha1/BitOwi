@@ -1,12 +1,11 @@
-import 'package:BitDo/features/wallet/presentation/controllers/balance_history_controller.dart';
-import 'package:BitDo/models/jour.dart';
-import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
-import 'package:BitDo/features/wallet/presentation/pages/withdrawal_page.dart';
-import 'package:BitDo/features/wallet/presentation/pages/deposit_screen.dart';
+import 'package:BitOwi/features/wallet/presentation/controllers/balance_history_controller.dart';
+import 'package:BitOwi/models/jour.dart';
+import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/withdrawal_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/deposit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-
 
 class BalanceHistoryPage extends GetView<BalanceHistoryController> {
   const BalanceHistoryPage({super.key});
@@ -88,7 +87,9 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Get.until((route) => Get.currentRoute == '/HomeScreen' || route.isFirst),
+            onTap: () => Get.until(
+              (route) => Get.currentRoute == '/HomeScreen' || route.isFirst,
+            ),
             child: Image.asset(
               'assets/icons/deposit/arrow_back.png',
               width: 24,
@@ -315,7 +316,8 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
 
     // Format amount sign
     final amountPrefix = isDeposit ? "+" : "-";
-    double val = double.tryParse(tx.transAmount?.replaceAll(',', '') ?? '0') ?? 0.0;
+    double val =
+        double.tryParse(tx.transAmount?.replaceAll(',', '') ?? '0') ?? 0.0;
     if (val < 0) val = -val;
     final amountStr = "$amountPrefix${val.toStringAsFixed(2)}";
 
@@ -410,13 +412,16 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
               height: 56,
               child: OutlinedButton(
                 onPressed: () {
-                  if (controller.symbol != null && controller.accountNumber != null) {
-                    Get.to(() => WithdrawalPage(
-                      symbol: controller.symbol!,
-                      accountNumber: controller.accountNumber!,
-                    ));
+                  if (controller.symbol != null &&
+                      controller.accountNumber != null) {
+                    Get.to(
+                      () => WithdrawalPage(
+                        symbol: controller.symbol!,
+                        accountNumber: controller.accountNumber!,
+                      ),
+                    );
                   } else {
-                     Get.snackbar("Error", "Account details missing");
+                    Get.snackbar("Error", "Account details missing");
                   }
                 },
                 style: OutlinedButton.styleFrom(

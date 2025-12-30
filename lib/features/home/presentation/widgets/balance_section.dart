@@ -1,5 +1,5 @@
-import 'package:BitDo/features/home/presentation/controllers/balance_controller.dart';
-import 'package:BitDo/features/wallet/presentation/pages/balance_history_page.dart';
+import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +12,7 @@ class BalanceSection extends StatefulWidget {
 
 class _BalanceSectionState extends State<BalanceSection> {
   final BalanceController controller = Get.put(BalanceController());
-  
+
   bool _hideSmallAssets = false;
 
   @override
@@ -63,11 +63,13 @@ class _BalanceSectionState extends State<BalanceSection> {
             ),
             GestureDetector(
               onTap: () {
-                final asset = controller.selectedAsset ?? 
-                            (controller.balanceData.value?.accountList.isNotEmpty == true 
-                                ? controller.balanceData.value!.accountList.first 
-                                : null);
-                
+                final asset =
+                    controller.selectedAsset ??
+                    (controller.balanceData.value?.accountList.isNotEmpty ==
+                            true
+                        ? controller.balanceData.value!.accountList.first
+                        : null);
+
                 if (asset != null) {
                   Get.to(
                     () => const BalanceHistoryPage(),
@@ -123,9 +125,7 @@ class _BalanceSectionState extends State<BalanceSection> {
                 ),
               );
             } else if (controller.balanceData.value != null) {
-              return Column(
-                children: _buildAssetList(),
-              );
+              return Column(children: _buildAssetList());
             }
             return const SizedBox.shrink();
           }),

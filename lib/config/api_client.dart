@@ -1,5 +1,5 @@
-import 'package:BitDo/config/config.dart';
-import 'package:BitDo/core/storage/storage_service.dart';
+import 'package:BitOwi/config/config.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 

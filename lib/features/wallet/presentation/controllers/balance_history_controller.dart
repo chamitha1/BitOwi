@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import 'package:BitDo/api/account_api.dart';
-import 'package:BitDo/models/account_detail_res.dart';
-import 'package:BitDo/models/jour.dart';
-import 'package:BitDo/models/account_detail_asset_inner_item.dart';
-import 'package:BitDo/models/page_info.dart';
-import 'package:BitDo/models/withdraw_page_res.dart';
-import 'package:BitDo/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/models/account_detail_res.dart';
+import 'package:BitOwi/models/jour.dart';
+import 'package:BitOwi/models/account_detail_asset_inner_item.dart';
+import 'package:BitOwi/models/page_info.dart';
+import 'package:BitOwi/models/withdraw_page_res.dart';
+import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 
 class BalanceHistoryController extends GetxController {
   var currentTab = 0.obs; // 0: All, 1: Deposits, 2: Withdrawals

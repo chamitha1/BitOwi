@@ -1,9 +1,9 @@
-import 'package:BitDo/config/api_client.dart';
-import 'package:BitDo/features/auth/presentation/pages/login_screen.dart';
-import 'package:BitDo/features/auth/presentation/pages/signup_screen.dart';
+import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
+import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/src/extensions/dynamic_extensions.dart';
-import 'package:BitDo/constants/sms_constants.dart';
+import 'package:BitOwi/constants/sms_constants.dart';
 
 class UserApi {
   //Login API
@@ -65,7 +65,7 @@ class UserApi {
 
       final data = response.data as Map<String, dynamic>;
       if (data['code'] == 200 ||
-          data['code'] == '200' || 
+          data['code'] == '200' ||
           data['errorCode'] == 'Success' ||
           data['errorCode'] == 'SUCCESS') {
         return true;
@@ -101,6 +101,7 @@ class UserApi {
       return false;
     }
   }
+
   // Bind Trade Password
   Future<Map<String, dynamic>> bindTradePwd({
     required String email,
@@ -110,11 +111,7 @@ class UserApi {
     try {
       final response = await ApiClient.dio.post(
         '/core/v1/user/bind_tradePwd',
-        data: {
-          'email': email,
-          'smsCaptcha': smsCode,
-          'tradePwd': tradePwd,
-        },
+        data: {'email': email, 'smsCaptcha': smsCode, 'tradePwd': tradePwd},
       );
       return response.data as Map<String, dynamic>;
     } catch (e) {

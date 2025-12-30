@@ -1,4 +1,4 @@
-import 'package:BitDo/features/wallet/presentation/controllers/deposit_controller.dart';
+import 'package:BitOwi/features/wallet/presentation/controllers/deposit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -51,7 +51,8 @@ class DepositScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const TransactionHistoryPage(),
+                              builder: (context) =>
+                                  const TransactionHistoryPage(),
                             ),
                           );
                         },
@@ -86,7 +87,7 @@ class DepositScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     Obx(() {
                       if (controller.isLoading.value) {
-                         return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
                       return DepositAddressSection(
                         address: controller.depositAddress.value,
@@ -133,7 +134,9 @@ class DepositScreen extends StatelessWidget {
                           child: InkWell(
                             onTap: () {
                               Clipboard.setData(
-                                ClipboardData(text: controller.depositAddress.value),
+                                ClipboardData(
+                                  text: controller.depositAddress.value,
+                                ),
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

@@ -1,4 +1,4 @@
-import 'package:BitDo/features/onboarding/models/onboarding_content.dart';
+import 'package:BitOwi/features/onboarding/models/onboarding_content.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingPage extends StatelessWidget {

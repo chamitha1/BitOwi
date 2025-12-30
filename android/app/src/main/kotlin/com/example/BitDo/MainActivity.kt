@@ -1,4 +1,4 @@
-package com.example.BitDo
+package com.example.BitOwi
 
 import io.flutter.embedding.android.FlutterActivity
 

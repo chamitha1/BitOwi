@@ -1,6 +1,6 @@
-import 'package:BitDo/features/auth/presentation/pages/login_screen.dart';
-import 'package:BitDo/features/onboarding/models/onboarding_content.dart';
-import 'package:BitDo/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
+import 'package:BitOwi/features/onboarding/models/onboarding_content.dart';
+import 'package:BitOwi/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -50,19 +50,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: _currentPage == _pages.length - 1
-                        ? const SizedBox(height: 48)
-                        : TextButton(
-                            onPressed: _goToLogin,
-                            child: const Text(
-                              'Skip',
-                              style: TextStyle(
-                                color: Color(0XFF717F9A),
-                                fontSize: 18,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                    ? const SizedBox(height: 48)
+                    : TextButton(
+                        onPressed: _goToLogin,
+                        child: const Text(
+                          'Skip',
+                          style: TextStyle(
+                            color: Color(0XFF717F9A),
+                            fontSize: 18,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+                      ),
               ),
             ),
 

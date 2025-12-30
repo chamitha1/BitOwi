@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:BitDo/api/account_api.dart';
-import 'package:BitDo/models/account_detail_res.dart';
-import 'package:BitDo/models/account_detail_asset_inner_item.dart';
-import 'package:BitDo/core/storage/storage_service.dart';
-import 'package:BitDo/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/models/account_detail_res.dart';
+import 'package:BitOwi/models/account_detail_asset_inner_item.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 
 class BalanceController extends GetxController {
   final Rx<AccountDetailAssetRes?> balanceData = Rx<AccountDetailAssetRes?>(
@@ -85,7 +85,7 @@ class BalanceController extends GetxController {
       if (item.currency == currency) {
         final currentAmount = double.tryParse(item.usableAmount) ?? 0.0;
         final newAmount = currentAmount - amountToMinus;
-        
+
         //  update totalAmount
         final currentTotal = double.tryParse(item.totalAmount) ?? 0.0;
         final newTotal = currentTotal - amountToMinus;

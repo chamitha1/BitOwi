@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:BitDo/api/user_api.dart';
-import 'package:BitDo/config/api_client.dart';
-import 'package:BitDo/constants/sms_constants.dart';
+import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pinput.dart';

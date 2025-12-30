@@ -1,6 +1,6 @@
-import 'package:BitDo/features/wallet/presentation/pages/balance_history_page.dart';
-import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
-import 'package:BitDo/models/jour.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
+import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
+import 'package:BitOwi/models/jour.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -32,11 +32,14 @@ class SuccessDialog extends StatelessWidget {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () {
-                   Get.until((route) => Get.currentRoute == '/HomeScreen' || route.isFirst);
+                  Get.until(
+                    (route) =>
+                        Get.currentRoute == '/HomeScreen' || route.isFirst,
+                  );
                 },
                 child: const Icon(
                   Icons.close,
-                  color: Color(0xFF9EA3AE), 
+                  color: Color(0xFF9EA3AE),
                   size: 24,
                 ),
               ),
@@ -76,7 +79,7 @@ class SuccessDialog extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.back(); 
+                  Get.back();
                   Get.to(
                     () => const BalanceHistoryPage(),
                     arguments: {

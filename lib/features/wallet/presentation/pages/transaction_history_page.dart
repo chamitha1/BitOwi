@@ -1,4 +1,4 @@
-import 'package:BitDo/features/wallet/presentation/controllers/transaction_history_controller.dart';
+import 'package:BitOwi/features/wallet/presentation/controllers/transaction_history_controller.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,14 +12,17 @@ class TransactionHistoryPage extends StatefulWidget {
 }
 
 class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
-  final TransactionHistoryController controller = Get.put(TransactionHistoryController());
+  final TransactionHistoryController controller = Get.put(
+    TransactionHistoryController(),
+  );
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         controller.loadMore();
       }
     });
@@ -82,126 +85,147 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             ),
 
             // Tabs
-            Obx(() => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: const Color(0xffF6F9FF),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xffECEFF5), width: 1),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => controller.changeTab(true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: controller.isDeposit.value ? Colors.white : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: controller.isDeposit.value
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.06),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Deposit",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: controller.isDeposit.value
-                                  ? const Color(0xff151E2F)
-                                  : const Color(0xff929EB8),
+            Obx(
+              () => Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: const Color(0xffF6F9FF),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xffECEFF5), width: 1),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => controller.changeTab(true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: controller.isDeposit.value
+                                ? Colors.white
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: controller.isDeposit.value
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.06),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Deposit",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: controller.isDeposit.value
+                                    ? const Color(0xff151E2F)
+                                    : const Color(0xff929EB8),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => controller.changeTab(false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: !controller.isDeposit.value
-                              ? Colors.white
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: !controller.isDeposit.value
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.06),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Withdraw",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: !controller.isDeposit.value
-                                  ? const Color(0xff151E2F)
-                                  : const Color(0xff929EB8),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => controller.changeTab(false),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: !controller.isDeposit.value
+                                ? Colors.white
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: !controller.isDeposit.value
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.06),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Withdraw",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: !controller.isDeposit.value
+                                    ? const Color(0xff151E2F)
+                                    : const Color(0xff929EB8),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
 
             const SizedBox(height: 12),
 
             Expanded(
               child: Obx(() {
-                 if (controller.isLoading.value && 
-                    (controller.isDeposit.value ? controller.depositList.isEmpty : controller.withdrawList.isEmpty)) {
-                   return const Center(child: CircularProgressIndicator());
-                 }
-                 
-                 final list = controller.isDeposit.value ? controller.depositList : controller.withdrawList;
-                 
-                 if (list.isEmpty) {
-                   return Center(child: Text("No transactions yet", style: TextStyle(color: Colors.grey)));
-                 }
+                if (controller.isLoading.value &&
+                    (controller.isDeposit.value
+                        ? controller.depositList.isEmpty
+                        : controller.withdrawList.isEmpty)) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                 return ListView.builder(
-                   controller: _scrollController,
-                   padding: const EdgeInsets.symmetric(
-                     horizontal: 24,
-                     vertical: 8,
-                   ),
-                   itemCount: list.length + (controller.isLoading.value ? 1 : 0),
-                   itemBuilder: (context, index) {
-                     if (index == list.length) {
-                       return const Center(child: Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator()));
-                     }
-                     
-                     final item = list[index];
-                     
-                     if (controller.isDeposit.value) {
-                       return _buildDepositItem(item);
-                     } else {
-                       return _buildWithdrawItem(item);
-                     }
-                   },
-                 );
+                final list = controller.isDeposit.value
+                    ? controller.depositList
+                    : controller.withdrawList;
+
+                if (list.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No transactions yet",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  itemCount: list.length + (controller.isLoading.value ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == list.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    final item = list[index];
+
+                    if (controller.isDeposit.value) {
+                      return _buildDepositItem(item);
+                    } else {
+                      return _buildWithdrawItem(item);
+                    }
+                  },
+                );
               }),
             ),
           ],
@@ -226,13 +250,13 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                item.transAmount != null 
+                item.transAmount != null
                     ? "+${item.transAmount} ${item.currency ?? ''}"
                     : "+0 ${item.currency ?? ''}",
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff27AE60), 
+                  color: Color(0xff27AE60),
                 ),
               ),
               Container(
@@ -244,7 +268,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 child: Text(
                   "Completed",
                   style: const TextStyle(
-                    fontSize: 10, 
+                    fontSize: 10,
                     color: Color(0xff27AE60),
                     fontWeight: FontWeight.w500,
                   ),
@@ -256,27 +280,25 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Expanded(
-                 child: Text(
+              Expanded(
+                child: Text(
                   item.remark ?? "Deposit",
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff929EB8),
                   ),
                   overflow: TextOverflow.ellipsis,
-              )),
+                ),
+              ),
               Text(
-                item.createDatetime != null 
+                item.createDatetime != null
                     ? DateTime.fromMillisecondsSinceEpoch(
-                        item.createDatetime is int 
-                           ? item.createDatetime 
-                           : int.tryParse(item.createDatetime.toString()) ?? 0
+                        item.createDatetime is int
+                            ? item.createDatetime
+                            : int.tryParse(item.createDatetime.toString()) ?? 0,
                       ).toString().split('.')[0]
                     : "",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xff929EB8),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xff929EB8)),
               ),
             ],
           ),
@@ -287,19 +309,21 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Widget _buildWithdrawItem(dynamic item) {
     final status = controller.statusEnum[item.status] ?? item.status;
-    
+
     Color statusColor = const Color(0xff151E2F);
     Color statusBg = const Color(0xffF6F9FF);
-    
+
     if (item.status == '2' || item.status == '5') {
-        statusColor = const Color(0xffFF5252);
-        statusBg = const Color(0xffFFEBEE);
-    } else if (item.status == '6') { // Completed
-        statusColor = const Color(0xff27AE60);
-        statusBg = const Color(0xffE8F5E9);
-    } else { // Processing
-        statusColor = const Color.fromARGB(255, 235, 161, 2);
-        statusBg = const Color(0xffFFF3E0);
+      statusColor = const Color(0xffFF5252);
+      statusBg = const Color(0xffFFEBEE);
+    } else if (item.status == '6') {
+      // Completed
+      statusColor = const Color(0xff27AE60);
+      statusBg = const Color(0xffE8F5E9);
+    } else {
+      // Processing
+      statusColor = const Color.fromARGB(255, 235, 161, 2);
+      statusBg = const Color(0xffFFF3E0);
     }
 
     return Container(
@@ -321,7 +345,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xffEB5757), 
+                  color: Color(0xffEB5757),
                 ),
               ),
               Container(
@@ -342,30 +366,28 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             ],
           ),
           const SizedBox(height: 8),
-           Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Expanded(
-                 child: Text(
+              Expanded(
+                child: Text(
                   "To: ${item.payCardNo ?? 'Unknown'}",
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff929EB8),
                   ),
                   overflow: TextOverflow.ellipsis,
-              )),
-              Text(
-                item.createDatetime != null 
-                    ? DateTime.fromMillisecondsSinceEpoch(
-                        item.createDatetime is int 
-                            ? item.createDatetime 
-                            : int.tryParse(item.createDatetime.toString()) ?? 0
-                       ).toString().split('.')[0]
-                    : "",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xff929EB8),
                 ),
+              ),
+              Text(
+                item.createDatetime != null
+                    ? DateTime.fromMillisecondsSinceEpoch(
+                        item.createDatetime is int
+                            ? item.createDatetime
+                            : int.tryParse(item.createDatetime.toString()) ?? 0,
+                      ).toString().split('.')[0]
+                    : "",
+                style: const TextStyle(fontSize: 12, color: Color(0xff929EB8)),
               ),
             ],
           ),

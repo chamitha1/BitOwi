@@ -1,7 +1,7 @@
-import 'package:BitDo/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:BitDo/core/storage/storage_service.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -22,17 +22,19 @@ class HomeHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Obx(() => Text(
-                "Hi, ${controller.userName.value}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0XFF332C3B),
-                  fontFamily: 'Inter',
+              Obx(
+                () => Text(
+                  "Hi, ${controller.userName.value}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0XFF332C3B),
+                    fontFamily: 'Inter',
+                  ),
                 ),
-              )),
+              ),
               RichText(
                 text: const TextSpan(
                   text: 'Welcome to  ',

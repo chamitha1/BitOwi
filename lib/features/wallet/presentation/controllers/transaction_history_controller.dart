@@ -1,7 +1,7 @@
-import 'package:BitDo/api/account_api.dart';
-import 'package:BitDo/api/common_api.dart';
-import 'package:BitDo/models/jour.dart';
-import 'package:BitDo/models/withdraw_page_res.dart';
+import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/models/jour.dart';
+import 'package:BitOwi/models/withdraw_page_res.dart';
 import 'package:get/get.dart';
 
 class TransactionHistoryController extends GetxController {

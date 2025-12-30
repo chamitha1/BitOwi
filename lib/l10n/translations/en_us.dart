@@ -61,7 +61,7 @@ const enUS = {
   '商家认证': 'Become a merchant',
   '个人实名信息认证': 'KYC verification',
   '请完成下面步骤，成为认证商家':
-      'Please complete the following steps to become certified Bitdo Merchant.',
+      'Please complete the following steps to become certified BitOwi Merchant.',
   '去实名': 'Go to KYC verification',
   '已完成': 'Completed',
   // '已完成': 'Start now',
@@ -74,7 +74,7 @@ const enUS = {
   '商家认证成功': 'Merchant certification completed',
   '商家认证审核中': 'Merchant certification under review',
   '解除认证审核中': 'Decertification under review',
-  '申请成为认证商家': 'Apply for becoming Bitdo Merchant',
+  '申请成为认证商家': 'Apply for becoming BitOwi Merchant',
   '确定解除商家认证？': 'Are you sure to proceed?',
   '解除商家认证后，冻结金额将释放至钱包账户，您将无法发布广告，并且已发布的广告将会下架':
       'Decertifying your merchant account will permanently remove all ads, restrict new posts, but your deposit will be safely returned to your wallet.',

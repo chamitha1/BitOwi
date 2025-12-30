@@ -1,4 +1,4 @@
-# BitDo
+# BitOwi
 
 A new Flutter project.
 

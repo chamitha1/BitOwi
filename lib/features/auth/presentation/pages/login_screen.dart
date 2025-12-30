@@ -1,9 +1,9 @@
-import 'package:BitDo/config/api_client.dart';
-import 'package:BitDo/core/storage/storage_service.dart';
-import 'package:BitDo/features/auth/presentation/controllers/user_controller.dart';
-import 'package:BitDo/features/auth/presentation/pages/forgot_password_screen.dart';
-import 'package:BitDo/features/auth/presentation/pages/signup_screen.dart';
-import 'package:BitDo/features/home/presentation/pages/home_screen.dart';
+import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/features/auth/presentation/pages/forgot_password_screen.dart';
+import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
+import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -82,12 +82,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (data['code'] == 200 || data['code'] == '200') {
         final tokenData = data['data'] as Map<String, dynamic>;
-        final token =
-            tokenData['token'] as String? ??
-            ''; 
+        final token = tokenData['token'] as String? ?? '';
 
         await StorageService.saveToken(token);
-        
+
         await StorageService.saveUserName(_emailController?.text.trim() ?? '');
         print('Token saved: $token');
 

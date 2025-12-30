@@ -1,7 +1,7 @@
-import 'package:BitDo/api/user_api.dart';
-import 'package:BitDo/constants/sms_constants.dart';
-import 'package:BitDo/core/widgets/gradient_button.dart';
-import 'package:BitDo/features/auth/presentation/pages/otp_bottom_sheet.dart';
+import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/gradient_button.dart';
+import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -146,7 +146,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 //   bizType: SmsBizType.forgetPwd,
                                 //   smsCode: pin,
                                 // );
-                                return true; 
+                                return true;
                               },
 
                               onResend: () async {

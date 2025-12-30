@@ -1,5 +1,5 @@
-import 'package:BitDo/config/api_client.dart';
-import 'package:BitDo/models/dict.dart';
+import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/models/dict.dart';
 
 class CommonApi {
   /// Fetch dictionary list

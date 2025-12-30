@@ -1,5 +1,5 @@
-import 'package:BitDo/features/wallet/presentation/controllers/withdraw_controller.dart';
-import 'package:BitDo/features/wallet/presentation/pages/qr_scanner_screen.dart';
+import 'package:BitOwi/features/wallet/presentation/controllers/withdraw_controller.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/qr_scanner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

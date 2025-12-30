@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "BitDo" "\0"
+            VALUE "FileDescription", "BitOwi" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "BitDo" "\0"
+            VALUE "InternalName", "BitOwi" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "BitDo.exe" "\0"
-            VALUE "ProductName", "BitDo" "\0"
+            VALUE "OriginalFilename", "BitOwi.exe" "\0"
+            VALUE "ProductName", "BitOwi" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

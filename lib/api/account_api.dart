@@ -1,12 +1,12 @@
-import 'package:BitDo/config/api_client.dart';
-import 'package:BitDo/models/account.dart';
-import 'package:BitDo/models/account_detail_res.dart';
-import 'package:BitDo/models/chain_symbol_list_res.dart';
-import 'package:BitDo/models/withdraw_page_res.dart';
-import 'package:BitDo/models/withdraw_request.dart';
-import 'package:BitDo/models/withdraw_rule_detail_res.dart';
-import 'package:BitDo/models/page_info.dart';
-import 'package:BitDo/models/jour.dart';
+import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/models/account.dart';
+import 'package:BitOwi/models/account_detail_res.dart';
+import 'package:BitOwi/models/chain_symbol_list_res.dart';
+import 'package:BitOwi/models/withdraw_page_res.dart';
+import 'package:BitOwi/models/withdraw_request.dart';
+import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
+import 'package:BitOwi/models/page_info.dart';
+import 'package:BitOwi/models/jour.dart';
 
 class AccountApi {
   static Future<AccountDetailAssetRes> getBalanceAccount({
