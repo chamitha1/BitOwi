@@ -92,8 +92,29 @@ class WithdrawController extends GetxController {
       return false;
     }
 
-    await StorageService.saveTempWithdrawData(payCardNo, amount, tradePwd);
-    return true;
+    try {
+      isLoading.value = true;
+      await AccountApi.withdrawCheck({
+        "accountNumber": accountNumber.value,
+        "amount": amount,
+        "payCardNo": payCardNo,
+        "tradePwd": tradePwd,
+      });
+
+      await StorageService.saveTempWithdrawData(payCardNo, amount, tradePwd);
+      return true;
+    } catch (e) {
+      print("Withdraw check failed: $e");
+      // Extract error
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+      }
+      Get.snackbar("Error", errorMsg);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void updateAddressFromScan(String scannedCode) {
@@ -102,7 +123,7 @@ class WithdrawController extends GetxController {
     }
   }
 
-  Future<bool> sendOtp({SmsBizType type = SmsBizType.bindTradePwd}) async {
+  Future<bool> sendOtp({SmsBizType type = SmsBizType.withdraw}) async {
     final email = await StorageService.getUserName();
     if (email == null) return false;
 
@@ -135,31 +156,7 @@ class WithdrawController extends GetxController {
         return false;
       }
 
-      print("Finalizing Withdrawal: Bind Password First...");
-
-      final email = await StorageService.getUserName();
-      if (email == null) {
-        throw Exception("User email not found");
-      }
-
-      // Bind Trade Password
-      final bindRes = await UserApi().bindTradePwd(
-        email: email,
-        smsCode: otp,
-        tradePwd: savedPwd,
-      );
-
-      print("Bind Password Response: $bindRes");
-
-      if (bindRes['code'] != 200 &&
-          bindRes['code'] != '200' &&
-          bindRes['errorCode'] != 'Success' &&
-          bindRes['errorCode'] != 'SUCCESS') {
-        throw Exception(
-          "Bind Password Failed: ${bindRes['msg'] ?? bindRes['errorMsg'] ?? 'Unknown error'}",
-        );
-      }
-      print("Bind Password Success. Creating Withdrawal...");
+      print("Finalizing Withdrawal: Creating Withdrawal directly...");
 
       // Create Withdrawal
       final params = {
@@ -170,8 +167,6 @@ class WithdrawController extends GetxController {
         "smsCaptcha": otp,
         "googleSecret": googleController.text.trim(),
         // "currency": symbol.value,
-        // "bizType": '2',
-        // "bizCategory": 'withdraw',
       };
 
       await AccountApi.createWithdraw(params);
@@ -213,7 +208,11 @@ class WithdrawController extends GetxController {
       return true;
     } catch (e) {
       print("Finalize withdrawal error: $e");
-      Get.snackbar("Error", "$e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+      }
+      Get.snackbar("Error", errorMsg);
       return false;
     } finally {
       isLoading.value = false;
@@ -221,11 +220,9 @@ class WithdrawController extends GetxController {
   }
 
   // Deprecated onApplyTap - kept empty or removed.
-  // We'll rename it to avoid confusion or remove it if not overridden.
+  // rename it to avoid confusion or remove it if not overridden.
   // Since the UI calls it via OtpBottomSheet, we should update the UI call in WithdrawalPage.
-  // But for now, let's leave a stub or just rely on finalizeWithdrawal being called.
   Future<bool> onApplyTap() async {
-    // This should not be called directly anymore in the new flow
     return false;
   }
 
@@ -235,6 +232,13 @@ class WithdrawController extends GetxController {
 
   void setMaxAmount() {
     amountController.text = availableAmount.value;
+  }
+
+  void clearInputs() {
+    addrController.clear();
+    amountController.clear();
+    tradeController.clear();
+    googleController.clear();
   }
 
   @override

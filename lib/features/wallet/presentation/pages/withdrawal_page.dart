@@ -92,7 +92,14 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
 
     if (!await controller.beforeSend()) return;
 
-    if (!await controller.sendOtp()) return;
+    if (!await controller.sendOtp(type: SmsBizType.withdraw)) return;
+
+    // Clear inputs
+    controller.clearInputs();
+    setState(() {
+      _fee = 0.00;
+      _isWithdrawAll = false;
+    });
 
     final email = await StorageService.getUserName() ?? '';
 
