@@ -47,8 +47,8 @@ class AwsUploadUtil {
       String baseUrl = kIsWeb ? AppConfig.webApiUrl : AppConfig.apiUrl;
 
       final response = await dio.post(
-        // '$baseUrl/core/v1/file/public/upload',
-        '$baseUrl/file/public/upload',
+        '$baseUrl/core/v1/file/public/upload',
+        // '$baseUrl/file/public/upload',
         data: data,
         onSendProgress: (int count, int data) {
           if (onSendProgress != null) {
