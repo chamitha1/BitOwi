@@ -116,7 +116,7 @@ class _WalletCardState extends State<WalletCard> {
 
       final asset = controller.selectedAsset;
 
-      final totalAmount = asset?.totalAmount ?? '0.00';
+      final totalAmount = asset?.usableAmount ?? '0.00';
       final totalAsset = asset?.totalAsset ?? '0.00';
       final totalAssetCurrency = asset?.totalAssetCurrency ?? 'USDT';
 
