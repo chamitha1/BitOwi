@@ -7,6 +7,7 @@ import 'package:BitOwi/features/splash/presentation/pages/splash_screen.dart';
 import 'package:BitOwi/features/splash/presentation/controllers/splash_controller.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/features/profile/presentation/pages/account_security_page.dart';
 
 class Routes {
   static const String splash = '/splash';
@@ -14,6 +15,7 @@ class Routes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String home = '/HomeScreen'; 
+  static const String accountSecurity = '/accountSecurity'; 
 }
 
 class AppPages {
@@ -43,6 +45,10 @@ class AppPages {
       binding: BindingsBuilder(() {
          Get.put(BalanceController()); 
       }),
+    ),
+    GetPage(
+      name: Routes.accountSecurity,
+      page: () => const AccountAndSecurityPage(),
     ),
   ];
 }
