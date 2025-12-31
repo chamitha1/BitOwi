@@ -232,11 +232,13 @@ class _BalanceSectionState extends State<BalanceSection> {
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _assetDetailColumn("Assets", total),
-            _assetDetailColumn("Frozen", frozen),
-            _assetDetailColumn("USDT", usdtVal),
+            Expanded(child: _assetDetailColumn("Assets", total)),
+            SizedBox(width: 2),
+            Expanded(child: _assetDetailColumn("Frozen", frozen)),
+            SizedBox(width: 2),
+            Expanded(child: _assetDetailColumn("USDT", usdtVal)),
           ],
         ),
       ],
@@ -256,12 +258,16 @@ class _BalanceSectionState extends State<BalanceSection> {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xff151E2F),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff151E2F),
+            ),
           ),
         ),
       ],

@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     */
                 MerchantBanner(merchantStatus: merchantStatus),
                     const SizedBox(height: 24),
-                    const TabSection(),
+                    // const TabSection(),
                     const SizedBox(height: 24),
                     const BalanceSection(),
                     const SizedBox(height: 20),
