@@ -17,96 +17,95 @@ class _BalanceSectionState extends State<BalanceSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Balance",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff151E2F),
-                    fontFamily: 'Inter',
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Balance",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff151E2F),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Text(
+                        "Hide Small Assets",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xff454F63),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Transform.scale(
+                        scale: 0.7,
+                        child: Switch(
+                          value: _hideSmallAssets,
+                          onChanged: (v) => setState(() => _hideSmallAssets = v),
+                          activeColor: const Color(0xff2ECC71),
+                          activeTrackColor: const Color(
+                            0xFF2ECC71,
+                          ).withOpacity(0.2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () {
+                  final asset =
+                      controller.selectedAsset ??
+                      (controller.balanceData.value?.accountList.isNotEmpty ==
+                              true
+                          ? controller.balanceData.value!.accountList.first
+                          : null);
+
+                  if (asset != null) {
+                    Get.to(
+                      () => const BalanceHistoryPage(),
+                      arguments: {
+                        'accountNumber': asset.accountNumber,
+                        'symbol': asset.currency,
+                      },
+                    );
+                  } else {
+                    Get.snackbar("Error", "No asset selected");
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffE8EFFF),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Image.asset(
+                    'assets/icons/home/clock.png',
+                    width: 24,
+                    height: 24,
+                    color: const Color(0xff151E2F),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Text(
-                      "Hide Small Assets",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xff454F63),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        value: _hideSmallAssets,
-                        onChanged: (v) => setState(() => _hideSmallAssets = v),
-                        activeColor: const Color(0xff2ECC71),
-                        activeTrackColor: const Color(
-                          0xFF2ECC71,
-                        ).withOpacity(0.2),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
-                final asset =
-                    controller.selectedAsset ??
-                    (controller.balanceData.value?.accountList.isNotEmpty ==
-                            true
-                        ? controller.balanceData.value!.accountList.first
-                        : null);
-
-                if (asset != null) {
-                  Get.to(
-                    () => const BalanceHistoryPage(),
-                    arguments: {
-                      'accountNumber': asset.accountNumber,
-                      'symbol': asset.currency,
-                    },
-                  );
-                } else {
-                  Get.snackbar("Error", "No asset selected");
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xffE8EFFF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Image.asset(
-                  'assets/icons/home/clock.png',
-                  width: 24,
-                  height: 24,
-                  color: const Color(0xff151E2F),
-                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            ],
           ),
-          child: Obx(() {
+          const SizedBox(height: 16),
+          Obx(() {
             if (controller.isLoading.value) {
               return const Center(child: CircularProgressIndicator());
             } else if (controller.errorMessage.value.isNotEmpty) {
@@ -129,8 +128,8 @@ class _BalanceSectionState extends State<BalanceSection> {
             }
             return const SizedBox.shrink();
           }),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
