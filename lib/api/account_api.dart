@@ -1,9 +1,9 @@
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/models/account.dart';
+import 'package:BitOwi/models/account_asset_res.dart';
 import 'package:BitOwi/models/account_detail_res.dart';
 import 'package:BitOwi/models/chain_symbol_list_res.dart';
 import 'package:BitOwi/models/withdraw_page_res.dart';
-import 'package:BitOwi/models/withdraw_request.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/models/jour.dart';
@@ -401,6 +401,25 @@ class AccountApi {
   //   //   rethrow;
   //   // }
   // }
+
+  /// Home page account total assets
+  static Future<AccountAssetRes> getHomeAsset([String? currency]) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/account/home_asset',
+        data: {"currency": currency},
+      );
+      final Map<String, dynamic> data = Map<String, dynamic>.from(
+        res.data['data'],
+      );
+      // return AccountAssetRes.fromJson(CommonUtils.removeNullKeys(data));
+      return AccountAssetRes.fromJson(data);
+    } catch (e) {
+      print("getHomeAsset error: $e");
+
+      rethrow;
+    }
+  }
 
   /// 📝TODO
   // static Future<AccountDetailAccountAndJourRes> getDetailAccountAndJour(

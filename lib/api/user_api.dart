@@ -1,10 +1,10 @@
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
-import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
+import 'package:BitOwi/models/identify_order_list_res.dart';
+import 'package:BitOwi/models/user_model.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/src/extensions/dynamic_extensions.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
-import 'package:BitOwi/models/user_model.dart';
 
 class UserApi {
   //Login API
@@ -126,13 +126,13 @@ class UserApi {
     try {
       final response = await ApiClient.dio.post("/core/v1/cuser/my");
       final responseData = response.data as Map<String, dynamic>;
-      
+
       if (responseData['code'] == 200 || responseData['code'] == '200') {
-         final userData = responseData['data'] as Map<String, dynamic>;
-         if (userData['nickname'] != null) {
-           userData['nickname'] = userData['nickname'].toString();
-         }
-         return User.fromJson(userData);
+        final userData = responseData['data'] as Map<String, dynamic>;
+        if (userData['nickname'] != null) {
+          userData['nickname'] = userData['nickname'].toString();
+        }
+        return User.fromJson(userData);
       }
       throw Exception(responseData['errorMsg'] ?? 'Unknown error');
     } catch (e) {
@@ -146,6 +146,61 @@ class UserApi {
     try {
       final response = await ApiClient.dio.get("/core/v1/cuser/logOut");
       print("Logout Response: ${response.data}");
+    } catch (e) {
+      e.printError();
+      rethrow;
+    }
+  }
+
+  /// Real name authentication (USER KYC)
+  static Future<Map<String, dynamic>> createIdentifyOrder(
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final res = await ApiClient.dio.post(
+        "/core/v1/identify_order/create",
+        data: data,
+      );
+      return Map<String, dynamic>.from(res.data);
+    } catch (e) {
+      e.printError();
+      rethrow;
+    }
+  }
+
+  /// Get User KYC requests status
+  static Future<List<IdentifyOrderListRes>> getIdentifyOrderList() async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/identify_order/list_front',
+        data: {},
+      );
+      final List<dynamic> data = res.data['data'] as List<dynamic>;
+      List<IdentifyOrderListRes> list = data
+          .map((item) => IdentifyOrderListRes.fromJson(item))
+          .toList();
+      return list;
+    } catch (e) {
+      e.printError();
+      rethrow;
+    }
+  }
+
+  /// Add merchant certification
+  static Future<void> createMerchantOrder() async {
+    try {
+      await ApiClient.dio.post("/core/v1/merchant_record/create");
+    } catch (e) {
+      e.printError();
+      rethrow;
+    }
+  }
+
+  /// Remove merchant certification
+  static Future<Map<String, dynamic>> removeMerchantOrder() async {
+    try {
+      final res = await ApiClient.dio.post("/core/v1/merchant_record/reliever");
+      return Map<String, dynamic>.from(res.data);
     } catch (e) {
       e.printError();
       rethrow;

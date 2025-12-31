@@ -7,6 +7,7 @@ class StepCard extends StatelessWidget {
   final String iconPath;
   final String stepNumber;
   final Color iconBackgroundColor;
+  final String? secondaryIconPath;
 
   const StepCard({
     super.key,
@@ -15,31 +16,29 @@ class StepCard extends StatelessWidget {
     required this.iconPath,
     required this.stepNumber,
     required this.iconBackgroundColor,
+    this.secondaryIconPath,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 60,
+            height: 60,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: iconBackgroundColor,
-              borderRadius: BorderRadius.circular(8), 
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: SvgPicture.asset(
-              iconPath,
-              fit: BoxFit.contain,
-            ),
+            child: SvgPicture.asset(iconPath, fit: BoxFit.contain),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -70,25 +69,35 @@ class StepCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Container(
-            width: 24,
-            height: 24,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: const Color(0xffECEFF5), 
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFE1E1EC)), 
-            ),
-            child: Text(
-              stepNumber,
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 12,
-                color: Color(0xFF151E2F),
-              ),
-            ),
-          ),
+          secondaryIconPath != null
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: SvgPicture.asset(
+                    secondaryIconPath!,
+                    width: 24,
+                    height: 24,
+                  ),
+                )
+              : Container(
+                  width: 24,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xffFFFFFF),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFECEFF5)),
+                  ),
+                  child: Text(
+                    stepNumber,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF151E2F),
+                    ),
+                  ),
+                ),
+          const SizedBox(width: 12),
         ],
       ),
     );

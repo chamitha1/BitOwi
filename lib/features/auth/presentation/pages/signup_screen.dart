@@ -4,10 +4,12 @@ import 'package:BitOwi/core/widgets/gradient_button.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
+import 'package:BitOwi/features/rich_text_config.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:get/get.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -379,19 +381,32 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   const SizedBox(width: 6),
+                  // terms and privacy
                   Expanded(
-                    child: Text.rich(
-                      TextSpan(
-                        text: "I agree to the ",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0XFF454F63),
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Inter',
+                    child: Wrap(
+                      runSpacing: 2,
+                      children: [
+                        Text(
+                          "I agree to the ",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0XFF454F63),
+                          ),
                         ),
-                        children: const [
-                          TextSpan(
-                            text: "Terms of Service",
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(
+                              () => RichTextConfig(
+                                title: "Terms & Condition",
+                                configKey: "registered_agreement_textarea",
+                                configType: "system",
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "Terms of Service",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 14,
@@ -399,17 +414,28 @@ class _SignupScreenState extends State<SignupScreen> {
                               color: Color(0XFF28A6FF),
                             ),
                           ),
-                          TextSpan(
-                            text: " and ",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0XFF454F63),
-                            ),
+                        ),
+                        Text(
+                          " and ",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0XFF454F63),
                           ),
-                          TextSpan(
-                            text: "Privacy Policy",
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(
+                              () => RichTextConfig(
+                                title: "Privacy Policy",
+                                configKey: "privacy_agreement_textarea",
+                                configType: "system",
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "Privacy Policy",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 14,
@@ -417,8 +443,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               color: Color(0XFF28A6FF),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

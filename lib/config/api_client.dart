@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:BitOwi/config/config.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:dio/dio.dart';
@@ -29,7 +30,11 @@ class ApiClient {
               options.headers.addAll({
                 // 'Authorization': authHeader,
                 'content-Type': 'application/json',
-                'Accept-Language': Get.deviceLocale?.toString() ?? 'en_US',
+                // 'Accept-Language': Get.deviceLocale?.toString() ?? 'en_US',
+                'Accept-Language': Get.deviceLocale?.toString() == 'en_GB'
+                    ? const Locale('en', 'US')
+                    : Get.deviceLocale,
+                // 'Accept-Language': 'en_US',
               });
 
               print("------------API Request------------");

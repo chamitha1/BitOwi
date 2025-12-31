@@ -2,9 +2,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String userToken = 'user_token';
 const String userName = 'user_name';
+const String userId = 'user_id';
 const String userAccountNumber = 'account_number';
 const String currency = '_currency';
 const String symbol = '_symbol';
+const merchantSucTip = '_merchantSucTip';
 
 class StorageService {
   static SharedPreferences? _prefs;
@@ -39,6 +41,18 @@ class StorageService {
   static Future<String?> getUserName() async {
     if (_prefs == null) await init();
     return _prefs!.getString(userName);
+  }
+
+  //set user id
+  static Future<bool> saveUserId(String idString) async {
+    if (_prefs == null) await init();
+    return await _prefs!.setString(userName, idString);
+  }
+
+  //get user id
+  static Future<String?> getUserId() async {
+    if (_prefs == null) await init();
+    return _prefs!.getString(userId);
   }
 
   static Future<bool> saveAccountNumber(String accNum) async {
@@ -156,5 +170,20 @@ class StorageService {
   static Future<bool> getRememberMe() async {
     if (_prefs == null) await init();
     return _prefs!.getBool(isRememberMeKey) ?? false;
+  }
+
+  /// Set whether to pop up a pop-up window indicating successful authentication.
+  static Future<bool> setMerchantSucTip(String userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = '${merchantSucTip}_$userId';
+    return prefs.setBool(key, true);
+  }
+
+  /// Get whether a pop-up window indicating successful authentication has popped up
+  static Future<bool> getMerchantSucTip(String userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = '${merchantSucTip}_$userId';
+    final bool? value = prefs.getBool(key);
+    return value ?? false;
   }
 }

@@ -4,6 +4,7 @@ import 'package:BitOwi/features/auth/presentation/controllers/user_controller.da
 import 'package:BitOwi/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
+import 'package:BitOwi/features/rich_text_config.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -88,6 +89,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         await StorageService.saveUserName(_emailController?.text.trim() ?? '');
         await StorageService.saveRememberMe(_rememberMe);
+
+        final userId = tokenData['userId'] as String? ?? '';
+        await StorageService.saveUserId(userId);
+
         print('Token saved: $token');
 
         if (!mounted) return;
@@ -333,30 +338,68 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 const SizedBox(height: 90),
-
-                Center(
-                  child: RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0XFF28A6FF),
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Inter',
-                      ),
-                      children: [
-                        TextSpan(text: "Terms & Condition".tr),
-                        TextSpan(
-                          text: " and ".tr,
-                          style: const TextStyle(
-                            color: Color(0XFF454F63),
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                          ),
+                // terms and privacy
+                Row(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          runSpacing: 4,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Get.to(
+                                  () => RichTextConfig(
+                                    title: "Terms & Condition",
+                                    configKey: "registered_agreement_textarea",
+                                    configType: "system",
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "Terms & Condition",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0XFF28A6FF),
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                            Text(
+                              " and ",
+                              style: const TextStyle(
+                                color: Color(0XFF454F63),
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Get.to(
+                                  () => RichTextConfig(
+                                    title: "Privacy Policy",
+                                    configKey: "privacy_agreement_textarea",
+                                    configType: "system",
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "Privacy Policy",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0XFF28A6FF),
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        TextSpan(text: "Privacy Policy".tr),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
 
                 const SizedBox(height: 20),

@@ -56,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
             _buildCircleIconButton(
               icon: Icons.notifications_none_outlined,
               onTap: () {},
-              badgeCount: 99,
+              // badgeCount: 99,
             ),
           ],
         ),
