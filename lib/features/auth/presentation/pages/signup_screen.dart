@@ -565,10 +565,10 @@ class _SignupScreenState extends State<SignupScreen> {
         return TextField(
           controller: controller,
           focusNode: focusNode,
+          enabled: !_isEmailVerified,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           onChanged: (_) {
-            // live validate but only show if previously error
             if (_emailErrorText != null) _validateEmailLocal();
           },
           decoration: _inputDecoration(
@@ -576,6 +576,7 @@ class _SignupScreenState extends State<SignupScreen> {
             iconPath: iconPath,
             suffixWidget: suffixWidget,
             errorText: _emailErrorText,
+            enabled: !_isEmailVerified,
           ),
           onSubmitted: (_) => onFieldSubmitted(),
         );
