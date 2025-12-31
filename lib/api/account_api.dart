@@ -7,6 +7,7 @@ import 'package:BitOwi/models/withdraw_page_res.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/models/jour.dart';
+import 'package:BitOwi/models/jour_front_detail.dart';
 
 class AccountApi {
   static Future<AccountDetailAssetRes> getBalanceAccount({
@@ -441,15 +442,15 @@ class AccountApi {
   // }
 
   // /// 📝TODO
-  // static Future<JourFrontDetail> getJourDetail(String id) async {
-  //   try {
-  //     final res = await HttpUtil.post('/core/v1/jour/detail_front/$id');
-  //     return JourFrontDetail.fromJson(CommonUtils.removeNullKeys(res));
-  //   } catch (e) {
-  //     e.printError();
-  //     rethrow;
-  //   }
-  // }
+  static Future<JourFrontDetail> getJourDetail(String id) async {
+    try {
+      final res = await ApiClient.dio.post('/core/v1/jour/detail_front/$id');
+      return JourFrontDetail.fromJson(res.data['data']);
+    } catch (e) {
+      print("getJourDetail error: $e");
+      rethrow;
+    }
+  }
 
   // /// 📝TODO
   // static Future<String> getTbayBalance() async {

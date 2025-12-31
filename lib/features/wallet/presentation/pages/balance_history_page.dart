@@ -3,6 +3,7 @@ import 'package:BitOwi/models/jour.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/withdrawal_page.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/deposit_screen.dart';
+import 'package:BitOwi/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -321,83 +322,94 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
     if (val < 0) val = -val;
     final amountStr = "$amountPrefix${val.toStringAsFixed(2)}";
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          Routes.transactionDetail,
+          arguments: {
+            'id': tx.id,
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Image.asset(iconAsset, color: iconColor),
             ),
-            child: Image.asset(iconAsset, color: iconColor),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isDeposit ? "Deposit" : "Withdraw",
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Color(0xFF151E2F),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    tx.createDatetime != null
+                        ? DateTime.fromMillisecondsSinceEpoch(
+                            tx.createDatetime is int
+                                ? tx.createDatetime
+                                : int.tryParse(tx.createDatetime.toString()) ??
+                                    0,
+                          ).toString().split('.')[0]
+                        : '',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF717F9A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  isDeposit ? "Deposit" : "Withdraw",
-                  style: const TextStyle(
+                  amountStr,
+                  style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
-                    color: Color(0xFF151E2F),
+                    color: amountColor,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  tx.createDatetime != null
-                      ? DateTime.fromMillisecondsSinceEpoch(
-                          tx.createDatetime is int
-                              ? tx.createDatetime
-                              : int.tryParse(tx.createDatetime.toString()) ?? 0,
-                        ).toString().split('.')[0]
-                      : '',
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Color(0xFF717F9A),
+                if (tx.remark != null && tx.remark!.isNotEmpty)
+                  Text(
+                    tx.remark!,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF717F9A),
+                    ),
                   ),
-                ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                amountStr,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: amountColor,
-                ),
-              ),
-              const SizedBox(height: 4),
-              if (tx.remark != null && tx.remark!.isNotEmpty)
-                Text(
-                  tx.remark!,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Color(0xFF717F9A),
-                  ),
-                ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

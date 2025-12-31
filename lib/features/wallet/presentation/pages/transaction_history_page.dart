@@ -1,3 +1,4 @@
+import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/transaction_history_controller.dart';
 
 import 'package:flutter/material.dart';
@@ -237,74 +238,91 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Widget _buildDepositItem(dynamic item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xffF1F4F9)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                item.transAmount != null
-                    ? "+${item.transAmount} ${item.currency ?? ''}"
-                    : "+0 ${item.currency ?? ''}",
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xff27AE60),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xffE8F5E9),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  "Completed",
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          Routes.transactionDetail,
+          arguments: {
+            'id': item.id,
+          },
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xffF1F4F9)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  item.transAmount != null
+                      ? "+${item.transAmount} ${item.currency ?? ''}"
+                      : "+0 ${item.currency ?? ''}",
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xff27AE60),
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  item.remark ?? "Deposit",
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffE8F5E9),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    "Completed", 
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xff27AE60),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    item.remark ?? "Deposit",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xff929EB8),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  item.createDatetime != null
+                      ? DateTime.fromMillisecondsSinceEpoch(
+                          item.createDatetime is int
+                              ? item.createDatetime
+                              : int.tryParse(item.createDatetime.toString()) ??
+                                    0,
+                        ).toString().split('.')[0]
+                      : "",
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff929EB8),
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                item.createDatetime != null
-                    ? DateTime.fromMillisecondsSinceEpoch(
-                        item.createDatetime is int
-                            ? item.createDatetime
-                            : int.tryParse(item.createDatetime.toString()) ?? 0,
-                      ).toString().split('.')[0]
-                    : "",
-                style: const TextStyle(fontSize: 12, color: Color(0xff929EB8)),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -328,72 +346,89 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       statusBg = const Color(0xffFFF3E0);
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xffF1F4F9)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "-${item.actualAmount} ${item.currency}",
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xffEB5757),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusBg,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: statusColor,
-                    fontWeight: FontWeight.w500,
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          Routes.transactionDetail,
+          arguments: {
+            'id': item.id,
+          },
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xffF1F4F9)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "-${item.actualAmount} ${item.currency}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xffEB5757),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  "To: ${item.payCardNo ?? 'Unknown'}",
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: statusColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    "To: ${item.payCardNo ?? 'Unknown'}",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xff929EB8),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  item.createDatetime != null
+                      ? DateTime.fromMillisecondsSinceEpoch(
+                          item.createDatetime is int
+                              ? item.createDatetime
+                              : int.tryParse(item.createDatetime.toString()) ??
+                                    0,
+                        ).toString().split('.')[0]
+                      : "",
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xff929EB8),
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                item.createDatetime != null
-                    ? DateTime.fromMillisecondsSinceEpoch(
-                        item.createDatetime is int
-                            ? item.createDatetime
-                            : int.tryParse(item.createDatetime.toString()) ?? 0,
-                      ).toString().split('.')[0]
-                    : "",
-                style: const TextStyle(fontSize: 12, color: Color(0xff929EB8)),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
