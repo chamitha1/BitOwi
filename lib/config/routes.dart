@@ -11,7 +11,7 @@ import 'package:BitOwi/features/profile/presentation/pages/account_security_page
 import 'package:BitOwi/features/wallet/presentation/pages/transaction_detail_page.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/wallet_detail_page.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/deposit_screen.dart';
-import 'package:BitOwi/features/wallet/presentation/pages/withdrawal_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/withdraw_screen.dart';
 
 class Routes {
   static const String splash = '/splash';
@@ -74,7 +74,7 @@ class AppPages {
       name: Routes.withdrawal,
       page: () {
           final args = Get.arguments ?? {};
-          return WithdrawalPage(
+          return WithdrawScreen(
               symbol: Get.parameters['symbol'] ?? args['symbol'] ?? '', 
               accountNumber: Get.parameters['accountNumber'] ?? args['accountNumber'] ?? ''
           );

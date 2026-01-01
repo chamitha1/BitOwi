@@ -1,7 +1,7 @@
 import 'package:BitOwi/features/wallet/presentation/controllers/balance_history_controller.dart';
 import 'package:BitOwi/models/jour.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
-import 'package:BitOwi/features/wallet/presentation/pages/withdrawal_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/withdraw_screen.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/deposit_screen.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:flutter/material.dart';
@@ -426,7 +426,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                   if (controller.symbol != null &&
                       controller.accountNumber != null) {
                     Get.to(
-                      () => WithdrawalPage(
+                      () => WithdrawScreen(
                         symbol: controller.symbol!,
                         accountNumber: controller.accountNumber!,
                       ),

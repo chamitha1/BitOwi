@@ -88,9 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               // Index 1: P2P (Placeholder)
-              const Center(child: Text("P2P Page")),
+              // const Center(child: Text("P2P Page")),
               // Index 2: Order (Placeholder)
-              const Center(child: Text("Order Page")),
+              // const Center(child: Text("Order Page")),
               // Index 3: Profile
               const ProfileScreen(),
             ],

@@ -1,4 +1,5 @@
 import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/forgot_password_screen.dart';
@@ -102,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Refresh user data in the global controller
         await UserController.to.loadUser();
-        Get.offAll(() => const HomeScreen());
+        Get.offAllNamed(Routes.home);
       } else {
         throw 'Login failed: ${data['errorMsg'] ?? 'Unknown'}';
       }
@@ -213,12 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ForgotPasswordScreen(),
-                          ),
-                        );
+                        Get.to(() => const ForgotPasswordScreen());
                       },
                       child: Text(
                         'Forgot Password?'.tr,
@@ -327,12 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignupScreen(),
-                                ),
-                              );
+                              Get.offNamed(Routes.signup);
                             },
                         ),
                       ],

@@ -134,9 +134,8 @@ class WithdrawController extends GetxController {
       // print("Fetching details for ${symbol.value}...");
       final accountRes = await AccountApi.getDetailAccount(symbol.value);
 
-      note.value = ruleRes.withdrawRule ?? ''; // Use empty default if null
-      
-      // Update min amount text logic if needed, usually just displayed in UI from ruleInfo
+      note.value = ruleRes.withdrawRule ?? ''; 
+    
       
       availableAmount.value = accountRes.availableAmount?.toString() ?? '0.00';
     } catch (e) {
@@ -301,7 +300,7 @@ class WithdrawController extends GetxController {
 
   // Deprecated onApplyTap - kept empty or removed.
   // rename it to avoid confusion or remove it if not overridden.
-  // Since the UI calls it via OtpBottomSheet, we should update the UI call in WithdrawalPage.
+  // Since the UI calls it via OtpBottomSheet, we should update the UI call in WithdrawScreen.
   Future<bool> onApplyTap() async {
     return false;
   }

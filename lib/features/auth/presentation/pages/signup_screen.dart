@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/gradient_button.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
@@ -19,7 +20,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  late TextEditingController _emailController;
+  TextEditingController? _emailController;
 
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
@@ -55,24 +56,12 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
-
-    _emailController.addListener(() {
-      final t = _emailController.text.trim();
-      final populated = t.isNotEmpty;
-      if (_isEmailPopulated != populated) {
-        setState(() => _isEmailPopulated = populated);
-      }
-
-      if (_isEmailVerified && populated) {
-        setState(() => _isEmailVerified = false);
-      }
-    });
+    // _emailController is managed by Autocomplete
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    // _emailController.dispose(); // Managed by Autocomplete
     _passController.dispose();
     _confirmPassController.dispose();
     _inviteController.dispose();
@@ -84,7 +73,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   bool _validateEmailLocal() {
-    final email = _emailController.text.trim();
+    final email = _emailController?.text.trim() ?? "";
     if (email.isEmpty) {
       setState(() => _emailErrorText = "Please enter your email");
       return false;
@@ -132,7 +121,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (!_validateEmailLocal()) return;
 
-    final email = _emailController.text.trim();
+      final email = _emailController!.text.trim();
 
     setState(() => _sendingOtp = true);
 
@@ -157,7 +146,7 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: Colors.transparent,
         barrierColor: const Color(0xFFECEFF5).withOpacity(0.7),
         builder: (context) => OtpBottomSheet(
-          email: _emailController.text.trim(),
+          email: _emailController!.text.trim(),
           otpLength: 6,
           bizType: SmsBizType.register,
 
@@ -177,7 +166,7 @@ class _SignupScreenState extends State<SignupScreen> {
           // ✅ resend api
           onResend: () async {
             return await userApi.sendOtp(
-              email: _emailController.text.trim(),
+              email: _emailController!.text.trim(),
               bizType: SmsBizType.register,
             );
           },
@@ -220,7 +209,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     try {
       final resData = await userApi.signup(
-        email: _emailController.text.trim(),
+        email: _emailController!.text.trim(),
         smsCode: _verifiedOtp ?? "", // Use captured OTP
         loginPwd: _passController.text.trim(),
         inviteCode: _inviteController.text.trim().isEmpty
@@ -235,14 +224,11 @@ class _SignupScreenState extends State<SignupScreen> {
         final token = tokenData['token'] as String? ?? '';
 
         await StorageService.saveToken(token);
-        await StorageService.saveUserName(_emailController.text.trim());
+        await StorageService.saveUserName(_emailController!.text.trim());
 
         if (!mounted) return;
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        Get.offAllNamed(Routes.home);
       } else {
         _toast("Signup failed: ${resData['errorMsg']}");
       }
@@ -480,12 +466,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
-                            );
+                            Get.offNamed(Routes.login);
                           },
                       ),
                     ],
@@ -547,8 +528,8 @@ class _SignupScreenState extends State<SignupScreen> {
         return matches.map((d) => '$local@$d');
       },
       onSelected: (String selection) {
-        _emailController.text = selection;
-        _emailController.selection = TextSelection.fromPosition(
+        _emailController?.text = selection;
+        _emailController?.selection = TextSelection.fromPosition(
           TextPosition(offset: selection.length),
         );
         setState(() {
@@ -560,6 +541,22 @@ class _SignupScreenState extends State<SignupScreen> {
         if (_emailController != controller) {
           _emailController = controller;
           _autocompleteFocusNode = focusNode;
+          
+          _emailController!.addListener(() {
+             final t = _emailController!.text.trim();
+             final populated = t.isNotEmpty;
+             if (_isEmailPopulated != populated) {
+               setState(() => _isEmailPopulated = populated);
+             }
+
+             if (_isEmailVerified && populated) {
+               // Only reset if user changes email
+                // Note: this listener fires on build too often, need care?
+                // Actually simplicity: if verified but text changed (and text matches expectation?)
+                // Here we just replicate old logic: if text changed, unverify.
+               setState(() => _isEmailVerified = false);
+             }
+          });
         }
 
         return TextField(

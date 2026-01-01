@@ -114,9 +114,11 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("OTP verification failed: $e")));
+      try {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("OTP verification failed: $e")),
+        );
+      } catch (_) {}
     } finally {
       if (mounted) setState(() => _isVerifying = false);
     }

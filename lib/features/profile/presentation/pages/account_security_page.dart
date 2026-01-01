@@ -43,12 +43,12 @@ class AccountAndSecurityPage extends StatelessWidget {
           child: Column(
             children: [
               // Transaction Password
-              _buildMenuCard(
-                title: "Change Transaction password",
-                onTap: () {
-                   Get.to(() => const ChangeTransactionPasswordPage());
-                },
-              ),
+              // _buildMenuCard(
+              //   title: "Change Transaction password",
+              //   onTap: () {
+              //      Get.to(() => const ChangeTransactionPasswordPage());
+              //   },
+              // ),
               const SizedBox(height: 16),
 
               // Change Login Password

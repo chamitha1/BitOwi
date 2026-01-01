@@ -130,7 +130,14 @@ class _ChangeTransactionPasswordPageState
           onVerified: () {
             Navigator.pop(context);
             Get.back();
-            _toast("Transaction Password Updated Successfully!");
+            Get.snackbar(
+              "Success",
+              "Transaction Password Updated Successfully!",
+              backgroundColor: const Color(0xFFEAF9F0),
+              colorText: const Color(0xFF40A372),
+              snackPosition: SnackPosition.TOP,
+              margin: const EdgeInsets.all(20),
+            );
           },
         ),
       );

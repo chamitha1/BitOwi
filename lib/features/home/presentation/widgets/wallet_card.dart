@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../wallet/presentation/pages/deposit_screen.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/profile/presentation/pages/change_transaction_password_page.dart';
-import '../../../wallet/presentation/pages/withdrawal_page.dart';
+import '../../../wallet/presentation/pages/withdraw_screen.dart';
 
 class WalletCard extends StatefulWidget {
   const WalletCard({super.key});
@@ -91,7 +91,7 @@ class _WalletCardState extends State<WalletCard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WithdrawalPage(
+                          builder: (context) => WithdrawScreen(
                             symbol: controller.selectedAsset?.currency ?? '',
                             accountNumber:
                                 controller.selectedAsset?.accountNumber ?? '',

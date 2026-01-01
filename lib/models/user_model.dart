@@ -7,6 +7,7 @@ class User {
   String? id;
   String? nickname;
   String? email;
+  @JsonKey(name: 'photo')
   String? avatar;
   String? realName;
   String? loginName;

@@ -1,5 +1,6 @@
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/features/profile/presentation/pages/change_transaction_password_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -136,14 +137,12 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   child: Obx(() {
                     final avatarUrl = controller.user.value?.avatar;
-                    return ClipOval(
-                      child: (avatarUrl != null && avatarUrl.isNotEmpty)
-                          ? Image.network(avatarUrl, fit: BoxFit.cover)
-                          : const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.white,
-                            ),
+                    return const CircleAvatar(
+                      radius: 22,
+                      backgroundImage: AssetImage(
+                        "assets/images/home/avatar.png",
+                      ),
+                      backgroundColor: Color(0xffD9D9D9),
                     );
                   }),
                 ),
@@ -316,6 +315,13 @@ class ProfileScreen extends StatelessWidget {
             onTap: () => Get.toNamed(Routes.accountSecurity),
           ),
           const Divider(height: 1, color: Color(0xFFF0F4FF)),
+          _buildMenuItem(
+            iconPath: 'assets/icons/profile_page/security.svg',
+            title: "Change Transaction Password",
+            subtitle: "",
+            onTap: () => Get.to(() => const ChangeTransactionPasswordPage()),
+          ),
+          const Divider(height: 1, color: Color(0xFFF0F4FF)),
         ]),
         const SizedBox(height: 16),
         // ... (other cards)
@@ -361,7 +367,7 @@ class ProfileScreen extends StatelessWidget {
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.w500,
           fontFamily: 'Inter',
           color: Color(0xFF151E2F),

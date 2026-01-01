@@ -61,9 +61,9 @@ class HomeHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        _headerIconButton("assets/icons/home/notification.png"),
+        // _headerIconButton("assets/icons/home/notification.png"),
         const SizedBox(width: 12),
-        _headerIconButton("assets/icons/home/headphones.png"),
+        // _headerIconButton("assets/icons/home/headphones.png"),
       ],
     );
   }

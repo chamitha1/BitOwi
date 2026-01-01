@@ -42,9 +42,9 @@ class HomeBottomNavBar extends StatelessWidget {
         elevation: 0,
         items: [
           _navItem("assets/icons/home/home.png", "Home", 0),
-          _navItem("assets/icons/home/p2p.png", "P2P", 1),
-          _navItem("assets/icons/home/order.png", "Order", 2),
-          _navItem("assets/icons/home/profile.png", "Profile", 3),
+          // _navItem("assets/icons/home/p2p.png", "P2P", 1),
+          // _navItem("assets/icons/home/order.png", "Order", 2),
+          _navItem("assets/icons/home/profile.png", "Profile", 1),
         ],
       ),
     );
