@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/qr_scanner_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:BitOwi/features/wallet/presentation/widgets/coin_selector_card.dart'; 
 import 'package:get/get.dart';
 
 class WithdrawalPage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
   // final TextEditingController _amountController = TextEditingController();
   final WithdrawController controller = Get.put(WithdrawController());
 
-  double _fee = 0.00;
+
   bool _isWithdrawAll = false;
   bool _isPasswordObscure = true;
   final double _balance = 543488384.94;
@@ -42,16 +43,6 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
     controller.setArgs(widget.symbol, widget.accountNumber);
   }
 
-  void _calculateFee(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        _fee = 0.00;
-        return;
-      }
-      final amount = double.tryParse(value) ?? 0.0;
-      _fee = amount * 0.05;
-    });
-  }
 
   void _toggleWithdrawAll() {
     setState(() {
@@ -64,12 +55,11 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
             0.0;
 
         controller.amountController.text = maxAmount.toString();
-        _fee = maxAmount * 0.05;
-        controller.amountController.text = maxAmount.toString();
-        _fee = maxAmount * 0.05;
+   
+        controller.calculateFee(maxAmount.toString());
       } else {
         controller.amountController.clear();
-        _fee = 0.00;
+        controller.calculateFee('');
       }
     });
   }
@@ -95,14 +85,13 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
 
     if (!await controller.sendOtp(type: SmsBizType.withdraw)) return;
 
-    // Clear inputs
+   
     controller.clearInputs();
     setState(() {
-      _fee = 0.00;
+      controller.calculateFee('');
       _isWithdrawAll = false;
     });
 
-    // Get email for display in OTP sheet
     final userController = Get.find<UserController>();
     final email = userController.user.value?.loginName ??
         userController.user.value?.email ??
@@ -163,6 +152,16 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Coin Selector
+                    Obx(
+                      () => CoinSelectorCard(
+                        coinList: controller.coinList,
+                        selectedCoin: controller.selectedCoin.value,
+                        onCoinSelected: controller.onCoinSelected,
+                        isLoading: controller.isLoading.value,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     const Text(
                       "Withdraw Address",
                       style: TextStyle(
@@ -294,7 +293,9 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      onChanged: _calculateFee,
+                      onChanged: (val) {
+                          
+                      },
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -370,15 +371,15 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                             ),
                           ],
                         ),
-                        Text(
-                          "Fee : ${_fee.toStringAsFixed(2)} USDT",
+                        Obx(() => Text(
+                          "Fee : ${controller.fee.value.toStringAsFixed(2)} ${controller.symbol.value}",
                           style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
                             color: Color(0xFF2E3D5B),
                           ),
-                        ),
+                        )),
                       ],
                     ),
                     const SizedBox(height: 30),
@@ -467,29 +468,31 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
                             color: const Color(0xFF40A372),
                           ),
                           const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Friendly Reminder",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                  color: Color(0xFF40A372),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Friendly Reminder",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Color(0xFF40A372),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                "Minimum withdrawal amount: 10 USDT",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                  color: Color(0xFF40A372),
-                                ),
-                              ),
-                            ],
+                                const SizedBox(height: 4),
+                                Obx(() => Text(
+                                  controller.note.value.isNotEmpty ? controller.note.value : "Minimum withdrawal amount: ${controller.ruleInfo.value?.minAmount ?? '10'} ${controller.symbol.value}",
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                    color: Color(0xFF40A372),
+                                  ),
+                                )),
+                              ],
+                            ),
                           ),
                         ],
                       ),

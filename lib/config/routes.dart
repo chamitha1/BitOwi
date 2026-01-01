@@ -9,6 +9,9 @@ import 'package:BitOwi/features/auth/presentation/controllers/user_controller.da
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 import 'package:BitOwi/features/profile/presentation/pages/account_security_page.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/transaction_detail_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/wallet_detail_page.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/deposit_screen.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/withdrawal_page.dart';
 
 class Routes {
   static const String splash = '/splash';
@@ -18,6 +21,9 @@ class Routes {
   static const String home = '/HomeScreen'; 
   static const String accountSecurity = '/accountSecurity';
   static const String transactionDetail = '/transactionDetail';
+  static const String walletDetail = '/walletDetail';
+  static const String deposit = '/deposit';
+  static const String withdrawal = '/withdrawal';
 }
 
 class AppPages {
@@ -55,6 +61,24 @@ class AppPages {
     GetPage(
       name: Routes.transactionDetail,
       page: () => const TransactionDetailPage(),
+    ),
+    GetPage(
+      name: Routes.walletDetail,
+      page: () => const WalletDetailPage(),
+    ),
+    GetPage(
+      name: Routes.deposit,
+      page: () => const DepositScreen(),
+    ),
+    GetPage(
+      name: Routes.withdrawal,
+      page: () {
+          final args = Get.arguments ?? {};
+          return WithdrawalPage(
+              symbol: Get.parameters['symbol'] ?? args['symbol'] ?? '', 
+              accountNumber: Get.parameters['accountNumber'] ?? args['accountNumber'] ?? ''
+          );
+      },
     ),
   ];
 }

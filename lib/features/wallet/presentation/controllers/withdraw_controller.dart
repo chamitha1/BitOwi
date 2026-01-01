@@ -1,6 +1,7 @@
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
-import 'package:BitOwi/models/account.dart'; // Added
+import 'package:BitOwi/models/account.dart'; 
+import 'package:BitOwi/models/chain_symbol_list_res.dart'; // Added
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/api/user_api.dart';
@@ -28,6 +29,9 @@ class WithdrawController extends GetxController {
   var accountNumber = ''.obs;
   var lastWithdrawTransaction = Rxn<Jour>();
 
+  var coinList = <ChainSymbolListRes>[].obs;
+  var selectedCoin = Rxn<ChainSymbolListRes>();
+
   @override
   void onInit() {
     super.onInit();
@@ -36,6 +40,7 @@ class WithdrawController extends GetxController {
       symbol.value = Get.parameters['symbol'] ?? '';
       getInitData();
     }
+    fetchCoinList();
   }
 
   void setArgs(String symbolVal, String accountNumVal) async {
@@ -51,6 +56,59 @@ class WithdrawController extends GetxController {
       }
     }
     getInitData();
+    
+    if(coinList.isNotEmpty && symbol.value.isNotEmpty){
+       final match = coinList.firstWhereOrNull((c) => c.symbol == symbol.value);
+       if(match != null) selectedCoin.value = match;
+    }
+  }
+
+  Future<void> fetchCoinList() async {
+    try {
+      // isLoading.value = true; 
+      final list = await AccountApi.getChainSymbolList(withdrawFlag: '1');
+      coinList.value = list;
+
+      if (symbol.value.isNotEmpty) {
+           final match = coinList.firstWhereOrNull((c) => c.symbol == symbol.value);
+           if(match != null) selectedCoin.value = match;
+      } else if (coinList.isNotEmpty) {
+         
+         selectedCoin.value = coinList.first;
+         symbol.value = coinList.first.symbol ?? '';
+         getInitData();
+      }
+
+    } catch (e) {
+      print("Error fetching coin list: $e");
+    } 
+  }
+
+  var fee = 0.0.obs;
+
+  void onCoinSelected(ChainSymbolListRes coin) {
+    if(coin.symbol == symbol.value) return;
+
+    selectedCoin.value = coin;
+    symbol.value = coin.symbol ?? '';
+    
+    // Clear inputs when switching coins
+    addrController.clear();
+    amountController.clear();
+    tradeController.clear();
+    availableAmount.value = '0.00';
+    fee.value = 0.0; 
+
+    getInitData();
+  }
+
+  void calculateFee(String value) {
+    
+     if(ruleInfo.value?.withdrawFee != null){
+         fee.value = double.tryParse(ruleInfo.value!.withdrawFee!) ?? 0.0;
+     } else {
+        fee.value = 0.0;
+     }
   }
 
   void getInitData() async {
@@ -65,19 +123,25 @@ class WithdrawController extends GetxController {
       // Fetch Rules
       print("Fetching rules for ${symbol.value}...");
       final ruleRes = await AccountApi.getWithdrawRuleDetail(symbol.value);
+      ruleInfo.value = ruleRes; 
+      
+      // Update Fee from Rule
+      if(ruleRes.withdrawFee != null) {
+          fee.value = double.tryParse(ruleRes.withdrawFee!) ?? 0.0;
+      }
 
       // Fetch Account Balance
-      print("Fetching details for ${symbol.value}...");
+      // print("Fetching details for ${symbol.value}...");
       final accountRes = await AccountApi.getDetailAccount(symbol.value);
 
-      ruleInfo.value = ruleRes;
-      note.value = ruleRes.withdrawRule ?? 'No special rules.';
-
-      availableAmount.value = accountRes.usableAmount?.toString() ?? '0.00';
+      note.value = ruleRes.withdrawRule ?? ''; // Use empty default if null
+      
+      // Update min amount text logic if needed, usually just displayed in UI from ruleInfo
+      
+      availableAmount.value = accountRes.availableAmount?.toString() ?? '0.00';
     } catch (e) {
       print("Error fetching withdraw init data: $e");
-
-      note.value = "Unable to load withdrawal details. Please try again later.";
+      
     } finally {
       isLoading.value = false;
     }

@@ -8,6 +8,7 @@ import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/models/jour.dart';
 import 'package:BitOwi/models/jour_front_detail.dart';
+import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
 
 class AccountApi {
@@ -95,12 +96,7 @@ class AccountApi {
       final resData = res.data as Map<String, dynamic>;
       if (resData['code'] == 200 || resData['code'] == '200') {
         if (resData['data'] == null) {
-          print("Warning: Withdrawal rules for $symbol are NULL");
-          return WithdrawRuleDetailRes(
-            withdrawRule: "No withdrawal rules found for this asset.",
-            minAmount: "0",
-            withdrawFee: "0",
-          );
+          return WithdrawRuleDetailRes();
         }
         return WithdrawRuleDetailRes.fromJson(resData['data']);
       } else {
@@ -220,7 +216,25 @@ class AccountApi {
         '/core/v1/account/detailByUser',
         data: {'accountType': '4', 'currency': currency},
       );
-      return Account.fromJson(res.data['data']);
+
+      final data = res.data['data'];
+      if (data != null && data is Map<String, dynamic>) {
+        final fields = [
+          'availableAmount',
+          'totalAmount',
+          'frozenAmount',
+          'usableAmount',
+          'amount',
+          'amountUsdt',
+        ];
+        for (var field in fields) {
+          if (data[field] is num) {
+            data[field] = data[field].toString();
+          }
+        }
+      }
+
+      return Account.fromJson(data);
     } catch (e) {
       print("getDetailAccount error: $e");
       rethrow;
@@ -478,24 +492,38 @@ class AccountApi {
     }
   }
 
-  /// 📝TODO
-  // static Future<AccountDetailAccountAndJourRes> getDetailAccountAndJour(
-  //   String accountNumber,
-  //   String currency,
-  // ) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post(
-  //   //     '/core/v1/account/detail_account_and_jour',
-  //   //     {'accountNumber': accountNumber, 'currency': currency},
-  //   //   );
-  //   //   return AccountDetailAccountAndJourRes.fromJson(
-  //   //     CommonUtils.removeNullKeys(res),
-  //   //   );
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
+  static Future<AccountDetailAccountAndJourRes> getDetailAccountAndJour(
+    String accountNumber,
+    String currency,
+  ) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/account/detail_account_and_jour',
+        data: {'accountNumber': accountNumber, 'currency': currency},
+      );
+
+      var data = res.data['data'];
+      if (data != null && data is Map<String, dynamic>) {
+        final fields = [
+          'totalAmount',
+          'usableAmount',
+          'frozenAmount',
+          'totalAmountUsdt',
+          'totalAsset',
+        ];
+        for (var field in fields) {
+          if (data[field] is num) {
+            data[field] = data[field].toString();
+          }
+        }
+      }
+
+      return AccountDetailAccountAndJourRes.fromJson(data);
+    } catch (e) {
+      print("getDetailAccountAndJour error: $e");
+      rethrow;
+    }
+  }
 
   // /// 📝TODO
   static Future<JourFrontDetail> getJourDetail(String id) async {

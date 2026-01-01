@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'l10n/translations.dart';
@@ -19,26 +20,33 @@ class BitOwi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
 
-      translations: AppTranslations(),
-      locale: Get.deviceLocale,
-      fallbackLocale: AppTranslations.fallbackLocale,
+          translations: AppTranslations(),
+          locale: Get.deviceLocale,
+          fallbackLocale: AppTranslations.fallbackLocale,
 
-      supportedLocales: AppTranslations.supportedLocales,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+          supportedLocales: AppTranslations.supportedLocales,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
 
-      initialBinding: BindingsBuilder(() {
-        Get.put(UserController(), permanent: true);
-      }),
-      home: null,
-      initialRoute: Routes.splash,
-      getPages: AppPages.routes,
+          initialBinding: BindingsBuilder(() {
+            Get.put(UserController(), permanent: true);
+          }),
+          home: null,
+          initialRoute: Routes.splash,
+          getPages: AppPages.routes,
+        );
+      },
     );
   }
 }

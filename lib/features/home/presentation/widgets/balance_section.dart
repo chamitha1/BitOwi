@@ -1,5 +1,6 @@
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
+import 'package:BitOwi/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -161,14 +162,24 @@ class _BalanceSectionState extends State<BalanceSection> {
       final item = list[index];
       return Column(
         children: [
-          _assetItem(
-            icon: item.icon,
-            name: item.currency,
-            total: item.usableAmount,
-            frozen: item.frozenAmount,
-        
-            usdtVal: item.totalAsset,
-            currencyLabel: item.totalAssetCurrency,
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              if (item.currency != null && item.accountNumber != null) {
+                Get.toNamed(Routes.walletDetail, parameters: {
+                  'symbol': item.currency!,
+                  'accountNumber': item.accountNumber!,
+                });
+              }
+            },
+            child: _assetItem(
+              icon: item.icon,
+              name: item.currency,
+              total: item.usableAmount,
+              frozen: item.frozenAmount,
+              usdtVal: item.totalAsset,
+              currencyLabel: item.totalAssetCurrency,
+            ),
           ),
           if (index < list.length - 1)
             const Divider(height: 32, color: Color(0xFFF1F5F9)),

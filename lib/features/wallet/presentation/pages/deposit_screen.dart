@@ -79,7 +79,14 @@ class DepositScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const CoinSelectorCard(),
+                    Obx(
+                      () => CoinSelectorCard(
+                        coinList: controller.coinList,
+                        selectedCoin: controller.selectedCoin.value,
+                        onCoinSelected: controller.onCoinSelected,
+                        isLoading: controller.isLoading.value,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     Obx(() {
                       if (controller.isLoading.value) {
