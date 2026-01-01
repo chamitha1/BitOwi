@@ -220,4 +220,26 @@ class UserApi {
       rethrow;
     }
   }
+  // Forget Login Password
+  static Future<void> forgetLoginPwd({
+    required String email,
+    required String smsCaptcha,
+    required String loginPwd,
+  }) async {
+    try {
+      final res = await ApiClient.dio.post(
+        "/core/v1/user/public/forget_loginPwd_by_email",
+        data: {
+          "email": email,
+          "smsCaptcha": smsCaptcha,
+          "loginPwd": loginPwd,
+          "userKind": "C"
+        },
+      );
+      print("Forget Login Password Response: ${res.data}");
+    } catch (e) {
+      e.printError();
+      rethrow;
+    }
+  }
 }

@@ -25,6 +25,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _isEmailPopulated = false;
   bool _isEmailVerified = false;
   String? _passwordErrorText;
+  String _verifiedSmsCode = '';
   bool _isSendingOtp = false;
 
   static const List<String> _emailDomains = <String>[
@@ -42,20 +43,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     _emailController = TextEditingController();
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passController.dispose();
-    _confirmPassController.dispose();
-
-    super.dispose();
-  }
+  // ... (dispose)
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0XFFF6F9FF),
       appBar: AppBar(
+        // ... (existing app bar props)
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -100,6 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               _emailAutocompleteField(
                 hint: "Enter your email",
                 iconPath: "assets/icons/sign_up/sms.svg",
+                enabled: !_isEmailVerified,
                 suffixWidget: Padding(
                   padding: const EdgeInsets.only(
                     right: 8.0,
@@ -128,6 +124,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         print('OTP sent response: $response');
 
                         if (response == true) {
+                          if (!mounted) return;
                           await showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -141,11 +138,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               bizType: SmsBizType.forgetPwd,
 
                               onVerifyPin: (pin) async {
-                                // return await userApi.verifyOtp(
-                                //   email: _emailController.text.trim(),
-                                //   bizType: SmsBizType.forgetPwd,
-                                //   smsCode: pin,
-                                // );
+                      
+                                _verifiedSmsCode = pin; 
                                 return true;
                               },
 
@@ -170,6 +164,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                           );
                         } else {
+                          if (!mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
@@ -226,16 +221,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               GradientButton(
                 text: "Update",
                 onPressed: _isEmailVerified
-                    ? () {
+                    ? () async {
                         setState(() {
-                          if (_passController.text !=
+                          if (_passController.text.isEmpty) {
+                             _passwordErrorText = "Password cannot be empty";
+                          } else if (_passController.text.length < 6) {
+                             _passwordErrorText = "Password must be at least 6 characters";
+                          } else if (_passController.text !=
                               _confirmPassController.text) {
                             _passwordErrorText = "Passwords do not match";
                           } else {
                             _passwordErrorText = null;
-                            // Handle Update
                           }
                         });
+
+                        if (_passwordErrorText == null) {
+                           try {
+                             await UserApi.forgetLoginPwd(
+                               email: _emailController.text.trim(),
+                               smsCaptcha: _verifiedSmsCode,
+                               loginPwd: _passController.text,
+                             );
+                             
+                             if (!mounted) return;
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(content: Text("Password Reset Successful!")),
+                             );
+                             Navigator.pop(context);
+                             
+                           } catch (e) {
+                             if (!mounted) return;
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               SnackBar(content: Text("Reset Failed: $e")),
+                             );
+                           }
+                        }
                       }
                     : () {},
               ),
@@ -262,7 +282,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
-
+ 
   InputDecoration _inputDecoration({
     required String hint,
     required String iconPath,
@@ -443,6 +463,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     required String hint,
     required String iconPath,
     required Widget suffixWidget,
+    bool enabled = true,
   }) {
     return Autocomplete<String>(
       optionsBuilder: (TextEditingValue value) {
@@ -495,12 +516,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         return TextField(
           controller: controller,
           focusNode: focusNode,
+          enabled: enabled,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           decoration: _inputDecoration(
             hint: hint,
             iconPath: iconPath,
             suffixWidget: suffixWidget,
+            enabled: enabled,
           ),
           onSubmitted: (_) => onFieldSubmitted(),
         );

@@ -97,6 +97,7 @@
       - assets/icons/balance_history/
       - assets/icons/merchant_details/
       - assets/icons/forgot_password/
+      - assets/icons/profile_page/
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
