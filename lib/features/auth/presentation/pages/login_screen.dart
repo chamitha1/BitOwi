@@ -9,6 +9,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
   bool _rememberMe = false;
-  bool _isLoading = false; // ✅ FIX: add loading state
+  bool _isLoading = false; 
 
   final Color _primaryBlue = const Color(0XFF1D5DE5);
 
@@ -76,7 +77,9 @@ class _LoginScreenState extends State<LoginScreen> {
           'loginPwd': _passwordController.text,
         },
       );
-      final data = response.data as Map<String, dynamic>;
+      final dynamic rawData = response.data;
+
+      final Map<String, dynamic> data = rawData is String ? jsonDecode(rawData) : rawData;
 
       // ignore: avoid_print
       print('Login response: $data');
@@ -411,7 +414,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ✅ Autocomplete with TextFormField validator (no need _EmailErrorText)
   Widget _emailAutocompleteField({
     required String hint,
     required String iconPath,

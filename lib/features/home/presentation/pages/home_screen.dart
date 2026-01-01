@@ -8,6 +8,7 @@ import '../widgets/merchant_banner.dart';
 import '../widgets/balance_section.dart';
 import '../widgets/home_bottom_nav_bar.dart';
 import '../../../../features/profile/presentation/pages/profile_screen.dart';
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
