@@ -37,7 +37,7 @@ class _ChangeTransactionPasswordPageState
     if (userController.user.value == null) {
       await userController.loadUser();
     }
-    
+
     final user = userController.user.value;
     final email = user?.loginName ?? user?.email;
 
@@ -52,7 +52,7 @@ class _ChangeTransactionPasswordPageState
     _confirmPassController.dispose();
     super.dispose();
   }
-  
+
   void _toast(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
@@ -69,8 +69,6 @@ class _ChangeTransactionPasswordPageState
       _toast("Passwords do not match");
       return;
     }
-
-    // Trigger OTP Flow
     _openOtpSheet();
   }
 
@@ -79,7 +77,7 @@ class _ChangeTransactionPasswordPageState
     setState(() => _isLoading = true);
 
     try {
-      // 1. Send OTP first
+      // Send OTP first
       final success = await _userApi.sendOtp(
         email: _email,
         bizType: SmsBizType.bindTradePwd,
@@ -92,10 +90,14 @@ class _ChangeTransactionPasswordPageState
         setState(() => _isLoading = false);
         return;
       }
-      
-      setState(() => _isLoading = false); 
 
-      // 2. Show Sheet
+      setState(() => _isLoading = false);
+
+      final pendingPassword = _passController.text.trim();
+      _passController.clear();
+      _confirmPassController.clear();
+
+      // Show Sheet
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -104,19 +106,19 @@ class _ChangeTransactionPasswordPageState
           email: _email,
           otpLength: 6,
           bizType: SmsBizType.bindTradePwd,
-           //  API verify here
+          //  API verify here
           onVerifyPin: (pin) async {
-             try{
-                await _userApi.bindTradePwd(
-                  email: _email,
-                  smsCode: pin,
-                  tradePwd: _passController.text.trim(),
-                );
-                return true;
-             } catch(e){
-               print(e);
-               return false;
-             }
+            try {
+              await _userApi.bindTradePwd(
+                email: _email,
+                smsCode: pin,
+                tradePwd: pendingPassword,
+              );
+              return true;
+            } catch (e) {
+              print(e);
+              return false;
+            }
           },
           // resend api
           onResend: () async {
@@ -126,16 +128,16 @@ class _ChangeTransactionPasswordPageState
             );
           },
           onVerified: () {
-            Navigator.pop(context); 
-            Get.back(); 
+            Navigator.pop(context);
+            Get.back();
             _toast("Transaction Password Updated Successfully!");
           },
         ),
       );
     } catch (e) {
       if (mounted) {
-         setState(() => _isLoading = false);
-         _toast("Error: $e");
+        setState(() => _isLoading = false);
+        _toast("Error: $e");
       }
     }
   }
@@ -153,7 +155,7 @@ class _ChangeTransactionPasswordPageState
         ),
         title: const Text(
           "Change Transaction Password",
-           style: TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
@@ -169,7 +171,10 @@ class _ChangeTransactionPasswordPageState
             children: [
               _label("Email"),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFECEFF5),
                   borderRadius: BorderRadius.circular(12),
@@ -200,7 +205,9 @@ class _ChangeTransactionPasswordPageState
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEAF9F0),
                         borderRadius: BorderRadius.circular(20),
@@ -208,9 +215,13 @@ class _ChangeTransactionPasswordPageState
                       ),
                       child: Row(
                         children: const [
-                           Icon(Icons.check_circle, size: 14, color: Color(0xFF40A372)),
-                           SizedBox(width: 4),
-                           Text(
+                          Icon(
+                            Icons.check_circle,
+                            size: 14,
+                            color: Color(0xFF40A372),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
                             "Verified",
                             style: TextStyle(
                               fontSize: 12,
@@ -220,7 +231,7 @@ class _ChangeTransactionPasswordPageState
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -301,7 +312,7 @@ class _ChangeTransactionPasswordPageState
     return TextField(
       controller: controller,
       obscureText: !_isPasswordVisible,
-      keyboardType: TextInputType.number, 
+      keyboardType: TextInputType.number,
       decoration: InputDecoration(
         hintText: placeholder,
         hintStyle: const TextStyle(
@@ -312,7 +323,10 @@ class _ChangeTransactionPasswordPageState
         ),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
@@ -343,11 +357,11 @@ class _ChangeTransactionPasswordPageState
                 ? "assets/icons/sign_up/eye.svg"
                 : "assets/icons/sign_up/eye-slash.svg",
             width: 20,
-             height: 20,
-             colorFilter: const ColorFilter.mode(
-               Color(0xFF2E3D5B),
-               BlendMode.srcIn,
-             ),
+            height: 20,
+            colorFilter: const ColorFilter.mode(
+              Color(0xFF2E3D5B),
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () {
             setState(() {

@@ -10,6 +10,7 @@ import 'package:BitOwi/features/auth/presentation/pages/bind_trade_pwd_sheet.dar
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
 import 'package:BitOwi/models/withdraw_request.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/models/jour.dart';
 
 class WithdrawController extends GetxController {
@@ -37,9 +38,18 @@ class WithdrawController extends GetxController {
     }
   }
 
-  void setArgs(String symbolVal, String accountNumVal) {
+  void setArgs(String symbolVal, String accountNumVal) async {
     symbol.value = symbolVal;
-    accountNumber.value = accountNumVal;
+    if (accountNumVal.isNotEmpty) {
+      accountNumber.value = accountNumVal;
+    } else {
+      // Fallback: Try to get from storage
+      final storedAcc = await StorageService.getAccountNumber();
+      print("WithdrawController: args account empty, fetched from storage: $storedAcc");
+      if (storedAcc != null) {
+        accountNumber.value = storedAcc;
+      }
+    }
     getInitData();
   }
 
@@ -124,8 +134,14 @@ class WithdrawController extends GetxController {
   }
 
   Future<bool> sendOtp({SmsBizType type = SmsBizType.withdraw}) async {
-    final email = await StorageService.getUserName();
-    if (email == null) return false;
+    final userController = Get.find<UserController>();
+    final email = userController.user.value?.loginName ??
+        userController.user.value?.email;
+
+    if (email == null) {
+      Get.snackbar("Error", "Could not retrieve user email");
+      return false;
+    }
 
     try {
       final res = await UserApi().sendOtp(email: email, bizType: type);

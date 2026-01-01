@@ -1,4 +1,5 @@
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/withdraw_controller.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
@@ -101,7 +102,11 @@ class _WithdrawalPageState extends State<WithdrawalPage> {
       _isWithdrawAll = false;
     });
 
-    final email = await StorageService.getUserName() ?? '';
+    // Get email for display in OTP sheet
+    final userController = Get.find<UserController>();
+    final email = userController.user.value?.loginName ??
+        userController.user.value?.email ??
+        '';
 
     if (!mounted) return;
 
