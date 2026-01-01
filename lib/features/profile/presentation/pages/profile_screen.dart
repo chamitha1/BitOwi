@@ -48,16 +48,16 @@ class ProfileScreen extends StatelessWidget {
         ),
         Row(
           children: [
-            _buildCircleIconButton(
-              icon: Icons.person_add_alt_1_outlined,
-              onTap: () {},
-            ),
-            const SizedBox(width: 12),
-            _buildCircleIconButton(
-              icon: Icons.notifications_none_outlined,
-              onTap: () {},
-              // badgeCount: 99,
-            ),
+            // _buildCircleIconButton(
+            //   icon: Icons.person_add_alt_1_outlined,
+            //   onTap: () {},
+            // ),
+            // const SizedBox(width: 12),
+            // _buildCircleIconButton(
+            //   icon: Icons.notifications_none_outlined,
+            //   onTap: () {},
+            //   // badgeCount: 99,
+            // ),
           ],
         ),
       ],
@@ -249,30 +249,30 @@ class ProfileScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween, 
       crossAxisAlignment: CrossAxisAlignment.start, 
       children: [
-        _buildActionItem(
-          label: "My\nAds",
-          icon: Icons.campaign_outlined,
-          bgColor: const Color(0xFFE9F6FF),
-          borderColor: const Color(0xFFD4EDFF),
-        ),
-        _buildActionItem(
-          label: "My\nPartners", 
-          icon: Icons.people_outline,
-          bgColor: const Color(0xFFFFFBF6),
-          borderColor: const Color(0xFFFFEFDC),
-        ),
-        _buildActionItem(
-          label: "Payment\nMethods",
-          icon: Icons.credit_card_outlined,
-          bgColor: const Color(0xFFEAF9F0),
-          borderColor: const Color(0xFFD5F4E2),
-        ),
-        _buildActionItem(
-          label: "Customer\nCare",
-          icon: Icons.headset_mic_outlined,
-          bgColor: const Color(0xFFF4E9FE),
-          borderColor: const Color(0xFFD8ABFC),
-        ),
+        // _buildActionItem(
+        //   label: "My\nAds",
+        //   icon: Icons.campaign_outlined,
+        //   bgColor: const Color(0xFFE9F6FF),
+        //   borderColor: const Color(0xFFD4EDFF),
+        // ),
+        // _buildActionItem(
+        //   label: "My\nPartners", 
+        //   icon: Icons.people_outline,
+        //   bgColor: const Color(0xFFFFFBF6),
+        //   borderColor: const Color(0xFFFFEFDC),
+        // ),
+        // _buildActionItem(
+        //   label: "Payment\nMethods",
+        //   icon: Icons.credit_card_outlined,
+        //   bgColor: const Color(0xFFEAF9F0),
+        //   borderColor: const Color(0xFFD5F4E2),
+        // ),
+        // _buildActionItem(
+        //   label: "Customer\nCare",
+        //   icon: Icons.headset_mic_outlined,
+        //   bgColor: const Color(0xFFF4E9FE),
+        //   borderColor: const Color(0xFFD8ABFC),
+        // ),
       ],
     );
   }
