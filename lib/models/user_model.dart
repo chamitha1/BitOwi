@@ -11,6 +11,7 @@ class User {
   String? realName;
   String? loginName;
   String? tradePwdFlag;
+  String? merchantStatus;
 
   User({
     this.id,
@@ -20,6 +21,7 @@ class User {
     this.realName,
     this.loginName,
     this.tradePwdFlag,
+    this.merchantStatus,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

@@ -139,8 +139,11 @@ class ProfileScreen extends StatelessWidget {
                     return ClipOval(
                       child: (avatarUrl != null && avatarUrl.isNotEmpty)
                           ? Image.network(avatarUrl, fit: BoxFit.cover)
-                          : const Icon(Icons.person,
-                              size: 40, color: Colors.white), 
+                          : const Icon(
+                              Icons.person,
+                              size: 40,
+                              color: Colors.white,
+                            ),
                     );
                   }),
                 ),
@@ -151,7 +154,8 @@ class ProfileScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Obx(() {
-                        final name = controller.user.value?.nickname ??
+                        final name =
+                            controller.user.value?.nickname ??
                             controller.userName.value;
                         return Text(
                           name,
@@ -165,40 +169,44 @@ class ProfileScreen extends StatelessWidget {
                       }),
                       const SizedBox(height: 8),
                       // Certified Badge
-                      Obx(() => (controller.tradeInfo.value?.isTrust == '1')
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE8EFFF),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/profile_page/shield.svg',
-                                    width: 14,
-                                    height: 14,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color(0xFF1D5DE5),
-                                      BlendMode.srcIn,
+                      Obx(
+                        () => (controller.user.value?.merchantStatus == '1')
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE8EFFF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/profile_page/shield.svg',
+                                      width: 14,
+                                      height: 14,
+                                      colorFilter: const ColorFilter.mode(
+                                        Color(0xFF1D5DE5),
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Text(
-                                    "Certified",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: 'Inter',
-                                      color: Color(0xFF1D5DE5),
+                                    const SizedBox(width: 4),
+                                    const Text(
+                                      "Certified",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'Inter',
+                                        color: Color(0xFF1D5DE5),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : const SizedBox()),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
+                      ),
                     ],
                   ),
                 ),
@@ -210,47 +218,63 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.08),
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                 Row(
-                   children: [
-                     SvgPicture.asset(
-                       'assets/icons/profile_page/like.svg', 
-                       width: 14, 
-                       height: 14,
-                       colorFilter: const ColorFilter.mode(Color(0xFFFFC107), BlendMode.srcIn),
-                     ), 
-                     const SizedBox(width: 4),
-                     Obx(() => Text(
-                       "${controller.goodRate}%", 
-                       style: _statTextStyle(fontWeight: FontWeight.w400)
-                     )),
-                   ],
-                 ),
-                 
-                 Row(
-                   children: [
-                     Text("Trust ", style: _statTextStyle(fontWeight: FontWeight.w400)),
-                     Obx(() => Text(
-                       "${controller.tradeInfo.value?.confidenceCount ?? 0}",
-                       style: _statTextStyle(fontWeight: FontWeight.w600),
-                     )),
-                   ],
-                 ),
-                 
-                 Row(
-                   children: [
-                     Text("Trade ", style: _statTextStyle(fontWeight: FontWeight.w400)),
-                      Obx(() => Text(
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/profile_page/like.svg',
+                      width: 14,
+                      height: 14,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFFFFC107),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Obx(
+                      () => Text(
+                        "${controller.goodRate}%",
+                        style: _statTextStyle(fontWeight: FontWeight.w400),
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Text(
+                      "Trust ",
+                      style: _statTextStyle(fontWeight: FontWeight.w400),
+                    ),
+                    Obx(
+                      () => Text(
+                        "${controller.tradeInfo.value?.confidenceCount ?? 0}",
+                        style: _statTextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Text(
+                      "Trade ",
+                      style: _statTextStyle(fontWeight: FontWeight.w400),
+                    ),
+                    Obx(
+                      () => Text(
                         "${controller.tradeInfo.value?.totalTradeCount ?? "0"} / ${controller.finishRate}%",
                         style: _statTextStyle(fontWeight: FontWeight.w600),
-                      )),
-                   ],
-                 ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -258,7 +282,7 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   TextStyle _statTextStyle({required FontWeight fontWeight}) {
     return TextStyle(
       fontSize: 12,
@@ -327,8 +351,11 @@ class ProfileScreen extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(10),
         child: SvgPicture.asset(
-          iconPath, 
-          colorFilter: const ColorFilter.mode(Color(0xFF1D5DE5), BlendMode.srcIn),
+          iconPath,
+          colorFilter: const ColorFilter.mode(
+            Color(0xFF1D5DE5),
+            BlendMode.srcIn,
+          ),
         ),
       ),
       title: Text(
@@ -342,8 +369,8 @@ class ProfileScreen extends StatelessWidget {
       ),
       subtitle: Text(
         subtitle,
-         style: const TextStyle(
-          fontSize: 12, 
+        style: const TextStyle(
+          fontSize: 12,
           fontWeight: FontWeight.w400,
           fontFamily: 'Inter',
           color: Color(0xFF6A7282),
@@ -353,9 +380,8 @@ class ProfileScreen extends StatelessWidget {
         'assets/icons/profile_page/arrow-right.svg',
         width: 20,
         height: 20,
-         colorFilter: const ColorFilter.mode(Color(0xFF909DAD), BlendMode.srcIn),
+        colorFilter: const ColorFilter.mode(Color(0xFF909DAD), BlendMode.srcIn),
       ),
     );
   }
 }
-
