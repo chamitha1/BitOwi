@@ -1,7 +1,5 @@
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
-import 'package:BitOwi/features/merchant/presentation/pages/become_merchant_page.dart';
-import 'package:BitOwi/features/merchant/presentation/pages/personal_information_page.dart';
 import 'package:BitOwi/features/merchant/presentation/pages/user_kyc_information_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/change_transaction_password_page.dart';
 import 'package:flutter/material.dart';
@@ -316,12 +314,12 @@ class ProfileScreen extends StatelessWidget {
             title: "KYC",
             subtitle: "User KYC verification",
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => UserKycInformationPage(),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserKycInformationPage(),
+                ),
+              );
             },
           ),
           const Divider(height: 1, color: Color(0xFFF0F4FF)),

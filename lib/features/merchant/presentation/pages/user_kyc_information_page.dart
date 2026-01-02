@@ -1,7 +1,6 @@
-import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/user_api.dart';
-import 'package:BitOwi/features/merchant/presentation/widgets/personal_information_status_page.dart';
+import 'package:BitOwi/features/merchant/presentation/widgets/user_kyc_information_status_page.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
 import 'package:BitOwi/models/identify_order_list_res.dart';
@@ -83,22 +82,10 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
       setState(() {
         // for success submit
         latestSubmittedInfo = list.isNotEmpty ? list.first : null;
+        merchantStatus = latestSubmittedInfo?.status;
       });
     } catch (e) {}
   }
-
-  Future<void> getHomeAsset() async {
-    try {
-      // Merchant certification status -1: Not initiated, 0: Under review, 1: Review passed, 2: Review failed, 3: Decertification under review, 4: Decertification
-      final res = await AccountApi.getHomeAsset();
-
-      setState(() {
-        merchantStatus = res.merchantStatus;
-      });
-    } catch (e) {}
-  }
-
-  
 
   Future<void> getInitData() async {
     try {
@@ -108,10 +95,10 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
       });
 
       final result = await Future.wait<dynamic>([
-        getHomeAsset(),
         CommonApi.getDictList(parentKey: 'id_kind'),
         CommonApi.getCountryList(),
         CommonApi.getConfig(type: 'identify_config'),
+        getLatestIdentifyOrderList(),
       ]);
 
       topTip = result[2].data['identify_note'] ?? '';
@@ -119,6 +106,16 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
 
       idTypeList = result[0];
       countryList = result[1];
+
+      //!
+      if (latestSubmittedInfo != null &&
+          countryList.isNotEmpty &&
+          idTypeList.isNotEmpty &&
+          ((latestSubmittedInfo!.status == '2') ||
+              (latestSubmittedInfo!.status == '0') ||
+              (latestSubmittedInfo!.status == '1'))) {
+        _fillFormFromLatestInfo();
+      }
 
       // ToastUtil.dismiss();
       // setState(() {});
@@ -135,6 +132,42 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
         _isLoading = false;
       });
     }
+  }
+
+  void _fillFormFromLatestInfo() {
+    if (latestSubmittedInfo == null) return;
+
+    // --- Country index ---
+    final countryIdx = countryList.indexWhere(
+      (c) => c.id == latestSubmittedInfo!.countryId,
+    );
+
+    // --- ID type index ---
+    final idTypeIdx = idTypeList.indexWhere(
+      (d) => d.key == latestSubmittedInfo!.kind,
+    );
+
+    // --- Expiry date ---
+    DateTime? expiry;
+    if (latestSubmittedInfo!.expireDate != '00/0000') {
+      try {
+        final parts = latestSubmittedInfo!.expireDate.split('/');
+        final month = int.parse(parts[0]);
+        final year = int.parse(parts[1]);
+        expiry = DateTime(year, month);
+      } catch (_) {}
+    }
+
+    setState(() {
+      if (countryIdx >= 0) countryIndex = countryIdx;
+      if (idTypeIdx >= 0) idTypeIndex = idTypeIdx;
+
+      _nameController.text = latestSubmittedInfo!.realName;
+      _idNumberController.text = latestSubmittedInfo!.idNo;
+      _selectedExpiryDate = expiry;
+
+      faceUrl = latestSubmittedInfo!.frontImage;
+    });
   }
 
   @override
@@ -184,9 +217,12 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: merchantStatus == null || merchantStatus == '-1'
+            child:
+                merchantStatus == null ||
+                    merchantStatus == '-1' ||
+                    merchantStatus == '2'
                 ? personalInfoInputContent(context)
-                : SuccessfullySubmittedKYCInfo(
+                : UserKycStatusPage(
                     countryIndex: countryIndex,
                     countryList: countryList,
                     idTypeIndex: idTypeIndex,
@@ -1306,13 +1342,18 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
   }
 
   Container buildTopTipWarningCard() {
+    final bool isRejected = merchantStatus == '2';
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFBF6),
+        color: isRejected ? Color(0xFFFDF4F5) : const Color(0xFFFFFBF6),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFFE2C1), width: 1),
+        border: Border.all(
+          color: isRejected ? Color(0xFFF5B7B1) : const Color(0xFFFFE2C1),
+          width: 1,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1321,20 +1362,25 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
             'assets/icons/merchant_details/info_circle.svg',
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(Color(0xFFC9710D), BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(
+              isRejected ? Color(0xFFCF4436) : Color(0xFFC9710D),
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "KYC Verification Required",
+                Text(
+                  isRejected
+                      ? "KYC Verification Failed"
+                      : "KYC Verification Required",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
-                    color: Color(0xFFC9710D),
+                    color: isRejected ? Color(0xFFCF4436) : Color(0xFFC9710D),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1344,7 +1390,7 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
                     fontSize: 12,
-                    color: Color(0xFFC9710D),
+                    color: isRejected ? Color(0xFFCF4436) : Color(0xFFC9710D),
                   ),
                 ),
               ],
@@ -1360,7 +1406,10 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
               'assets/icons/merchant_details/close-square.svg',
               width: 20,
               height: 20,
-              colorFilter: ColorFilter.mode(Color(0xFFC9710D), BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                isRejected ? Color(0xFFCF4436) : Color(0xFFC9710D),
+                BlendMode.srcIn,
+              ),
             ),
           ),
         ],
@@ -1440,8 +1489,8 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          "Submit",
+        child: Text(
+          merchantStatus == '2' ? "Resubmit" : "Submit",
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
