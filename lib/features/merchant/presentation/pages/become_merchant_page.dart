@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/features/merchant/presentation/pages/personal_information_page.dart';
@@ -15,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BecomeMerchantPage extends StatefulWidget {
-  
   const BecomeMerchantPage({super.key});
 
   @override
@@ -43,7 +43,12 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
         _isLoading = true;
       });
 
-      await Future.wait<void>([getHomeAsset(), getLatestIdentifyOrderList()]);
+      await Future.wait<void>([
+        getLockAmount(),
+        getHomeAsset(),
+        getLatestIdentifyOrderList(),
+        getUSDTAmount(),
+      ]);
     } catch (e) {}
 
     // ToastUtil.dismiss();
@@ -71,6 +76,43 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
 
       setState(() {
         assetInfo = res;
+        // hasEnoughAmount = assetInfo.merchantStatus
+      });
+    } catch (e) {}
+  }
+
+  double usdtAmount = 0;
+  String frozenAmount = '';
+  String get merchantStatus {
+    return assetInfo?.merchantStatus ?? '';
+  }
+
+  bool get hasEnoughAmount {
+    if (merchantStatus == '0' ||
+        merchantStatus == '1' ||
+        merchantStatus == '3') {
+      return true;
+    }
+    if (assetInfo == null || double.tryParse(frozenAmount) == null) {
+      return false;
+    }
+    return usdtAmount >= double.parse(frozenAmount);
+  }
+
+  Future<void> getLockAmount() async {
+    try {
+      final res = await CommonApi.getConfig(key: 'merchant_frozen_amount');
+      setState(() {
+        frozenAmount = res.data["merchant_frozen_amount"] ?? '';
+      });
+    } catch (e) {}
+  }
+
+  Future<void> getUSDTAmount() async {
+    try {
+      final res = await AccountApi.getDetailAccount('USDT');
+      setState(() {
+        usdtAmount = double.tryParse(res.availableAmount!) ?? 0;
       });
     } catch (e) {}
   }
@@ -205,12 +247,13 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
                       // StepCard 2
                       StepCard(
                         title: "Deposit Fund",
-                        description:
-                            "Deposit minimum 1000 USDT to activate merchant account",
+                        // description:
+                        //     "Deposit minimum 1000 USDT to activate merchant account",
+                        description: "Deposit amount ${frozenAmount}USDT'",
                         iconPath: "assets/icons/merchant_details/money.svg",
                         stepNumber: "2",
                         iconBackgroundColor: Color(0xFFF4E9FE),
-                        secondaryIconPath: assetInfo?.merchantStatus == '1'
+                        secondaryIconPath: hasEnoughAmount
                             ? "assets/icons/merchant_details/tick-circle.svg"
                             : null,
                       ),
