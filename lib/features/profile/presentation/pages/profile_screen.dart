@@ -1,5 +1,8 @@
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/features/merchant/presentation/pages/become_merchant_page.dart';
+import 'package:BitOwi/features/merchant/presentation/pages/personal_information_page.dart';
+import 'package:BitOwi/features/merchant/presentation/pages/user_kyc_information_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/change_transaction_password_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -26,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildQuickActionsRow(),
               const SizedBox(height: 24),
-              _buildMenuCards(),
+              _buildMenuCards(context),
               const SizedBox(height: 40),
             ],
           ),
@@ -303,11 +306,25 @@ class ProfileScreen extends StatelessWidget {
 
   // ... (existing _buildActionItem)
 
-  Widget _buildMenuCards() {
+  Widget _buildMenuCards(BuildContext context) {
     return Column(
       children: [
         // Card 1
         _buildGroupCard([
+          _buildMenuItem(
+            iconPath: 'assets/icons/merchant_details/user_kyc.svg',
+            title: "KYC",
+            subtitle: "User KYC verification",
+            onTap: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => UserKycInformationPage(),
+              //   ),
+              // );
+            },
+          ),
+          const Divider(height: 1, color: Color(0xFFF0F4FF)),
           _buildMenuItem(
             iconPath: 'assets/icons/profile_page/security.svg',
             title: "Account and Security",

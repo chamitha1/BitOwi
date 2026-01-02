@@ -1,3 +1,4 @@
+import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/personal_information_status_page.dart';
@@ -13,23 +14,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 // import 'package:file_picker/file_picker.dart';
 
-class KycPersonalInformationPage extends StatefulWidget {
-  String merchantStatus;
-  bool isEdit;
-
-  KycPersonalInformationPage({
-    super.key,
-    required this.merchantStatus,
-    required this.isEdit,
-  });
+class UserKycInformationPage extends StatefulWidget {
+  const UserKycInformationPage({super.key});
 
   @override
-  State<KycPersonalInformationPage> createState() =>
-      _KycPersonalInformationPageState();
+  State<UserKycInformationPage> createState() => _UserKycInformationPageState();
 }
 
-class _KycPersonalInformationPageState
-    extends State<KycPersonalInformationPage> {
+class _UserKycInformationPageState extends State<UserKycInformationPage> {
+  String? merchantStatus;
   final _formKey = GlobalKey<FormState>();
 
   String topTip = '';
@@ -68,14 +61,11 @@ class _KycPersonalInformationPageState
 
   IdentifyOrderListRes? latestSubmittedInfo;
 
-  bool isEdit = false;
-
   @override
   void initState() {
     super.initState();
     // isEdit = Get.parameters["edit"] == '1';
     // for rejected status re apply via edit
-    isEdit = widget.isEdit;
     getInitData();
   }
 
@@ -97,6 +87,19 @@ class _KycPersonalInformationPageState
     } catch (e) {}
   }
 
+  Future<void> getHomeAsset() async {
+    try {
+      // Merchant certification status -1: Not initiated, 0: Under review, 1: Review passed, 2: Review failed, 3: Decertification under review, 4: Decertification
+      final res = await AccountApi.getHomeAsset();
+
+      setState(() {
+        merchantStatus = res.merchantStatus;
+      });
+    } catch (e) {}
+  }
+
+  
+
   Future<void> getInitData() async {
     try {
       // ToastUtil.showLoading();
@@ -105,6 +108,7 @@ class _KycPersonalInformationPageState
       });
 
       final result = await Future.wait<dynamic>([
+        getHomeAsset(),
         CommonApi.getDictList(parentKey: 'id_kind'),
         CommonApi.getCountryList(),
         CommonApi.getConfig(type: 'identify_config'),
@@ -116,22 +120,6 @@ class _KycPersonalInformationPageState
       idTypeList = result[0];
       countryList = result[1];
 
-      if (isEdit) {
-        final list = await UserApi.getIdentifyOrderList();
-        if (list.isNotEmpty) {
-          final order = list.first;
-          countryIndex = countryList.indexWhere(
-            (element) => element.id == order.countryId,
-          );
-          idTypeIndex = idTypeList.indexWhere(
-            (element) => element.key == order.kind,
-          );
-          // expiry not loaded, since its optional
-          _nameController.text = order.realName;
-          _idNumberController.text = order.idNo;
-          faceUrl = order.frontImage;
-        }
-      }
       // ToastUtil.dismiss();
       // setState(() {});
 
@@ -151,6 +139,7 @@ class _KycPersonalInformationPageState
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("🚀${merchantStatus}🚀");
     return PopScope(
       canPop: false, // prevent automatic pop
       onPopInvokedWithResult: (didPop, result) {
@@ -159,7 +148,7 @@ class _KycPersonalInformationPageState
         // Handle system back + gesture back
         Navigator.pop(
           context,
-          widget.merchantStatus != '-1',
+          merchantStatus != '-1',
         ); //  return value to previous screen
       },
       child: Scaffold(
@@ -179,8 +168,7 @@ class _KycPersonalInformationPageState
                 BlendMode.srcIn,
               ),
             ),
-            onPressed: () =>
-                Navigator.pop(context, widget.merchantStatus != '-1'),
+            onPressed: () => Navigator.pop(context, merchantStatus != '-1'),
           ),
           title: const Text(
             "Personal Information",
@@ -196,7 +184,7 @@ class _KycPersonalInformationPageState
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: widget.merchantStatus == '-1'
+            child: merchantStatus == null || merchantStatus == '-1'
                 ? personalInfoInputContent(context)
                 : SuccessfullySubmittedKYCInfo(
                     countryIndex: countryIndex,
@@ -206,7 +194,7 @@ class _KycPersonalInformationPageState
                     name: _nameController.text,
                     idNumber: _idNumberController.text,
                     expiryDate: _selectedExpiryDate,
-                    merchantStatus: widget.merchantStatus,
+                    merchantStatus: merchantStatus ?? '-1',
                     identifyOrderLatestSubmittedInfoStatus:
                         latestSubmittedInfo?.status ?? '0',
                   ),
@@ -1418,8 +1406,7 @@ class _KycPersonalInformationPageState
                       await getLatestIdentifyOrderList();
                       setState(() {
                         _isLoading = false;
-                        widget.merchantStatus =
-                            latestSubmittedInfo?.status ?? '0';
+                        merchantStatus = latestSubmittedInfo?.status ?? '0';
                       });
                     } else {
                       setState(() {

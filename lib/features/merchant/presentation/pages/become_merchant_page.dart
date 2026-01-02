@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BecomeMerchantPage extends StatefulWidget {
+  
   const BecomeMerchantPage({super.key});
 
   @override
@@ -366,6 +367,10 @@ Widget _buildActionButton(
     onReturn,
   );
 
+  if (config == null) {
+    return const SizedBox.shrink();
+  }
+
   return SizedBox(
     width: double.infinity,
     height: 56,
@@ -402,7 +407,7 @@ Widget _buildActionButton(
   );
 }
 
-_ActionButtonConfig _getActionConfig(
+_ActionButtonConfig? _getActionConfig(
   BuildContext context,
   String merchantStatus,
   String identifyOrderLatestSubmittedInfoStatus,
@@ -481,12 +486,13 @@ _ActionButtonConfig _getActionConfig(
   } else {
     switch (merchantStatus) {
       case '0':
-        return _ActionButtonConfig(
-          label: "Deposit Fund",
-          backgroundColor: const Color(0xFFCBD5E1),
-          textColor: const Color(0xFF64748B),
-          onPressed: null,
-        );
+        return null;
+      // return _ActionButtonConfig(
+      //   label: "Deposit Fund",
+      //   backgroundColor: const Color(0xFFCBD5E1),
+      //   textColor: const Color(0xFF64748B),
+      //   onPressed: null,
+      // );
 
       case '3':
         return _ActionButtonConfig(
@@ -517,17 +523,18 @@ _ActionButtonConfig _getActionConfig(
         );
 
       case '1':
-        return _ActionButtonConfig(
-          label: "Deposit Fund",
-          backgroundColor: const Color(0xFF1D5DE5),
-          textColor: Colors.white,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DepositScreen()),
-            );
-          },
-        );
+        return null;
+      // return _ActionButtonConfig(
+      //   label: "Deposit Fund",
+      //   backgroundColor: const Color(0xFF1D5DE5),
+      //   textColor: Colors.white,
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const DepositScreen()),
+      //     );
+      //   },
+      // );
     }
   }
   return _ActionButtonConfig(

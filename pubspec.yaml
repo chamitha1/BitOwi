@@ -68,6 +68,21 @@
     # package. See that file for information about deactivating specific lint
     # rules and activating additional ones.
     flutter_lints: ^6.0.0
+    flutter_launcher_icons: ^0.14.4
+
+  flutter_launcher_icons:
+    android: true
+    ios: false 
+
+    # Main launcher icon (pre-Android 12 & iOS)
+    image_path: assets/app_icons/app_icon.png
+
+    # Android 12+ adaptive icon config
+    adaptive_icon_background: assets/app_icons/app_icon_background.png
+    adaptive_icon_foreground: assets/app_icons/app_icon_foreground.png
+
+      # Android 13+ monochrome (optional but recommended)
+      # adaptive_icon_monochrome: assets/icons/app_icon_monochrome.png
 
   # For information on the generic Dart part of this file, see the
   # following page: https://dart.dev/tools/pub/pubspec
@@ -98,6 +113,7 @@
       - assets/icons/merchant_details/
       - assets/icons/forgot_password/
       - assets/icons/profile_page/
+      - assets/app_icons/
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
