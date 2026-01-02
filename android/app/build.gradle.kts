@@ -16,16 +16,21 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.BitOwi"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    namespace = "com.bitowi.app"
+    compileSdk = 36
+    ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.example.BitOwi"
+        applicationId = "com.bitowi.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        ndk {
+            abiFilters.clear()
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     compileOptions {
@@ -56,6 +61,16 @@ android {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
+        }
+    }
+
+    packaging {
+        jniLibs {
+            excludes += setOf(
+                "**/x86_64/**",
+                "**/libbarhopper_v3.so",
+                "**/libimage_processing_util_jni.so"
+            )
         }
     }
 }

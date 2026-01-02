@@ -1,4 +1,4 @@
-package com.example.BitOwi
+package com.bitowi.app
 
 import io.flutter.embedding.android.FlutterActivity
 
