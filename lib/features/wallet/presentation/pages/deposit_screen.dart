@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/wallet/presentation/controllers/deposit_controller.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -141,11 +142,9 @@ class DepositScreen extends StatelessWidget {
                                   text: controller.depositAddress.value,
                                 ),
                               );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Address copied to clipboard"),
-                                  duration: Duration(seconds: 2),
-                                ),
+                              CustomSnackbar.showSuccess(
+                                title: "Success",
+                                message: "Address copied to clipboard",
                               );
                             },
                             child: Container(

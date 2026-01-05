@@ -1,4 +1,5 @@
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/withdraw_controller.dart';
@@ -233,10 +234,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                 } else if (status.isPermanentlyDenied) {
                                   openAppSettings();
                                 } else {
-                                  Get.snackbar(
-                                    "Permission Denied",
-                                    "Camera permission is required to scan QR codes.",
-                                    snackPosition: SnackPosition.BOTTOM,
+                                  CustomSnackbar.showError(
+                                    title: "Permission Denied",
+                                    message: "Camera permission is required to scan QR codes.",
                                   );
                                 }
                               },

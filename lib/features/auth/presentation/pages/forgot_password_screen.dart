@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/gradient_button.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -153,24 +154,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               onVerified: () {
                                 Navigator.pop(context);
                                 setState(() => _isEmailVerified = true);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Email Verified Successfully!",
-                                    ),
-                                  ),
+                                CustomSnackbar.showSuccess(
+                                  title: "Success",
+                                  message: "Email Verified Successfully!",
                                 );
                               },
                             ),
                           );
                         } else {
                           if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Failed to send OTP. Please try again.',
-                              ),
-                            ),
+                          CustomSnackbar.showError(
+                            title: "Error",
+                            message: "Failed to send OTP. Please try again.",
                           );
                         }
                       }
@@ -244,15 +239,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                              );
                              
                              if (!mounted) return;
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               const SnackBar(content: Text("Password Reset Successful!")),
+                             CustomSnackbar.showSuccess(
+                               title: "Success",
+                               message: "Password Reset Successful!",
                              );
                              Navigator.pop(context);
                              
                            } catch (e) {
                              if (!mounted) return;
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(content: Text("Reset Failed: $e")),
+                             CustomSnackbar.showError(
+                               title: "Error",
+                               message: "Reset Failed: $e",
                              );
                            }
                         }

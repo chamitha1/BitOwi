@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/jour_front_detail.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
 import 'package:get/get.dart';
@@ -62,7 +63,7 @@ class TransactionDetailController extends GetxController {
       }
     } catch (e) {
       print("Error fetching transaction detail: $e");
-      Get.snackbar("Error", "Failed to load details");
+      CustomSnackbar.showError(title: "Error", message: "Failed to load details");
     } finally {
       isLoading.value = false;
     }

@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
 import 'package:BitOwi/models/account.dart'; 
 import 'package:BitOwi/models/chain_symbol_list_res.dart'; // Added
@@ -152,16 +153,16 @@ class WithdrawController extends GetxController {
     final tradePwd = tradeController.text.trim();
 
     if (payCardNo.isEmpty) {
-      Get.snackbar("Error", "Please enter withdrawal address or scan QR");
+      CustomSnackbar.showError(title: "Error", message: "Please enter withdrawal address or scan QR");
       return false;
     } else if (amount.isEmpty) {
-      Get.snackbar("Error", "Please enter withdrawal amount");
+      CustomSnackbar.showError(title: "Error", message: "Please enter withdrawal amount");
       return false;
     } else if (double.tryParse(amount) == null) {
-      Get.snackbar("Error", "Invalid amount");
+      CustomSnackbar.showError(title: "Error", message: "Invalid amount");
       return false;
     } else if (tradePwd.isEmpty) {
-      Get.snackbar("Error", "Please enter transaction password");
+      CustomSnackbar.showError(title: "Error", message: "Please enter transaction password");
       return false;
     }
 
@@ -183,7 +184,7 @@ class WithdrawController extends GetxController {
       if (errorMsg.startsWith("Exception: ")) {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");
       }
-      Get.snackbar("Error", errorMsg);
+      CustomSnackbar.showError(title: "Error", message: errorMsg);
       return false;
     } finally {
       isLoading.value = false;
@@ -202,21 +203,21 @@ class WithdrawController extends GetxController {
         userController.user.value?.email;
 
     if (email == null) {
-      Get.snackbar("Error", "Could not retrieve user email");
+      CustomSnackbar.showError(title: "Error", message: "Could not retrieve user email");
       return false;
     }
 
     try {
       final res = await UserApi().sendOtp(email: email, bizType: type);
       if (res) {
-        Get.snackbar("Success", "OTP sent successfully");
+        CustomSnackbar.showSuccess(title: "Success", message: "OTP sent successfully");
         return true;
       } else {
-        Get.snackbar("Error", "Failed to send OTP");
+        CustomSnackbar.showError(title: "Error", message: "Failed to send OTP");
         return false;
       }
     } catch (e) {
-      Get.snackbar("Error", "Error sending OTP: $e");
+      CustomSnackbar.showError(title: "Error", message: "Error sending OTP: $e");
       return false;
     }
   }
@@ -231,7 +232,7 @@ class WithdrawController extends GetxController {
       final savedPwd = tempData['pwd'];
 
       if (savedAddr == null || savedAmount == null || savedPwd == null) {
-        Get.snackbar("Error", "Session expired. Please try again.");
+        CustomSnackbar.showError(title: "Error", message: "Session expired. Please try again.");
         return false;
       }
 
@@ -291,7 +292,7 @@ class WithdrawController extends GetxController {
       if (errorMsg.startsWith("Exception: ")) {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");
       }
-      Get.snackbar("Error", errorMsg);
+      CustomSnackbar.showError(title: "Error", message: errorMsg);
       return false;
     } finally {
       isLoading.value = false;

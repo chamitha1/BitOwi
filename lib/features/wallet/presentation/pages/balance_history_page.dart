@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/wallet/presentation/controllers/balance_history_controller.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/jour.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/withdraw_screen.dart';
@@ -432,7 +433,10 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                       ),
                     );
                   } else {
-                    Get.snackbar("Error", "Account details missing");
+                    CustomSnackbar.showError(
+                      title: "Error",
+                      message: "Account details missing",
+                    );
                   }
                 },
                 style: OutlinedButton.styleFrom(

@@ -8,6 +8,7 @@ import '../widgets/merchant_banner.dart';
 import '../widgets/balance_section.dart';
 import '../widgets/home_bottom_nav_bar.dart';
 import '../../../../features/profile/presentation/pages/profile_screen.dart';
+import '../../../../features/p2p/presentation/pages/p2p_page.dart';
 import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
@@ -87,11 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              // Index 1: P2P (Placeholder)
-              // const Center(child: Text("P2P Page")),
+              // Index 1: P2P
+              const P2PPage(),
               // Index 2: Order (Placeholder)
               // const Center(child: Text("Order Page")),
-              // Index 3: Profile
+              // Index 2: Profile
               const ProfileScreen(),
             ],
           ),

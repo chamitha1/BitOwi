@@ -12,7 +12,6 @@ class AwsUploadUtil {
   static final AwsUploadUtil _singleton = AwsUploadUtil._internal();
 
   factory AwsUploadUtil() => _singleton;
-
   /// Get upload parameters
   Future<FormData> getUploadParams(XFile xfile) async {
     MultipartFile file;

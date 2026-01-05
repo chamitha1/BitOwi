@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/user_kyc_information_status_page.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
@@ -1223,7 +1224,10 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
       const maxSize = 5 * 1024 * 1024; // 5 MB
 
       if (bytes.lengthInBytes > maxSize) {
-        showRedToast(context, 'Image size cannot exceed 5MB');
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Image size cannot exceed 5MB',
+        );
         return;
       }
 
@@ -1241,7 +1245,10 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
       });
       onSuccess(url);
     } catch (e) {
-      showRedToast(context, 'Image upload failed, please try again');
+      CustomSnackbar.showError(
+         title: "Error",
+        message: 'Image upload failed, please try again',
+      );
       setState(() {
         _idImageUploading = false;
       });
@@ -1258,29 +1265,7 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
   }
 
   //! -- submit button methods --
-  void showRedToast(
-    BuildContext context,
-    String message, {
-    Duration duration = const Duration(seconds: 2),
-  }) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          backgroundColor: const Color(0xFFD32F2F), // 🔴 Red
-          duration: duration,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
-  }
+
 
   Widget personalInfoInputContent(BuildContext context) {
     return _isLoading
@@ -1445,11 +1430,9 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
                   }).then((value) async {
                     if (value['errorMsg'] == 'SUCCESS' ||
                         value['errorCode'] == 'Success') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("KYC Information Submitted!"),
-                          backgroundColor: Color(0xFF10B981),
-                        ),
+                      CustomSnackbar.showSuccess(
+                        title: "Success",
+                        message: "KYC Information Submitted!",
                       );
 
                       await getLatestIdentifyOrderList();
@@ -1460,14 +1443,9 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
                     } else {
                       setState(() {
                         _isLoading = false;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "${value['errorMsg']}",
-                              style: TextStyle(color: const Color(0xFFCF4436)),
-                            ),
-                            backgroundColor: const Color(0xFFFDF4F5),
-                          ),
+                        CustomSnackbar.showError(
+                          title: "Error",
+                          message: "${value['errorMsg']}",
                         );
                       });
                     }
@@ -1476,7 +1454,10 @@ class _UserKycInformationPageState extends State<UserKycInformationPage> {
                   setState(() {
                     _isLoading = false;
                   });
-                  showRedToast(context, 'Submission failed. Please try again.');
+                  CustomSnackbar.showError(
+                    title: "Error",
+                    message: 'Submission failed. Please try again.',
+                  );
                 }
               }
             : null, //DISABLED

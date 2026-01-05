@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
@@ -93,9 +94,10 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
     final pin = _pinController.text.trim();
 
     if (pin.length != widget.otpLength) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter valid OTP")));
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter valid OTP",
+      );
       return;
     }
 
@@ -108,15 +110,17 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       if (ok) {
         widget.onVerified();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid OTP, please try again.")),
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Invalid OTP, please try again.",
         );
       }
     } catch (e) {
       if (!mounted) return;
       try {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("OTP verification failed: $e")),
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "OTP verification failed: $e",
         );
       } catch (_) {}
     } finally {
@@ -136,12 +140,14 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
 
         if (ok) {
           _startTimer();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("OTP resent successfully.")),
+          CustomSnackbar.showSuccess(
+            title: "Success",
+            message: "OTP resent successfully.",
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to resend OTP. Try again.")),
+          CustomSnackbar.showError(
+            title: "Error",
+            message: "Failed to resend OTP. Try again.",
           );
         }
       } else {
@@ -150,9 +156,10 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Resend failed: $e")));
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Resend failed: $e",
+      );
     } finally {
       if (mounted) setState(() => _isResending = false);
     }

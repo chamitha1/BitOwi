@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pinput.dart';
@@ -72,22 +73,25 @@ class _BindTradePwdSheetState extends State<BindTradePwdSheet> {
       if (success) {
         _startTimer();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("OTP sent successfully")),
+          CustomSnackbar.showSuccess(
+            title: "Success",
+            message: "OTP sent successfully",
           );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("Failed to send OTP")));
+          CustomSnackbar.showError(
+            title: "Error",
+            message: "Failed to send OTP",
+          );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error sending OTP: $e")));
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Error sending OTP: $e",
+        );
       }
     } finally {
       if (mounted) setState(() => _isSending = false);
@@ -99,15 +103,17 @@ class _BindTradePwdSheetState extends State<BindTradePwdSheet> {
     final otp = _pinController.text.trim();
 
     if (pwd.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter transaction password")),
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter transaction password",
       );
       return;
     }
     if (otp.length != 6) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter valid OTP")));
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter valid OTP",
+      );
       return;
     }
 
@@ -123,17 +129,17 @@ class _BindTradePwdSheetState extends State<BindTradePwdSheet> {
       if (mounted) {
         widget.onSuccess();
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Transaction password set successfully"),
-          ),
+        CustomSnackbar.showSuccess(
+          title: "Success",
+          message: "Transaction password set successfully",
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Failed to set password: $e")));
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Failed to set password: $e",
+        );
       }
     } finally {
       if (mounted) setState(() => _isConfirming = false);

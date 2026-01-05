@@ -43,12 +43,32 @@ android {
     }
 
     /* 🔐 Signing Config */
-    signingConfigs {
+    /*signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
             storeFile = file(keystoreProperties["storeFile"] as String)
             storePassword = keystoreProperties["storePassword"] as String
+        }
+    }*/
+    signingConfigs {
+        create("release") {
+            //Try to read values safely using 'as? String'
+            val kAlias = keystoreProperties["keyAlias"] as? String
+            val kPassword = keystoreProperties["keyPassword"] as? String
+            val sFile = keystoreProperties["storeFile"] as? String
+            val sPassword = keystoreProperties["storePassword"] as? String
+
+            // Only configure signing if all values are present
+            if (kAlias != null && kPassword != null && sFile != null && sPassword != null) {
+                keyAlias = kAlias
+                keyPassword = kPassword
+                storeFile = file(sFile)
+                storePassword = sPassword
+            } else {
+                //  Print a warning to the console
+                println(" Release signing config not found. Release builds may fail.")
+            }
         }
     }
 
@@ -67,7 +87,7 @@ android {
     packaging {
         jniLibs {
             excludes += setOf(
-                "**/x86_64/**",
+                //"**/x86_64/**",
                 "**/libbarhopper_v3.so",
                 "**/libimage_processing_util_jni.so"
             )

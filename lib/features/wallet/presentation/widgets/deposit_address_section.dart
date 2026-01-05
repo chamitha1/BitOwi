@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,11 +17,9 @@ class DepositAddressSection extends StatelessWidget {
 
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: address));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Address copied to clipboard"),
-        duration: Duration(seconds: 2),
-      ),
+    CustomSnackbar.showSuccess(
+      title: "Success",
+      message: "Address copied to clipboard",
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +88,10 @@ class _BalanceSectionState extends State<BalanceSection> {
                       },
                     );
                   } else {
-                    Get.snackbar("Error", "No asset selected");
+                    CustomSnackbar.showError(
+                      title: "Error",
+                      message: "No asset selected",
+                    );
                   }
                 },
                 child: Container(

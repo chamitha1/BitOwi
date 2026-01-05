@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:convert';
 import 'package:BitOwi/config/config.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:dio/dio.dart';
@@ -12,6 +13,7 @@ class ApiClient {
             connectTimeout: const Duration(seconds: 5),
             receiveTimeout: const Duration(seconds: 3),
             headers: {'Content-Type': 'application/json'},
+            responseType: ResponseType.plain, // as string to avoid MIME issues
           ),
         )
         ..interceptors.add(
@@ -29,7 +31,7 @@ class ApiClient {
 
               options.headers.addAll({
                 // 'Authorization': authHeader,
-                'content-Type': 'application/json',
+                // 'content-Type': 'application/json',
                 // 'Accept-Language': Get.deviceLocale?.toString() ?? 'en_US',
                 'Accept-Language': Get.deviceLocale?.toString() == 'en_GB'
                     ? const Locale('en', 'US')
@@ -44,6 +46,14 @@ class ApiClient {
               return handler.next(options);
             },
             onResponse: (response, handler) {
+              if (response.data is String) {
+                try {
+                  response.data = json.decode(response.data);
+                } catch (e) {
+                  print('JSON decode error: $e');
+                }
+              }
+
               print("------------API Response------------");
               print("URI: ${response.requestOptions.uri}");
               print("Code: ${response.statusCode}");

@@ -1,6 +1,7 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/gradient_button.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
@@ -68,9 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
+
 
   bool _validateEmailLocal() {
     final email = _emailController?.text.trim() ?? "";
@@ -134,11 +133,17 @@ class _SignupScreenState extends State<SignupScreen> {
       if (!mounted) return;
 
       if (!success) {
-        _toast("Failed to send OTP. Please try again.");
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Failed to send OTP. Please try again.",
+        );
         return;
       }
 
-      _toast("OTP sent to your email!");
+      CustomSnackbar.showSuccess(
+        title: "Success",
+        message: "OTP sent to your email!",
+      );
 
       showModalBottomSheet(
         context: context,
@@ -174,15 +179,16 @@ class _SignupScreenState extends State<SignupScreen> {
           onVerified: () {
             Navigator.pop(context);
             setState(() => _isEmailVerified = true);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Email Verified Successfully!")),
+            CustomSnackbar.showSuccess(
+              title: "Success",
+              message: "Email Verified Successfully!",
             );
           },
         ),
       );
     } catch (e) {
       if (!mounted) return;
-      _toast("OTP send failed: $e");
+      CustomSnackbar.showError(title: "Error", message: "OTP send failed: $e");
     } finally {
       if (mounted) setState(() => _sendingOtp = false);
     }
@@ -196,12 +202,18 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!_validateEmailLocal()) return;
 
     if (!_isEmailVerified) {
-      _toast("Please verify your email first");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please verify your email first",
+      );
       return;
     }
     if (!_validatePasswordsLocal()) return;
     if (!_agreedToTerms) {
-      _toast("Please read and accept Terms & Privacy");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please read and accept Terms & Privacy",
+      );
       return;
     }
 
@@ -230,11 +242,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
         Get.offAllNamed(Routes.home);
       } else {
-        _toast("Signup failed: ${resData['errorMsg']}");
+        CustomSnackbar.showError(title: "Error", message: "Signup failed: ${resData['errorMsg']}");
       }
     } catch (e) {
       if (!mounted) return;
-      _toast("Signup failed: $e");
+      CustomSnackbar.showError(title: "Error", message: "Signup failed: $e");
     } finally {
       if (mounted) setState(() => _signingUp = false);
     }
@@ -351,6 +363,7 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 22),
 
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     height: 24,

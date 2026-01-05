@@ -1,6 +1,7 @@
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
@@ -111,10 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
       // ignore: avoid_print
       print('Login error: $e');
 
-      Get.snackbar(
-        '登录失败'.tr,
-        '请检查账号或网络后重试'.tr,
-        snackPosition: SnackPosition.BOTTOM,
+      CustomSnackbar.showError(
+        title: '登录失败'.tr,
+        message: '请检查账号或网络后重试'.tr,
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);

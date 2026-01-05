@@ -1,8 +1,9 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
-import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart'; // Added import
-import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart'; // Ensure correct import
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart'; 
+import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart'; 
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -53,20 +54,18 @@ class _ChangeTransactionPasswordPageState
     super.dispose();
   }
 
-  void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
+
 
   Future<void> _onUpdate() async {
     final pass = _passController.text.trim();
     final confirm = _confirmPassController.text.trim();
 
     if (pass.isEmpty || pass.length != 6 || int.tryParse(pass) == null) {
-      _toast("Please enter a valid 6-digit number password");
+      CustomSnackbar.showError(title: "Error", message: "Please enter a valid 6-digit number password");
       return;
     }
     if (confirm != pass) {
-      _toast("Passwords do not match");
+      CustomSnackbar.showError(title: "Error", message: "Passwords do not match");
       return;
     }
     _openOtpSheet();
@@ -86,7 +85,7 @@ class _ChangeTransactionPasswordPageState
       if (!mounted) return;
 
       if (!success) {
-        _toast("Failed to send OTP. Please try again.");
+        CustomSnackbar.showError(title: "Error", message: "Failed to send OTP. Please try again.");
         setState(() => _isLoading = false);
         return;
       }
@@ -130,21 +129,18 @@ class _ChangeTransactionPasswordPageState
           onVerified: () {
             Navigator.pop(context);
             Get.back();
-            Get.snackbar(
-              "Success",
-              "Transaction Password Updated Successfully!",
-              backgroundColor: const Color(0xFFEAF9F0),
-              colorText: const Color(0xFF40A372),
-              snackPosition: SnackPosition.TOP,
-              margin: const EdgeInsets.all(20),
+            CustomSnackbar.showSuccess(
+              title: "Success",
+              message: "Transaction Password Updated Successfully!",
             );
           },
         ),
       );
     } catch (e) {
       if (mounted) {
+        // setState(() => _isLoading = false); 
         setState(() => _isLoading = false);
-        _toast("Error: $e");
+        CustomSnackbar.showError(title: "Error", message: "$e");
       }
     }
   }

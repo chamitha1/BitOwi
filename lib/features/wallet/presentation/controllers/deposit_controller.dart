@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/models/chain_symbol_list_res.dart';
 import 'package:flutter/material.dart';
@@ -66,9 +68,11 @@ class DepositController extends GetxController {
 
     try {
       // Check for access permissions
-      final hasAccess = await Gal.hasAccess();
-      if (!hasAccess) {
-        await Gal.requestAccess();
+      if (!kIsWeb) {
+        final hasAccess = await Gal.hasAccess();
+        if (!hasAccess) {
+          await Gal.requestAccess();
+        }
       }
 
       final Uint8List? image = await screenshotController.capture();
@@ -78,15 +82,17 @@ class DepositController extends GetxController {
           name: "deposit_qr_${selectedCoin.value?.symbol ?? 'code'}",
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("QR Code saved to gallery!")),
+        CustomSnackbar.showSuccess(
+          title: "Success",
+          message: "QR Code saved to gallery!",
         );
       }
     } catch (e) {
       print("Error saving image: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error saving image: $e")));
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Error saving image: $e",
+      );
     }
   }
 }
