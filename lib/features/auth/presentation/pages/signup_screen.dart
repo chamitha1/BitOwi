@@ -1,16 +1,14 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/gradient_button.dart';
-import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
-import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:BitOwi/features/rich_text_config.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:get/get.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -21,13 +19,14 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  TextEditingController? _emailController;
+  final _formKey = GlobalKey<FormState>();
 
+  final userApi = UserApi();
+
+  TextEditingController? _emailController; // managed by Autocomplete
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
   final _inviteController = TextEditingController();
-
-  final userApi = UserApi();
 
   FocusNode? _autocompleteFocusNode;
 
@@ -36,12 +35,15 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isEmailPopulated = false;
   bool _isEmailVerified = false;
 
-  String? _emailErrorText;
-  String? _passwordErrorText;
-  String? _verifiedOtp; // Store captured OTP
-
   bool _sendingOtp = false;
   bool _signingUp = false;
+  bool _submitted = false;
+
+  String? _verifiedOtp;
+  String _lastEmail = "";
+
+  late final TapGestureRecognizer _termsRec;
+  late final TapGestureRecognizer _privacyRec;
 
   static const List<String> _emailDomains = <String>[
     'gmail.com',
@@ -57,60 +59,92 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   void initState() {
     super.initState();
-    // _emailController is managed by Autocomplete
+
+    _termsRec = TapGestureRecognizer()
+      ..onTap = () {
+        Get.to(
+          () => const RichTextConfig(
+            title: "Terms & Condition",
+            configKey: "registered_agreement_textarea",
+            configType: "system",
+          ),
+        );
+      };
+
+    _privacyRec = TapGestureRecognizer()
+      ..onTap = () {
+        Get.to(
+          () => const RichTextConfig(
+            title: "Privacy Policy",
+            configKey: "privacy_agreement_textarea",
+            configType: "system",
+          ),
+        );
+      };
   }
 
   @override
   void dispose() {
-    // _emailController.dispose(); // Managed by Autocomplete
+    _termsRec.dispose();
+    _privacyRec.dispose();
+
     _passController.dispose();
     _confirmPassController.dispose();
     _inviteController.dispose();
     super.dispose();
   }
 
+  // ----------------------------
+  // Helpers
+  // ----------------------------
 
-
-  bool _validateEmailLocal() {
-    final email = _emailController?.text.trim() ?? "";
-    if (email.isEmpty) {
-      setState(() => _emailErrorText = "Please enter your email");
-      return false;
-    }
-    if (!_emailRegex.hasMatch(email)) {
-      setState(() => _emailErrorText = "Invalid email format");
-      return false;
-    }
-    setState(() => _emailErrorText = null);
-    return true;
+  void _showTopError(String message) {
+    Get.snackbar(
+      "Error",
+      message,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      backgroundColor: Colors.white,
+      colorText: const Color(0xFF151E2F),
+      borderColor: const Color(0xFFE74C3C),
+      borderWidth: 1,
+      duration: const Duration(seconds: 4),
+      icon: const Icon(Icons.error_outline, color: Color(0xFFE74C3C)),
+    );
   }
 
-  bool _validatePasswordsLocal() {
+  String _extractBackendMsg(dynamic e) {
+    final s = e.toString();
+    return s.replaceFirst("Exception: ", "");
+  }
+
+  String? _validateEmail(String? v) {
+    final email = (v ?? "").trim();
+    if (email.isEmpty) return "Please enter your email";
+    if (!_emailRegex.hasMatch(email)) return "Invalid email format";
+    return null;
+  }
+
+  String? _validatePassword(String? v) {
+    if (!_isEmailVerified) return null; // don't show error before verification
+    final pass = (v ?? "").trim();
+    if (pass.isEmpty) return "Please enter password";
+    if (pass.length < 6) return "Password must be at least 6 characters";
+    return null;
+  }
+
+  String? _validateConfirm(String? v) {
+    if (!_isEmailVerified) return null; // don't show error before verification
+    final confirm = (v ?? "").trim();
     final pass = _passController.text.trim();
-    final confirm = _confirmPassController.text.trim();
-
-    if (pass.isEmpty) {
-      setState(() => _passwordErrorText = "Please enter password");
-      return false;
-    }
-    if (pass.length < 6) {
-      setState(
-        () => _passwordErrorText = "Password must be at least 6 characters",
-      );
-      return false;
-    }
-    if (confirm.isEmpty) {
-      setState(() => _passwordErrorText = "Please confirm password");
-      return false;
-    }
-    if (confirm != pass) {
-      setState(() => _passwordErrorText = "Passwords do not match");
-      return false;
-    }
-
-    setState(() => _passwordErrorText = null);
-    return true;
+    if (confirm.isEmpty) return "Please confirm password";
+    if (confirm != pass) return "Passwords do not match";
+    return null;
   }
+
+  // ----------------------------
+  // OTP + Signup
+  // ----------------------------
 
   Future<void> _openOtpSheet() async {
     if (_sendingOtp) return;
@@ -118,9 +152,13 @@ class _SignupScreenState extends State<SignupScreen> {
     FocusScope.of(context).unfocus();
     _autocompleteFocusNode?.unfocus();
 
-    if (!_validateEmailLocal()) return;
+    setState(() => _submitted = true);
 
-      final email = _emailController!.text.trim();
+    final ok = _formKey.currentState?.validate() ?? false;
+    if (!ok) return;
+
+    final email = _emailController?.text.trim() ?? "";
+    if (email.isEmpty) return;
 
     setState(() => _sendingOtp = true);
 
@@ -133,62 +171,42 @@ class _SignupScreenState extends State<SignupScreen> {
       if (!mounted) return;
 
       if (!success) {
-        CustomSnackbar.showError(
-          title: "Error",
-          message: "Failed to send OTP. Please try again.",
-        );
+        _showTopError("Failed to send OTP. Please try again.");
         return;
       }
 
-      CustomSnackbar.showSuccess(
-        title: "Success",
-        message: "OTP sent to your email!",
-      );
+      CustomSnackbar.showSuccess(title: "Success", message: "OTP sent to your email!");
 
-      showModalBottomSheet(
+      await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         barrierColor: const Color(0xFFECEFF5).withOpacity(0.7),
         builder: (context) => OtpBottomSheet(
-          email: _emailController!.text.trim(),
+          email: email,
           otpLength: 6,
           bizType: SmsBizType.register,
-
-          // ✅ API verify here (replace with your real endpoint)
           onVerifyPin: (pin) async {
-            // return await userApi.verifyOtp(
-            //   email: _emailController.text.trim(),
-            //   bizType: SmsBizType.register,
-            //   smsCode: pin,
-            // );
+            // ✅ If you have a real verify endpoint, call it here and return true/false.
+            // final ok = await userApi.verifyOtp(email: email, bizType: SmsBizType.register, smsCode: pin);
+            // return ok;
 
-            // Store the OTP entered by the user
-            _verifiedOtp = pin;
-            return true; // Proceed with this OTP
+            _verifiedOtp = pin; // store OTP entered
+            return true;
           },
-
-          // ✅ resend api
           onResend: () async {
-            return await userApi.sendOtp(
-              email: _emailController!.text.trim(),
-              bizType: SmsBizType.register,
-            );
+            return await userApi.sendOtp(email: email, bizType: SmsBizType.register);
           },
-
           onVerified: () {
             Navigator.pop(context);
             setState(() => _isEmailVerified = true);
-            CustomSnackbar.showSuccess(
-              title: "Success",
-              message: "Email Verified Successfully!",
-            );
+            CustomSnackbar.showSuccess(title: "Success", message: "Email Verified Successfully!");
           },
         ),
       );
     } catch (e) {
       if (!mounted) return;
-      CustomSnackbar.showError(title: "Error", message: "OTP send failed: $e");
+      _showTopError(_extractBackendMsg(e));
     } finally {
       if (mounted) setState(() => _sendingOtp = false);
     }
@@ -199,21 +217,23 @@ class _SignupScreenState extends State<SignupScreen> {
 
     FocusScope.of(context).unfocus();
 
-    if (!_validateEmailLocal()) return;
+    setState(() => _submitted = true);
+
+    final ok = _formKey.currentState?.validate() ?? false;
+    if (!ok) return;
 
     if (!_isEmailVerified) {
-      CustomSnackbar.showError(
-        title: "Error",
-        message: "Please verify your email first",
-      );
+      _showTopError("Please verify your email first.");
       return;
     }
-    if (!_validatePasswordsLocal()) return;
+
+    if ((_verifiedOtp ?? "").trim().isEmpty) {
+      _showTopError("OTP missing. Please verify again.");
+      return;
+    }
+
     if (!_agreedToTerms) {
-      CustomSnackbar.showError(
-        title: "Error",
-        message: "Please read and accept Terms & Privacy",
-      );
+      _showTopError("Please read and accept Terms & Privacy");
       return;
     }
 
@@ -222,279 +242,267 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       final resData = await userApi.signup(
         email: _emailController!.text.trim(),
-        smsCode: _verifiedOtp ?? "", // Use captured OTP
+        smsCode: _verifiedOtp ?? "",
         loginPwd: _passController.text.trim(),
-        inviteCode: _inviteController.text.trim().isEmpty
-            ? null
-            : _inviteController.text.trim(),
+        inviteCode: _inviteController.text.trim().isEmpty ? null : _inviteController.text.trim(),
       );
 
-      print('Signup response: $resData');
+      if (!mounted) return;
 
-      if (resData['code'] == 200 || resData['code'] == '200') {
-        final tokenData = resData['data'] as Map<String, dynamic>;
+      final code = resData['code'];
+      if (code == 200 || code == '200') {
+        final tokenData = (resData['data'] as Map<String, dynamic>? ?? {});
         final token = tokenData['token'] as String? ?? '';
 
         await StorageService.saveToken(token);
         await StorageService.saveUserName(_emailController!.text.trim());
 
-        if (!mounted) return;
-
         Get.offAllNamed(Routes.home);
       } else {
-        CustomSnackbar.showError(title: "Error", message: "Signup failed: ${resData['errorMsg']}");
+        final msg = (resData['errorMsg'] ?? resData['message'] ?? "Signup failed").toString();
+        _showTopError(msg);
       }
     } catch (e) {
       if (!mounted) return;
-      CustomSnackbar.showError(title: "Error", message: "Signup failed: $e");
+      _showTopError(_extractBackendMsg(e));
     } finally {
       if (mounted) setState(() => _signingUp = false);
     }
   }
+
+  // ----------------------------
+  // Build
+  // ----------------------------
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0XFFF6F9FF),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 56),
-              const Text(
-                "Let's Get You Started",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                  color: Color(0XFF151E2F),
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                "Set up your profile with strong protection for safe crypto trading and storage.",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0XFF454F63),
-                ),
-              ),
-              const SizedBox(height: 28),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth >= 700;
+            final maxW = wide ? 520.0 : double.infinity;
 
-              _textLabel("Email"),
-              _emailAutocompleteField(
-                hint: "Enter your email",
-                iconPath: "assets/icons/sign_up/sms.svg",
-                suffixWidget: Padding(
-                  padding: const EdgeInsets.only(
-                    right: 8.0,
-                    top: 8.0,
-                    bottom: 8.0,
-                  ),
-                  child: _verifyButton(
-                    text: _isEmailVerified
-                        ? "Verified"
-                        : (_sendingOtp ? "Sending..." : "Verify"),
-                    isEnabled: _isEmailPopulated && !_sendingOtp,
-                    isVerified: _isEmailVerified,
-                    onPressed: _openOtpSheet,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: wide ? 0 : 24.0),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxW),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: wide ? 24.0 : 0),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: _submitted
+                          ? AutovalidateMode.always
+                          : AutovalidateMode.onUserInteraction,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 56),
+                          const Text(
+                            "Let's Get You Started",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              color: Color(0XFF151E2F),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            "Set up your profile with strong protection for safe crypto trading and storage.",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w500,
+                              color: Color(0XFF454F63),
+                            ),
+                          ),
+                          const SizedBox(height: 28),
 
-              _textLabel("Password"),
-              TextField(
-                controller: _passController,
-                enabled: _isEmailVerified,
-                obscureText: !_isPasswordVisible,
-                onChanged: (_) {
-                  if (_passwordErrorText != null) _validatePasswordsLocal();
-                },
-                decoration: _inputDecoration(
-                  hint: "Enter Password",
-                  iconPath: "assets/icons/sign_up/lock.svg",
-                  suffixIconPath: !_isPasswordVisible
-                      ? "assets/icons/sign_up/eye.svg"
-                      : "assets/icons/sign_up/eye-slash.svg",
-                  isPassword: true,
-                  enabled: _isEmailVerified,
-                  borderColor: _passwordErrorText != null
-                      ? const Color(0xFFE74C3C)
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 30),
+                          _textLabel("Email"),
+                          _emailAutocompleteField(
+                            hint: "Enter your email",
+                            iconPath: "assets/icons/sign_up/sms.svg",
+                            suffixWidget: Padding(
+                              // ✅ SAME padding for Verify + Verified
+                              padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
+                              child: _verifyButton(
+                                text: _isEmailVerified
+                                    ? "Verified"
+                                    : (_sendingOtp ? "Sending..." : "Verify"),
+                                isEnabled: _isEmailPopulated && !_sendingOtp,
+                                isVerified: _isEmailVerified,
+                                onPressed: _openOtpSheet,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
 
-              _textLabel("Confirm Password"),
-              TextField(
-                controller: _confirmPassController,
-                enabled: _isEmailVerified,
-                obscureText: !_isPasswordVisible,
-                onChanged: (_) {
-                  if (_passwordErrorText != null) _validatePasswordsLocal();
-                },
-                decoration: _inputDecoration(
-                  hint: "Re-Enter Password",
-                  iconPath: "assets/icons/sign_up/lock.svg",
-                  suffixIconPath: !_isPasswordVisible
-                      ? "assets/icons/sign_up/eye.svg"
-                      : "assets/icons/sign_up/eye-slash.svg",
-                  isPassword: true,
-                  enabled: _isEmailVerified,
-                  errorText: _passwordErrorText,
-                ),
-              ),
-              const SizedBox(height: 30),
+                          _textLabel("Password"),
+                          TextFormField(
+                            controller: _passController,
+                            enabled: _isEmailVerified,
+                            obscureText: !_isPasswordVisible,
+                            validator: _validatePassword,
+                            onChanged: (_) {
+                              if (_submitted) setState(() {});
+                            },
+                            decoration: _inputDecoration(
+                              hint: "Enter Password",
+                              iconPath: "assets/icons/sign_up/lock.svg",
+                              suffixIconPath: !_isPasswordVisible
+                                  ? "assets/icons/sign_up/eye.svg"
+                                  : "assets/icons/sign_up/eye-slash.svg",
+                              isPassword: true,
+                              enabled: _isEmailVerified,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
 
-              _textLabel("Invitation Code (optional)"),
-              TextField(
-                controller: _inviteController,
-                enabled: _isEmailVerified,
-                decoration: _inputDecoration(
-                  hint: "Please Enter Your Code",
-                  iconPath: "assets/icons/sign_up/hashtag.svg",
-                  enabled: _isEmailVerified,
-                ),
-              ),
-              const SizedBox(height: 22),
+                          _textLabel("Confirm Password"),
+                          TextFormField(
+                            controller: _confirmPassController,
+                            enabled: _isEmailVerified,
+                            obscureText: !_isPasswordVisible,
+                            validator: _validateConfirm,
+                            decoration: _inputDecoration(
+                              hint: "Re-Enter Password",
+                              iconPath: "assets/icons/sign_up/lock.svg",
+                              suffixIconPath: !_isPasswordVisible
+                                  ? "assets/icons/sign_up/eye.svg"
+                                  : "assets/icons/sign_up/eye-slash.svg",
+                              isPassword: true,
+                              enabled: _isEmailVerified,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
 
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: Checkbox(
-                      value: _agreedToTerms,
-                      onChanged: _isEmailVerified
-                          ? (v) => setState(() => _agreedToTerms = v ?? false)
-                          : null,
-                      activeColor: const Color(0xFF2F5599),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                          _textLabel("Invitation Code (optional)"),
+                          TextField(
+                            controller: _inviteController,
+                            enabled: _isEmailVerified,
+                            decoration: _inputDecoration(
+                              hint: "Please Enter Your Code",
+                              iconPath: "assets/icons/sign_up/hashtag.svg",
+                              enabled: _isEmailVerified,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+
+                          // ✅ ONE LINE Terms (auto scale down if needed)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: Checkbox(
+                                  value: _agreedToTerms,
+                                  onChanged: _isEmailVerified
+                                      ? (v) => setState(() => _agreedToTerms = v ?? false)
+                                      : null,
+                                  activeColor: const Color(0xFF2F5599),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text.rich(
+                                    TextSpan(
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0XFF454F63),
+                                      ),
+                                      children: [
+                                        const TextSpan(text: "I agree to the "),
+                                        TextSpan(
+                                          text: "Terms of Service",
+                                          style: const TextStyle(color: Color(0XFF28A6FF)),
+                                          recognizer: _termsRec,
+                                        ),
+                                        const TextSpan(text: " and "),
+                                        TextSpan(
+                                          text: "Privacy Policy",
+                                          style: const TextStyle(color: Color(0XFF28A6FF)),
+                                          recognizer: _privacyRec,
+                                        ),
+                                      ],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.clip,
+                                    softWrap: false,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          GradientButton(
+                            text: _signingUp ? "Signing Up..." : "Sign Up",
+                            onPressed: (_isEmailVerified && _agreedToTerms && !_signingUp)
+                                ? _onSignup
+                                : () {
+                                    setState(() => _submitted = true);
+                                    if (!_isEmailVerified) _showTopError("Please verify your email first.");
+                                    if (!_agreedToTerms) _showTopError("Please accept Terms & Privacy.");
+                                  },
+                          ),
+
+                          const SizedBox(height: 24),
+                          Center(
+                            child: Text.rich(
+                              TextSpan(
+                                text: "Already have an account? ",
+                                style: const TextStyle(
+                                  color: Color(0XFF151E2F),
+                                  fontSize: 14,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: "Sign in",
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 14,
+                                      color: Color(0XFF1D5DE5),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => Get.offNamed(Routes.login),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  // terms and privacy
-                  Expanded(
-                    child: Wrap(
-                      runSpacing: 2,
-                      children: [
-                        Text(
-                          "I agree to the ",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0XFF454F63),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(
-                              () => RichTextConfig(
-                                title: "Terms & Condition",
-                                configKey: "registered_agreement_textarea",
-                                configType: "system",
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "Terms of Service",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0XFF28A6FF),
-                            ),
-                          ),
-                        ),
-                        Text(
-                          " and ",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0XFF454F63),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(
-                              () => RichTextConfig(
-                                title: "Privacy Policy",
-                                configKey: "privacy_agreement_textarea",
-                                configType: "system",
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "Privacy Policy",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0XFF28A6FF),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              GradientButton(
-                text: _signingUp ? "Signing Up..." : "Sign Up",
-                onPressed: (_isEmailVerified && _agreedToTerms && !_signingUp)
-                    ? _onSignup
-                    : () {},
-              ),
-
-              const SizedBox(height: 24),
-              Center(
-                child: Text.rich(
-                  TextSpan(
-                    text: "Already have an account? ",
-                    style: const TextStyle(
-                      color: Color(0XFF151E2F),
-                      fontSize: 14,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: "Sign in",
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 14,
-                          color: Color(0XFF1D5DE5),
-                          fontWeight: FontWeight.w600,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Get.offNamed(Routes.login);
-                          },
-                      ),
-                    ],
-                  ),
                 ),
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  // widgets
+  // ----------------------------
+  // Widgets
+  // ----------------------------
 
   Widget _textLabel(String text) {
     return Padding(
@@ -520,12 +528,6 @@ class _SignupScreenState extends State<SignupScreen> {
         final input = value.text.trim();
         if (input.isEmpty) return const Iterable<String>.empty();
 
-        if (_emailDomains.any(
-          (d) => input.toLowerCase() == '${_localPart(input).toLowerCase()}@$d',
-        )) {
-          return const Iterable<String>.empty();
-        }
-
         final atIndex = input.indexOf('@');
         if (atIndex < 0) {
           return _emailDomains.map((d) => '$input@$d');
@@ -535,9 +537,7 @@ class _SignupScreenState extends State<SignupScreen> {
         final typedDomain = input.substring(atIndex + 1).toLowerCase();
         if (local.isEmpty) return const Iterable<String>.empty();
 
-        final matches = _emailDomains.where(
-          (d) => d.toLowerCase().startsWith(typedDomain),
-        );
+        final matches = _emailDomains.where((d) => d.toLowerCase().startsWith(typedDomain));
         return matches.map((d) => '$local@$d');
       },
       onSelected: (String selection) {
@@ -546,49 +546,51 @@ class _SignupScreenState extends State<SignupScreen> {
           TextPosition(offset: selection.length),
         );
         setState(() {
-          _isEmailPopulated = true;
-          _emailErrorText = null;
+          _isEmailPopulated = selection.trim().isNotEmpty;
         });
       },
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
         if (_emailController != controller) {
           _emailController = controller;
           _autocompleteFocusNode = focusNode;
-          
-          _emailController!.addListener(() {
-             final t = _emailController!.text.trim();
-             final populated = t.isNotEmpty;
-             if (_isEmailPopulated != populated) {
-               setState(() => _isEmailPopulated = populated);
-             }
 
-             if (_isEmailVerified && populated) {
-               // Only reset if user changes email
-                // Note: this listener fires on build too often, need care?
-                // Actually simplicity: if verified but text changed (and text matches expectation?)
-                // Here we just replicate old logic: if text changed, unverify.
-               setState(() => _isEmailVerified = false);
-             }
+          _lastEmail = controller.text.trim();
+
+          controller.addListener(() {
+            final now = controller.text.trim();
+            final populated = now.isNotEmpty;
+
+            // ✅ only reset verification if email actually changed
+            if (_isEmailVerified && now != _lastEmail) {
+              setState(() {
+                _isEmailVerified = false;
+                _verifiedOtp = null;
+                _agreedToTerms = false;
+              });
+            }
+
+            if (_isEmailPopulated != populated) {
+              setState(() => _isEmailPopulated = populated);
+            }
+
+            _lastEmail = now;
           });
         }
 
-        return TextField(
+        return TextFormField(
           controller: controller,
           focusNode: focusNode,
           enabled: !_isEmailVerified,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          onChanged: (_) {
-            if (_emailErrorText != null) _validateEmailLocal();
-          },
+          validator: _validateEmail,
           decoration: _inputDecoration(
             hint: hint,
             iconPath: iconPath,
             suffixWidget: suffixWidget,
-            errorText: _emailErrorText,
             enabled: !_isEmailVerified,
           ),
-          onSubmitted: (_) => onFieldSubmitted(),
+          onFieldSubmitted: (_) => onFieldSubmitted(),
         );
       },
       optionsViewBuilder: (context, onSelected, options) {
@@ -604,7 +606,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 itemCount: options.length,
-                separatorBuilder: (_, _) => const SizedBox.shrink(),
+                separatorBuilder: (_, __) => const SizedBox.shrink(),
                 itemBuilder: (context, i) {
                   final opt = options.elementAt(i);
                   return InkWell(
@@ -631,12 +633,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  String _localPart(String emailLike) {
-    final idx = emailLike.indexOf('@');
-    if (idx < 0) return emailLike;
-    return emailLike.substring(0, idx);
-  }
-
   InputDecoration _inputDecoration({
     required String hint,
     required String iconPath,
@@ -644,11 +640,17 @@ class _SignupScreenState extends State<SignupScreen> {
     bool isPassword = false,
     bool enabled = true,
     String? suffixIconPath,
-    String? errorText,
-    Color? borderColor,
   }) {
     return InputDecoration(
-      errorText: errorText,
+      hintText: hint,
+      hintStyle: const TextStyle(
+        color: Color(0XFF717F9A),
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w500,
+        fontSize: 16,
+      ),
+
+      // ✅ error style + red borders
       errorStyle: const TextStyle(
         color: Color(0xFFE74C3C),
         fontSize: 12,
@@ -663,34 +665,22 @@ class _SignupScreenState extends State<SignupScreen> {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
       ),
-      hintText: hint,
-      hintStyle: const TextStyle(
-        color: Color(0XFF717F9A),
-        fontFamily: 'Inter',
-        fontWeight: FontWeight.w500,
-        fontSize: 16,
-      ),
+
       prefixIcon: Padding(
         padding: const EdgeInsets.all(12.0),
         child: SvgPicture.asset(
           iconPath,
           width: 20,
           height: 20,
-          colorFilter: const ColorFilter.mode(
-            Color(0XFF717F9A),
-            BlendMode.srcIn,
-          ),
+          colorFilter: const ColorFilter.mode(Color(0XFF717F9A), BlendMode.srcIn),
         ),
       ),
+
       suffixIcon: isPassword && suffixIconPath != null
           ? Padding(
               padding: const EdgeInsets.only(right: 4.0),
               child: IconButton(
-                onPressed: enabled
-                    ? () => setState(
-                        () => _isPasswordVisible = !_isPasswordVisible,
-                      )
-                    : null,
+                onPressed: enabled ? () => setState(() => _isPasswordVisible = !_isPasswordVisible) : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 icon: Padding(
@@ -699,29 +689,23 @@ class _SignupScreenState extends State<SignupScreen> {
                     suffixIconPath,
                     width: 20,
                     height: 20,
-                    colorFilter: const ColorFilter.mode(
-                      Color(0xff2E3D5B),
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: const ColorFilter.mode(Color(0xff2E3D5B), BlendMode.srcIn),
                   ),
                 ),
               ),
             )
           : suffixWidget,
+
       filled: true,
       fillColor: MaterialStateColor.resolveWith((states) {
-        if (states.contains(MaterialState.disabled)) {
-          return const Color(0xFFECEFF5);
-        }
+        if (states.contains(MaterialState.disabled)) return const Color(0xFFECEFF5);
         return Colors.white;
       }),
-      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+
+      // ✅ normal + focused (blue) borders
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: borderColor ?? const Color(0xFFDAE0EE),
-          width: 1.0,
-        ),
+        borderSide: const BorderSide(color: Color(0xFFDAE0EE), width: 1.0),
       ),
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -729,18 +713,14 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: borderColor ?? const Color.fromARGB(255, 112, 152, 221),
-          width: 1.0,
-        ),
+        borderSide: const BorderSide(color: Color.fromARGB(255, 112, 152, 221), width: 1.0),
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: borderColor ?? const Color(0xFFDAE0EE),
-          width: 1.0,
-        ),
+        borderSide: const BorderSide(color: Color(0xFFDAE0EE), width: 1.0),
       ),
+
+      contentPadding: const EdgeInsets.symmetric(vertical: 12),
     );
   }
 
@@ -750,68 +730,65 @@ class _SignupScreenState extends State<SignupScreen> {
     required bool isEnabled,
     bool isVerified = false,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      height: 30,
-      decoration: BoxDecoration(
-        color: isVerified
-            ? const Color(0xffEAF9F0)
-            : (isEnabled ? null : const Color(0XFFB9C6E2)),
-        gradient: (isEnabled && !isVerified)
-            ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
-              )
-            : null,
-        border: isVerified
-            ? Border.all(color: const Color(0xFFABEAC6), width: 1.0)
-            : null,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          disabledBackgroundColor: Colors.transparent,
-          disabledForegroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: isVerified ? 12 : 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return SizedBox(
+      height: 32,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isVerified ? const Color(0xffEAF9F0) : (isEnabled ? null : const Color(0XFFB9C6E2)),
+          gradient: (isEnabled && !isVerified)
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
+                )
+              : null,
+          border: isVerified ? Border.all(color: const Color(0xFFABEAC6), width: 1.0) : null,
+          borderRadius: BorderRadius.circular(8),
         ),
-        onPressed: (isEnabled && !isVerified) ? onPressed : null,
-        child: isVerified
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    "assets/icons/sign_up/check_circle.png",
-                    width: 14,
-                    height: 14,
-                    color: const Color(0xFF40A372),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Inter',
-                      color: Color(0xFF40A372),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            disabledBackgroundColor: Colors.transparent,
+            disabledForegroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: (isEnabled && !isVerified) ? onPressed : null,
+          child: isVerified
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      "assets/icons/sign_up/check_circle.png",
+                      width: 14,
+                      height: 14,
+                      color: const Color(0xFF40A372),
                     ),
+                    const SizedBox(width: 6),
+                    Text(
+                      text,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Inter',
+                        color: Color(0xFF40A372),
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                    color: Colors.white,
                   ),
-                ],
-              )
-            : Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'Inter',
-                  color: Colors.white,
                 ),
-              ),
+        ),
       ),
     );
   }
