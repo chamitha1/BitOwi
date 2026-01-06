@@ -24,7 +24,11 @@ class UserKycInformationController extends GetxController {
   final idTypeIndex = (-1).obs;
 
   final selectedExpiryDate = Rxn<DateTime>();
-  final lastPickedDate = Rxn<DateTime>();
+
+  final focusedDay = DateTime.now().obs;
+  void syncFocusedDay() {
+    focusedDay.value = selectedExpiryDate.value ?? DateTime.now();
+  }
 
   final name = ''.obs;
   final idNumber = ''.obs;
@@ -175,8 +179,7 @@ class UserKycInformationController extends GetxController {
       // final formattedDate = selectedExpiryDate.value != null
       //     ? "${selectedExpiryDate.value!.day.toString().padLeft(2, '0')}/${selectedExpiryDate.value!.month.toString().padLeft(2, '0')}/${selectedExpiryDate.value!.year}"
       //     : "00/00/0000";
-      final formattedDate =
-    ExpiryDateUtils.format(selectedExpiryDate.value);
+      final formattedDate = ExpiryDateUtils.format(selectedExpiryDate.value);
 
       if (!isFormReady) {
         Get.snackbar('Error', 'Please complete all required fields');

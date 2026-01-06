@@ -22,7 +22,12 @@ class KycPersonalInformationController extends GetxController {
   var idTypeIndex = (-1).obs;
 
   final selectedExpiryDate = Rxn<DateTime>();
-  final lastPickedDate = Rxn<DateTime>();
+
+  final focusedDay = DateTime.now().obs;
+  void syncFocusedDay() {
+    focusedDay.value = selectedExpiryDate.value ?? DateTime.now();
+  }
+
 
   final faceUrl = RxnString();
   final uploadedFileName = RxnString();

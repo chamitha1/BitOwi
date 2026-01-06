@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/merchant/presentation/controllers/kyc_personal_information_controller.dart';
+import 'package:BitOwi/features/merchant/presentation/widgets/expiry_calendar.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/personal_information_status_page.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
@@ -678,20 +679,19 @@ class KycPersonalInformationPage extends StatelessWidget {
 
   //* -- select expiry methods --
 
-  // String formatDate(DateTime? date) {
-  //   if (date == null) return "Select Date";
-  //   return DateFormat('MMM dd yyyy').format(date);
-  // }
-
   Column buildExpirySelection(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Select Date Field
         GestureDetector(
           onTap: () {
-            controller.showCalendar.value = true; // 🔁
+            controller.syncFocusedDay(); // ✅ focus today or selected date
+            controller.showCalendar.value = true;
           },
           child: Obx(() {
             final selectedDate = controller.selectedExpiryDate.value;
+
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
@@ -705,11 +705,10 @@ class KycPersonalInformationPage extends StatelessWidget {
                   Text(
                     selectedDate == null
                         ? "Select Date"
-                        : DateFormat('MMM dd yyyy').format(selectedDate), // 🔁
+                        : DateFormat('MMM dd yyyy').format(selectedDate),
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
                       fontSize: 14,
+                      fontWeight: FontWeight.w400,
                       color: selectedDate == null
                           ? const Color(0xFF717F9A)
                           : const Color(0xFF151E2F),
@@ -723,11 +722,17 @@ class KycPersonalInformationPage extends StatelessWidget {
             );
           }),
         ),
-        // calendar
+
+        // Calendar
         Obx(() {
-          if (!controller.showCalendar.value) return const SizedBox.shrink();
+          if (!controller.showCalendar.value) {
+            return const SizedBox.shrink();
+          }
+
           return Container(
-            margin: EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: 6),
+            padding: const EdgeInsets.only(bottom: 12, left: 4, right: 4),
+
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -740,51 +745,19 @@ class KycPersonalInformationPage extends StatelessWidget {
                 ),
               ],
             ),
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-                  primary: Color(0xFF1D5DE5), // Selected day, header
-                  secondary: Color(0xFFE8EFFF), // Range / hover / accents
-                  onPrimary: Colors.white, // Text on selected day
-                  surface: Colors.white, // Calendar background
-                  onSurface: Color(0xFF151E2F), // Default text
-                ),
-                textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Color(0xFF1D5DE5), // Month / year switch
-                  ),
-                ),
-              ),
-              child: CalendarDatePicker(
-                initialDate:
-                    controller.selectedExpiryDate.value ?? DateTime.now(),
-                firstDate: DateTime(1900),
-                lastDate: DateTime(2100),
-                // currentDate: _focusedDate,
-                onDateChanged: (DateTime date) {
-                  bool pickedFromYearMode = false;
+            child: CommonExpiryCalendar(
+              focusedDay: controller.focusedDay.value,
+              selectedDate: controller.selectedExpiryDate.value,
 
-                  final lastDate = controller.lastPickedDate.value;
+              onDaySelected: (date) {
+                controller.selectedExpiryDate.value = date;
+                controller.focusedDay.value = date;
+                controller.showCalendar.value = false;
+              },
 
-                  if (lastDate != null) {
-                    pickedFromYearMode =
-                        date.year != lastDate.year &&
-                        date.month == lastDate.month &&
-                        date.day == lastDate.day;
-                  }
-
-                  if (pickedFromYearMode) {
-                    // 🟡 YEAR MODE → keep calendar open
-                    controller.lastPickedDate.value = date;
-                    controller.selectedExpiryDate.value = date;
-                  } else {
-                    // 🟢 DAY MODE → close calendar
-                    controller.lastPickedDate.value = date;
-                    controller.selectedExpiryDate.value = date;
-                    controller.showCalendar.value = false;
-                  }
-                },
-              ),
+              onMonthChanged: (date) {
+                controller.focusedDay.value = date;
+              },
             ),
           );
         }),

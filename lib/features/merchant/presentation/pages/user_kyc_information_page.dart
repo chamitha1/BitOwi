@@ -1,17 +1,13 @@
-import 'package:BitOwi/api/common_api.dart';
-import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/features/merchant/presentation/controllers/user_kyc_personal_information_controller.dart';
+import 'package:BitOwi/features/merchant/presentation/widgets/expiry_calendar.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/user_kyc_information_status_page.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
-import 'package:BitOwi/models/identify_order_list_res.dart';
-import 'package:BitOwi/utils/aws_upload_util.dart';
 import 'package:BitOwi/utils/string_utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class UserKycInformationPage extends StatelessWidget {
@@ -655,26 +651,20 @@ class UserKycInformationPage extends StatelessWidget {
 
   //* -- select expiry methods --
 
-  String formatDate(DateTime? date) {
-    if (date == null) return "Select Date";
-    return DateFormat('MMM dd yyyy').format(date);
-  }
+  Column buildExpirySelection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Select Date Field
+        GestureDetector(
+          onTap: () {
+            controller.syncFocusedDay(); // ✅ focus today or selected date
+            controller.showCalendar.value = true;
+          },
+          child: Obx(() {
+            final selectedDate = controller.selectedExpiryDate.value;
 
-  Widget buildExpirySelection(BuildContext context) {
-    return Obx(() {
-      final date = controller.selectedExpiryDate.value; // 🔁
-      final showCalendar = controller.showCalendar.value; // 🔁
-      final lastPickedDate = controller.lastPickedDate.value; // 🔁
-      return Column(
-        children: [
-          /// 📅 DATE FIELD
-          GestureDetector(
-            onTap: () {
-              if (!controller.showCalendar.value) {
-                controller.showCalendar.value = true;
-              }
-            }, // 🔁
-            child: Container(
+            return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -685,12 +675,13 @@ class UserKycInformationPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    formatDate(date),
+                    selectedDate == null
+                        ? "Select Date"
+                        : DateFormat('MMM dd yyyy').format(selectedDate),
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
                       fontSize: 14,
-                      color: date == null
+                      fontWeight: FontWeight.w400,
+                      color: selectedDate == null
                           ? const Color(0xFF717F9A)
                           : const Color(0xFF151E2F),
                     ),
@@ -700,72 +691,50 @@ class UserKycInformationPage extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          }),
+        ),
 
-          /// 🗓️ CALENDAR
-          if (showCalendar) ...[
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  colorScheme: const ColorScheme.light(
-                    primary: Color(0xFF1D5DE5), // Selected day, header
-                    secondary: Color(0xFFE8EFFF), // Range / hover / accents
-                    onPrimary: Colors.white, // Text on selected day
-                    surface: Colors.white, // Calendar background
-                    onSurface: Color(0xFF151E2F), // Default text
-                  ),
-                  textButtonTheme: TextButtonThemeData(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Color(0xFF1D5DE5), // Month / year switch
-                    ),
-                  ),
-                ),
-                child: CalendarDatePicker(
-                  initialDate: date ?? DateTime.now(), // 🔁
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2100),
-                  // currentDate: _focusedDate,
-                  onDateChanged: (DateTime pickedDate) {
-                    bool pickedFromYearMode = false;
+        // Calendar
+        Obx(() {
+          if (!controller.showCalendar.value) {
+            return const SizedBox.shrink();
+          }
 
-                    if (lastPickedDate != null) {
-                      pickedFromYearMode =
-                          pickedDate.year != lastPickedDate.year &&
-                          pickedDate.month == lastPickedDate.month &&
-                          pickedDate.day == lastPickedDate.day;
-                    }
-                    if (pickedFromYearMode) {
-                      // 🧠 YEAR MODE → keep calendar open
-                      controller.lastPickedDate.value = pickedDate; // 🔁
-                      controller.selectedExpiryDate.value = pickedDate; // 🔁
-                    } else {
-                      // 🧠 DAY MODE → close calendar
-                      controller.lastPickedDate.value = pickedDate; // 🔁
-                      controller.selectedExpiryDate.value = pickedDate; // 🔁
-                      controller.showCalendar.value = false; // 🔁
-                    }
-                  },
-                ),
-              ),
+          return Container(
+            // margin: const EdgeInsets.only(top: 6),
+            // padding: const EdgeInsets.only(bottom: 12, left: 4, right: 4),
+
+            // decoration: BoxDecoration(
+            //   color: Colors.white,
+            //   borderRadius: BorderRadius.circular(12),
+            //   border: Border.all(color: const Color(0xFFE2E8F0)),
+            //   boxShadow: [
+            //     BoxShadow(
+            //       color: Colors.black.withOpacity(0.05),
+            //       blurRadius: 10,
+            //       offset: const Offset(0, 4),
+            //     ),
+            //   ],
+            // ),
+            child: CommonExpiryCalendar(
+              focusedDay: controller.focusedDay.value,
+              selectedDate: controller.selectedExpiryDate.value,
+
+              onDaySelected: (date) {
+                controller.selectedExpiryDate.value = date;
+                controller.focusedDay.value = date;
+                controller.showCalendar.value = false;
+              },
+
+              onMonthChanged: (date) {
+                controller.focusedDay.value = date;
+              },
             ),
-          ],
-        ],
-      );
-    });
+          );
+        }),
+      ],
+    );
   }
 
   //* -- select ID picture methods --
