@@ -54,8 +54,9 @@
     screenshot: ^3.0.0
     gal: ^2.3.0
     flutter_screenutil: ^5.0.0
-    mobile_scanner: ^5.1.1
+    # mobile_scanner: ^5.1.1
     permission_handler: ^11.3.0
+    qr_code_scanner_plus: ^2.0.14
     
   dev_dependencies:
     flutter_test:

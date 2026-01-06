@@ -4,11 +4,9 @@ import java.io.FileInputStream
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // Flutter Gradle plugin
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-/* 🔐 Load keystore properties */
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
@@ -38,36 +36,24 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
+    kotlinOptions { jvmTarget = "17" }
 
-    /* 🔐 Signing Config */
-    /*signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
-        }
-    }*/
     signingConfigs {
         create("release") {
-            //Try to read values safely using 'as? String'
-            val kAlias = keystoreProperties["keyAlias"] as? String
-            val kPassword = keystoreProperties["keyPassword"] as? String
-            val sFile = keystoreProperties["storeFile"] as? String
-            val sPassword = keystoreProperties["storePassword"] as? String
+            val keyAliasVal = keystoreProperties["keyAlias"]?.toString()
+            val keyPasswordVal = keystoreProperties["keyPassword"]?.toString()
+            val storeFileVal = keystoreProperties["storeFile"]?.toString()
+            val storePasswordVal = keystoreProperties["storePassword"]?.toString()
 
-            // Only configure signing if all values are present
-            if (kAlias != null && kPassword != null && sFile != null && sPassword != null) {
-                keyAlias = kAlias
-                keyPassword = kPassword
-                storeFile = file(sFile)
-                storePassword = sPassword
-            } else {
-                //  Print a warning to the console
-                println(" Release signing config not found. Release builds may fail.")
+            if (!keyAliasVal.isNullOrBlank() &&
+                !keyPasswordVal.isNullOrBlank() &&
+                !storeFileVal.isNullOrBlank() &&
+                !storePasswordVal.isNullOrBlank()
+            ) {
+                keyAlias = keyAliasVal
+                keyPassword = keyPasswordVal
+                storeFile = file(storeFileVal)
+                storePassword = storePasswordVal
             }
         }
     }
@@ -76,9 +62,8 @@ android {
         debug {
             signingConfig = signingConfigs.getByName("debug")
         }
-
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             isMinifyEnabled = false
             isShrinkResources = false
         }
@@ -86,13 +71,18 @@ android {
 
     packaging {
         jniLibs {
-            excludes += setOf(
-                //"**/x86_64/**",
-                "**/libbarhopper_v3.so",
-                "**/libimage_processing_util_jni.so"
-            )
+            // Optional: if you don't support emulators
+            excludes += setOf("**/x86/**", "**/x86_64/**")
         }
     }
+}
+
+configurations.configureEach {
+    exclude(group = "com.google.mlkit", module = "barcode-scanning")
+}
+
+dependencies {
+    implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
 }
 
 flutter {
