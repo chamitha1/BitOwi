@@ -38,6 +38,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String? _emailErrorText;
   String? _passwordErrorText;
+  String? _confirmPasswordErrorText;
+  bool _termsError = false;
+
   String? _verifiedOtp; // Store captured OTP
 
   bool _sendingOtp = false;
@@ -88,28 +91,33 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _validatePasswordsLocal() {
     final pass = _passController.text.trim();
     final confirm = _confirmPassController.text.trim();
+    bool isValid = true;
 
+    // Validate Password
     if (pass.isEmpty) {
       setState(() => _passwordErrorText = "Please enter password");
-      return false;
-    }
-    if (pass.length < 6) {
+      isValid = false;
+    } else if (pass.length < 6) {
       setState(
         () => _passwordErrorText = "Password must be at least 6 characters",
       );
-      return false;
-    }
-    if (confirm.isEmpty) {
-      setState(() => _passwordErrorText = "Please confirm password");
-      return false;
-    }
-    if (confirm != pass) {
-      setState(() => _passwordErrorText = "Passwords do not match");
-      return false;
+      isValid = false;
+    } else {
+      setState(() => _passwordErrorText = null);
     }
 
-    setState(() => _passwordErrorText = null);
-    return true;
+    // Validate Confirm Password
+    if (confirm.isEmpty) {
+      setState(() => _confirmPasswordErrorText = "Please confirm password");
+      isValid = false;
+    } else if (confirm != pass) {
+      setState(() => _confirmPasswordErrorText = "Passwords do not match");
+      isValid = false;
+    } else {
+      setState(() => _confirmPasswordErrorText = null);
+    }
+
+    return isValid;
   }
 
   Future<void> _openOtpSheet() async {
@@ -208,14 +216,19 @@ class _SignupScreenState extends State<SignupScreen> {
       );
       return;
     }
-    if (!_validatePasswordsLocal()) return;
+    final bool passwordsValid = _validatePasswordsLocal();
+    bool termsValid = true;
+
     if (!_agreedToTerms) {
+      setState(() => _termsError = true);
+      termsValid = false;
       CustomSnackbar.showError(
         title: "Error",
         message: "Please read and accept Terms & Privacy",
       );
-      return;
     }
+
+    if (!passwordsValid || !termsValid) return;
 
     setState(() => _signingUp = true);
 
@@ -322,9 +335,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       : "assets/icons/sign_up/eye-slash.svg",
                   isPassword: true,
                   enabled: _isEmailVerified,
-                  borderColor: _passwordErrorText != null
-                      ? const Color(0xFFE74C3C)
-                      : null,
+                  errorText: _passwordErrorText,
                 ),
               ),
               const SizedBox(height: 30),
@@ -335,7 +346,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 enabled: _isEmailVerified,
                 obscureText: !_isPasswordVisible,
                 onChanged: (_) {
-                  if (_passwordErrorText != null) _validatePasswordsLocal();
+                  if (_confirmPasswordErrorText != null) _validatePasswordsLocal();
                 },
                 decoration: _inputDecoration(
                   hint: "Re-Enter Password",
@@ -345,7 +356,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       : "assets/icons/sign_up/eye-slash.svg",
                   isPassword: true,
                   enabled: _isEmailVerified,
-                  errorText: _passwordErrorText,
+                  errorText: _confirmPasswordErrorText,
                 ),
               ),
               const SizedBox(height: 30),
@@ -368,14 +379,36 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(
                     height: 24,
                     width: 24,
-                    child: Checkbox(
-                      value: _agreedToTerms,
-                      onChanged: _isEmailVerified
-                          ? (v) => setState(() => _agreedToTerms = v ?? false)
-                          : null,
-                      activeColor: const Color(0xFF2F5599),
-                      shape: RoundedRectangleBorder(
+                    child: Container(
+                      height: 20,
+                      width: 20,
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: _agreedToTerms
+                              ? Colors.transparent
+                              : (_termsError
+                                  ? const Color(0xFFE74C3C)
+                                  : const Color(0xFFC0C0C0)),
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Checkbox(
+                        value: _agreedToTerms,
+                        onChanged: _isEmailVerified
+                            ? (v) => setState(() {
+                                  _agreedToTerms = v ?? false;
+                                  if (_agreedToTerms) _termsError = false;
+                                })
+                            : null,
+                        activeColor: const Color(0xFF2F5599),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        side: const BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
                       ),
                     ),
                   ),
@@ -452,9 +485,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
               GradientButton(
                 text: _signingUp ? "Signing Up..." : "Sign Up",
-                onPressed: (_isEmailVerified && _agreedToTerms && !_signingUp)
-                    ? _onSignup
-                    : () {},
+                onPressed: () {
+                  _onSignup();
+                },
               ),
 
               const SizedBox(height: 24),
@@ -730,8 +763,8 @@ class _SignupScreenState extends State<SignupScreen> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(
-          color: borderColor ?? const Color.fromARGB(255, 112, 152, 221),
-          width: 1.0,
+          color: borderColor ?? const Color(0xFF1D5DE5),
+          width: 1.5,
         ),
       ),
       border: OutlineInputBorder(

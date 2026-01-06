@@ -522,6 +522,14 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: _primaryBlue, width: 1.5),
       ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
+      ),
       prefixIcon: Padding(
         padding: const EdgeInsets.all(13.5),
         child: SvgPicture.asset(
