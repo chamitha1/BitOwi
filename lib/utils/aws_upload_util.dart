@@ -12,6 +12,7 @@ class AwsUploadUtil {
   static final AwsUploadUtil _singleton = AwsUploadUtil._internal();
 
   factory AwsUploadUtil() => _singleton;
+
   /// Get upload parameters
   Future<FormData> getUploadParams(XFile xfile) async {
     MultipartFile file;
@@ -82,6 +83,10 @@ class AwsUploadUtil {
     }
     // ---------- DIO ERRORS ----------
     on DioException catch (e) {
+      // 🔴 NGINX / Cloudflare Handle 413 explicitly
+      if (e.response?.statusCode == 413) {
+        throw UploadTooLargeException();
+      }
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
         throw Exception('Network timeout, please try again');
@@ -100,3 +105,6 @@ class AwsUploadUtil {
 }
 
 final awsUploadUtil = AwsUploadUtil();
+
+///--- exceptions
+class UploadTooLargeException implements Exception {}
