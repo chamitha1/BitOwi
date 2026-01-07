@@ -1,5 +1,6 @@
 import 'package:BitOwi/features/address_book/data/models/address_item.dart';
 import 'package:BitOwi/features/address_book/presentation/widgets/address_card.dart';
+import 'package:BitOwi/features/address_book/presentation/pages/add_address_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -37,26 +38,33 @@ class _AddressBookPageState extends State<AddressBookPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/merchant_details/arrow_left.svg',
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF151E2F),
-              BlendMode.srcIn,
+        automaticallyImplyLeading: false,
+        titleSpacing: 20,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () => Get.back(),
+              child: SvgPicture.asset(
+                'assets/icons/merchant_details/arrow_left.svg',
+                colorFilter: const ColorFilter.mode(
+                  Color(0xFF151E2F),
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
-          ),
-          onPressed: () => Get.back(),
+            const SizedBox(width: 12),
+            const Text(
+              "Address Book",
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                color: Color(0xFF151E2F),
+              ),
+            ),
+          ],
         ),
-        title: const Text(
-          "Address Book",
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            color: Color(0xFF151E2F),
-          ),
-        ),
-        centerTitle: true,
+        centerTitle: false,
       ),
       body: SafeArea(
         child: Column(
@@ -119,10 +127,10 @@ class _AddressBookPageState extends State<AddressBookPage> {
               padding: const EdgeInsets.all(20),
               child: SizedBox(
                 width: double.infinity,
-                height: 48,
+                height: 58,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Action for Add Address
+                    Get.to(() => const AddAddressPage());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1D5DE5),

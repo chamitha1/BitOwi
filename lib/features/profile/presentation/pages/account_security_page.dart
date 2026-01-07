@@ -1,6 +1,8 @@
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/profile/presentation/pages/change_transaction_password_page.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/profile_widgets.dart';
+import 'package:BitOwi/features/profile/presentation/pages/add_authenticator_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/change_email_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,6 +22,7 @@ class AccountAndSecurityPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFF151E2F)),
           onPressed: () => Get.back(),
@@ -41,10 +44,32 @@ class AccountAndSecurityPage extends StatelessWidget {
           child: Column(
             children: [
               // Header Image
-              SvgPicture.asset(
-                'assets/icons/profile_page/shield_account_security.svg',
-                width: 80, 
-                height: 80,
+              Container(
+                width: 72,
+                height: 72,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF28A6FF), Color(0xFF1D5DE5)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1D5DE5).withOpacity(0.2),
+                      offset: const Offset(0, 6),
+                      blurRadius: 24,
+                    ),
+                  ],
+                ),
+                child: SvgPicture.asset(
+                  'assets/icons/profile_page/account_security/shield-tick.svg',
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               // Header Title
@@ -109,14 +134,18 @@ class AccountAndSecurityPage extends StatelessWidget {
                     iconPath: 'assets/icons/profile_page/account_security/security-safe.svg',
                     title: "Authenticator App",
                     subtitle: "Enable 2 Factor Authentication",
-                    onTap: () {},
+                    onTap: () {
+                      Get.to(() => const AddAuthenticatorPage());
+                    },
                   ),
                   const _Divider(),
                   ProfileMenuItem(
                     iconPath: 'assets/icons/profile_page/account_security/sms-edit.svg',
                     title: "Change Email",
                     subtitle: "Update your email address",
-                    onTap: () {},
+                    onTap: () {
+                      Get.to(() => const ChangeEmailPage());
+                    },
                   ),
                 ],
               ),
