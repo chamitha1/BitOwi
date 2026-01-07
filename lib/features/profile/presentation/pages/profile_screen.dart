@@ -317,7 +317,7 @@ class ProfileScreen extends StatelessWidget {
             ProfileMenuItem(
               iconPath: 'assets/icons/merchant_details/user_kyc.svg',
               title: "KYC",
-              subtitle: "User KYC verification",
+              subtitle: "Know Your Customer verification",
               onTap: () {
                 Get.to(
                   () => UserKycInformationPage(),
