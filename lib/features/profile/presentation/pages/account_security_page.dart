@@ -99,7 +99,8 @@ class AccountAndSecurityPage extends StatelessWidget {
               ProfileGroupCard(
                 children: [
                   ProfileMenuItem(
-                    iconPath: 'assets/icons/profile_page/account_security/arrow-swap-horizontal.svg',
+                    iconPath:
+                        'assets/icons/profile_page/account_security/arrow-swap-horizontal.svg',
                     title: "Change Transaction Password",
                     subtitle: "Update your transaction password",
                     onTap: () {
@@ -108,7 +109,8 @@ class AccountAndSecurityPage extends StatelessWidget {
                   ),
                   const _Divider(),
                   ProfileMenuItem(
-                    iconPath: 'assets/icons/profile_page/account_security/lock.svg',
+                    iconPath:
+                        'assets/icons/profile_page/account_security/lock.svg',
                     title: "Change Login Password",
                     subtitle: "Transaction password, payment options",
                     onTap: () {
@@ -116,22 +118,23 @@ class AccountAndSecurityPage extends StatelessWidget {
                     },
                   ),
                   const _Divider(),
-                  Obx(() => ProfileMenuItem(
-                    iconPath: 'assets/icons/profile_page/account_security/menu.svg',
-                    title: "Pattern Lock",
-                    subtitle: "Transaction password",
-                    trailing: CupertinoSwitch(
-                      value: isPatternLockEnabled.value,
-                      activeColor: const Color(0xFF2ECC71),
-                      onChanged: (value) {
-                        isPatternLockEnabled.value = value;
-                      },
-                    ),
-                    onTap: () {}, // Toggle switch
-                  )),
-                  const _Divider(),
+                  // Obx(() => ProfileMenuItem(
+                  //   iconPath: 'assets/icons/profile_page/account_security/menu.svg',
+                  //   title: "Pattern Lock",
+                  //   subtitle: "Transaction password",
+                  //   trailing: CupertinoSwitch(
+                  //     value: isPatternLockEnabled.value,
+                  //     activeColor: const Color(0xFF2ECC71),
+                  //     onChanged: (value) {
+                  //       isPatternLockEnabled.value = value;
+                  //     },
+                  //   ),
+                  //   onTap: () {}, // Toggle switch
+                  // )),
+                  // const _Divider(),
                   ProfileMenuItem(
-                    iconPath: 'assets/icons/profile_page/account_security/security-safe.svg',
+                    iconPath:
+                        'assets/icons/profile_page/account_security/security-safe.svg',
                     title: "Authenticator App",
                     subtitle: "Enable 2 Factor Authentication",
                     onTap: () {
@@ -140,7 +143,8 @@ class AccountAndSecurityPage extends StatelessWidget {
                   ),
                   const _Divider(),
                   ProfileMenuItem(
-                    iconPath: 'assets/icons/profile_page/account_security/sms-edit.svg',
+                    iconPath:
+                        'assets/icons/profile_page/account_security/sms-edit.svg',
                     title: "Change Email",
                     subtitle: "Update your email address",
                     onTap: () {

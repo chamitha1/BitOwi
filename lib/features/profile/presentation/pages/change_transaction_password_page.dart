@@ -1,8 +1,8 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
-import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart'; 
-import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart'; 
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -54,18 +54,22 @@ class _ChangeTransactionPasswordPageState
     super.dispose();
   }
 
-
-
   Future<void> _onUpdate() async {
     final pass = _passController.text.trim();
     final confirm = _confirmPassController.text.trim();
 
     if (pass.isEmpty || pass.length != 6 || int.tryParse(pass) == null) {
-      CustomSnackbar.showError(title: "Error", message: "Please enter a valid 6-digit number password");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter a valid 6-digit number password",
+      );
       return;
     }
     if (confirm != pass) {
-      CustomSnackbar.showError(title: "Error", message: "Passwords do not match");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Passwords do not match",
+      );
       return;
     }
     _openOtpSheet();
@@ -85,7 +89,10 @@ class _ChangeTransactionPasswordPageState
       if (!mounted) return;
 
       if (!success) {
-        CustomSnackbar.showError(title: "Error", message: "Failed to send OTP. Please try again.");
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Failed to send OTP. Please try again.",
+        );
         setState(() => _isLoading = false);
         return;
       }
@@ -138,7 +145,7 @@ class _ChangeTransactionPasswordPageState
       );
     } catch (e) {
       if (mounted) {
-        // setState(() => _isLoading = false); 
+        // setState(() => _isLoading = false);
         setState(() => _isLoading = false);
         CustomSnackbar.showError(title: "Error", message: "$e");
       }
@@ -176,7 +183,7 @@ class _ChangeTransactionPasswordPageState
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
-                  vertical: 14,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFECEFF5),
@@ -213,23 +220,26 @@ class _ChangeTransactionPasswordPageState
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEAF9F0),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: const Color(0xFFABEAC6)),
                       ),
                       child: Row(
-                        children: const [
-                          Icon(
-                            Icons.check_circle,
-                            size: 14,
-                            color: Color(0xFF40A372),
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/profile_page/account_security/check-circle.svg',
+                            height: 18,
+                            width: 18,
                           ),
                           SizedBox(width: 4),
-                          Text(
-                            "Verified",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF40A372),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
+                            child: Text(
+                              "Verified",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF40A372),
+                              ),
                             ),
                           ),
                         ],

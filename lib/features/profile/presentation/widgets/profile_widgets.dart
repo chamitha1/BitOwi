@@ -5,10 +5,7 @@ import 'package:get/get.dart';
 class ProfileGroupCard extends StatelessWidget {
   final List<Widget> children;
 
-  const ProfileGroupCard({
-    super.key,
-    required this.children,
-  });
+  const ProfileGroupCard({super.key, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +74,8 @@ class ProfileMenuItem extends StatelessWidget {
           color: Color(0xFF6A7282),
         ),
       ),
-      trailing: trailing ??
+      trailing:
+          trailing ??
           SvgPicture.asset(
             'assets/icons/profile_page/arrow-right.svg',
             width: 20,

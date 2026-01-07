@@ -219,12 +219,11 @@ class ProfileScreen extends StatelessWidget {
           ),
           // Stats Row
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            margin: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.08),
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(20),
-              ),
+              borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -249,13 +248,18 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-
+                Container(
+                  width: 1,
+                  height: 14,
+                  color: Colors.white.withOpacity(0.3),
+                ),
                 Row(
                   children: [
                     Text(
                       "Trust ",
                       style: _statTextStyle(fontWeight: FontWeight.w400),
                     ),
+                    const SizedBox(width: 4),
                     Obx(
                       () => Text(
                         "${controller.tradeInfo.value?.confidenceCount ?? 0}",
@@ -264,13 +268,18 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-
+                Container(
+                  width: 1,
+                  height: 14,
+                  color: Colors.white.withOpacity(0.3),
+                ),
                 Row(
                   children: [
                     Text(
                       "Trade ",
                       style: _statTextStyle(fontWeight: FontWeight.w400),
                     ),
+                    const SizedBox(width: 4),
                     Obx(
                       () => Text(
                         "${controller.tradeInfo.value?.totalTradeCount ?? "0"} / ${controller.finishRate}%",
@@ -306,7 +315,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ... (existing _buildActionItem)
 
   Widget _buildMenuCards(BuildContext context) {
     return Column(
