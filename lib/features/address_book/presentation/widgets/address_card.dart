@@ -1,16 +1,35 @@
-import 'package:BitOwi/features/address_book/data/models/address_item.dart';
+import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class AddressCard extends StatelessWidget {
-  final AddressItem item;
+  final PersonalAddressListRes? apiItem;
+
   final VoidCallback? onMoreTap;
 
-  const AddressCard({super.key, required this.item, this.onMoreTap});
+  const AddressCard({super.key, required this.apiItem, this.onMoreTap});
 
   @override
   Widget build(BuildContext context) {
+    if (apiItem == null) return const SizedBox();
+    final item = apiItem!;
+
+    String iconPath = 'assets/icons/profile_page/address/usdt.svg';
+    if (item.symbol.toUpperCase() == 'BTC') {
+      iconPath = 'assets/icons/profile_page/address/btc.svg';
+    }
+
+    String dateStr = "";
+    try {
+      dateStr = DateFormat('yyyy-MM-dd HH:mm:ss').format(
+        DateTime.fromMillisecondsSinceEpoch(item.createDatetime.toInt()),
+      );
+    } catch (e) {
+      dateStr = item.createDatetime.toString();
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -39,11 +58,11 @@ class AddressCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Color(0xFFF6F9FF),
                 ),
-                // padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: SvgPicture.asset(
-                  item.iconPath,
-                  width: 40,
-                  height: 40,
+                  iconPath,
+                  width: 24,
+                  height: 24,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -64,7 +83,7 @@ class AddressCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      item.currencyCode,
+                      item.symbol,
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
@@ -171,7 +190,7 @@ class AddressCard extends StatelessWidget {
                 ),
               ),
               Text(
-                item.date,
+                dateStr,
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,

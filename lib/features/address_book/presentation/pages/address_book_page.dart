@@ -1,9 +1,12 @@
+import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/features/address_book/data/models/address_item.dart';
+import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:BitOwi/features/address_book/presentation/widgets/address_card.dart';
 import 'package:BitOwi/features/address_book/presentation/pages/add_address_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class AddressBookPage extends StatefulWidget {
   const AddressBookPage({super.key});
@@ -13,23 +16,27 @@ class AddressBookPage extends StatefulWidget {
 }
 
 class _AddressBookPageState extends State<AddressBookPage> {
-  // Dummy Data
-  final List<AddressItem> dummyAddresses = [
-    AddressItem(
-      name: "Main USDT Wallet",
-      currencyCode: "USDT",
-      address: "wuqian//tajeoh.ggg:.5000.cb.id",
-      date: "2024-07-12 04:42:44",
-      iconPath: "assets/icons/profile_page/address/usdt.svg",
-    ),
-    AddressItem(
-      name: "Savings Bitcoin",
-      currencyCode: "BTC",
-      address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-      date: "2024-08-20 10:15:22",
-      iconPath: "assets/icons/profile_page/address/btc.svg",
-    ),
-  ];
+  List<PersonalAddressListRes> addresses = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAddresses();
+  }
+
+  Future<void> _fetchAddresses() async {
+    try {
+      final list = await AccountApi.getAddressList();
+      setState(() {
+        addresses = list;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      print("Error loading addresses: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,18 +115,43 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
             // Address List
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                itemCount: dummyAddresses.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  return AddressCard(item: dummyAddresses[index]);
-                },
-              ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : addresses.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "No addresses found",
+                        style: TextStyle(color: Color(0xFF717F9A)),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      itemCount: addresses.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 16),
+                      itemBuilder: (context, index) {
+                        final item = addresses[index];
+                        // icon based on sybol
+                        String iconPath =
+                            'assets/icons/profile_page/address/usdt.svg';
+                        if (item.symbol.toUpperCase() == 'BTC') {
+                          iconPath =
+                              'assets/icons/profile_page/address/btc.svg';
+                        }
+
+                        final dateStr = DateFormat('yyyy-MM-dd HH:mm:ss')
+                            .format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                item.createDatetime.toInt(),
+                              ),
+                            );
+
+                        return AddressCard(apiItem: item);
+                      },
+                    ),
             ),
 
             // Add address Button
@@ -129,8 +161,11 @@ class _AddressBookPageState extends State<AddressBookPage> {
                 width: double.infinity,
                 height: 58,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => const AddAddressPage());
+                  onPressed: () async {
+                    final result = await Get.to(() => const AddAddressPage());
+                    if (result == true) {
+                      _fetchAddresses();
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1D5DE5),

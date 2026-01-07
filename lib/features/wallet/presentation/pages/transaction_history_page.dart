@@ -80,10 +80,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     ),
                   ),
                   const Spacer(),
-                  Image.asset(
-                    "assets/icons/home/headphones.png",
-                    width: 40,
-                    height: 40,
+                  SvgPicture.asset(
+                    "assets/icons/home/headphones.svg",
+                    width: 28,
+                    height: 28,
                   ),
                 ],
               ),

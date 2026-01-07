@@ -10,6 +10,8 @@ import 'package:BitOwi/models/jour.dart';
 import 'package:BitOwi/models/jour_front_detail.dart';
 import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
+import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
+import 'package:BitOwi/models/coin_list_res.dart';
 
 class AccountApi {
   static Future<AccountDetailAssetRes> getBalanceAccount({
@@ -257,6 +259,36 @@ class AccountApi {
     }
   }
 
+  static Future<List<PersonalAddressListRes>> getAddressList() async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/personal_address/list_front',
+        data: {},
+      );
+      final data = res.data;
+      print('AddressBook Response: $data');
+
+      if (data is Map<String, dynamic> && data['code'] == '200') {
+        final listData = data['data'] as List<dynamic>;
+        return listData
+            .map(
+              (e) => PersonalAddressListRes.fromJson(e as Map<String, dynamic>),
+            )
+            .toList();
+      } else if (data is List) {
+        return data
+            .map(
+              (e) => PersonalAddressListRes.fromJson(e as Map<String, dynamic>),
+            )
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching address list: $e');
+      rethrow;
+    }
+  }
+
   //📝TODO
   static Future<void> createBankCard(Map<String, dynamic> params) async {
     // try {
@@ -367,48 +399,34 @@ class AccountApi {
   //   // }
   // }
 
-  //📝TODO
-  // static Future<List<CoinListRes>> getCoinList([
-  //   Map<String, dynamic>? params,
-  // ]) async {
-  //   //   try {
-  //   //     final res = await HttpUtil.post('/core/v1/coin/list_front', params);
-  //   //     List<CoinListRes> list = (res as List<dynamic>)
-  //   //         .map((item) => CoinListRes.fromJson(CommonUtils.removeNullKeys(item)))
-  //   //         .toList();
-  //   //     return list;
-  //   //   } catch (e) {
-  //   //     e.printError();
-  //   //     rethrow;
-  //   //   }
-  // }
+  static Future<List<CoinListRes>> getCoinList() async {
+    try {
+      final res = await ApiClient.dio.post('/core/v1/coin/list_front', data: {});
+      final data = res.data;
+      if (data is Map<String, dynamic> && (data['code'] == 200 || data['code'] == '200')) {
+        final list = data['data'] as List<dynamic>;
+        return list.map((e) => CoinListRes.fromJson(e as Map<String, dynamic>)).toList();
+      }
+      return [];
+    } catch (e) {
+      print("getCoinList error: $e");
+      rethrow;
+    }
+  }
 
-  //📝TODO
-  // static Future<List<PersonalAddressListRes>> getAddressList() async {
-  //   // try {
-  //   //   final res = await HttpUtil.post('/core/v1/personal_address/list_front');
-  //   //   List<PersonalAddressListRes> list = (res as List<dynamic>)
-  //   //       .map(
-  //   //         (item) => PersonalAddressListRes.fromJson(
-  //   //           CommonUtils.removeNullKeys(item),
-  //   //         ),
-  //   //       )
-  //   //       .toList();
-  //   //   return list;
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
-
-  /// 📝TODO
   static Future<void> createAddress(Map<String, dynamic> params) async {
-    // try {
-    //   await HttpUtil.post('/core/v1/personal_address/create', params);
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+    try {
+      final res = await ApiClient.dio.post('/core/v1/personal_address/create', data: params);
+      final data = res.data;
+       if (data['code'] == 200 || data['code'] == '200') {
+         return;
+       } else {
+         throw Exception(data['errorMsg'] ?? 'Failed to create address');
+       }
+    } catch (e) {
+      print("createAddress error: $e");
+      rethrow;
+    }
   }
 
   /// 📝TODO
