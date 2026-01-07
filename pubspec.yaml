@@ -74,7 +74,7 @@
 
   flutter_launcher_icons:
     android: true
-    ios: false 
+    ios: true 
 
     # Main launcher icon (pre-Android 12 & iOS)
     image_path: assets/app_icons/app_icon.png
