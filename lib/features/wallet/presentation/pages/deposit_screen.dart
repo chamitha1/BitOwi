@@ -7,6 +7,7 @@ import '../widgets/coin_selector_card.dart';
 import 'transaction_history_page.dart';
 import '../widgets/deposit_address_section.dart';
 import '../widgets/friendly_reminder_card.dart';
+import '../widgets/deposit_network_bottom_sheet.dart';
 
 class DepositScreen extends StatelessWidget {
   const DepositScreen({super.key});
@@ -88,6 +89,73 @@ class DepositScreen extends StatelessWidget {
                         onCoinSelected: controller.onCoinSelected,
                         isLoading: controller.isLoading.value,
                       ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Deposit Network",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xff2E3D5B),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              barrierColor: Color(0xffECEFF5).withOpacity(0.7),
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => DepositNetworkBottomSheet(
+                                networks: controller.networkList,
+                                selectedNetwork:
+                                    controller.selectedNetwork.value,
+                                onNetworkSelected: controller.onNetworkSelected,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 52,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xffDAE0EE),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Obx(
+                                  () => Text(
+                                    controller.selectedNetwork.value.isEmpty
+                                        ? "Select Network"
+                                        : controller.selectedNetwork.value,
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff151E2F),
+                                    ),
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: Color(0xff151E2F),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Obx(() {

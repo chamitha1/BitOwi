@@ -1,23 +1,23 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
-import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
-class ChangeTransactionPasswordPage extends StatefulWidget {
-  const ChangeTransactionPasswordPage({super.key});
+class ChangeLoginPasswordPage extends StatefulWidget {
+  const ChangeLoginPasswordPage({super.key});
 
   @override
-  State<ChangeTransactionPasswordPage> createState() =>
-      _ChangeTransactionPasswordPageState();
+  State<ChangeLoginPasswordPage> createState() =>
+      _ChangeLoginPasswordPageState();
 }
 
-class _ChangeTransactionPasswordPageState
-    extends State<ChangeTransactionPasswordPage> {
+class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
+  final _formKey = GlobalKey<FormState>();
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
   final _userApi = UserApi();
@@ -55,16 +55,15 @@ class _ChangeTransactionPasswordPageState
   }
 
   Future<void> _onUpdate() async {
+    FocusScope.of(context).unfocus();
+
+    // Trigger validation
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
     final pass = _passController.text.trim();
     final confirm = _confirmPassController.text.trim();
 
-    if (pass.isEmpty || pass.length != 6 || int.tryParse(pass) == null) {
-      CustomSnackbar.showError(
-        title: "Error",
-        message: "Please enter a valid 6-digit number password",
-      );
-      return;
-    }
     if (confirm != pass) {
       CustomSnackbar.showError(
         title: "Error",
@@ -72,7 +71,30 @@ class _ChangeTransactionPasswordPageState
       );
       return;
     }
+
     _openOtpSheet();
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter password';
+    }
+    // You might want to add more password rules here if needed
+    // e.g. length check similar to login page
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please re-enter password';
+    }
+    if (value != _passController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
   }
 
   Future<void> _openOtpSheet() async {
@@ -83,7 +105,7 @@ class _ChangeTransactionPasswordPageState
       // Send OTP first
       final success = await _userApi.sendOtp(
         email: _email,
-        bizType: SmsBizType.bindTradePwd,
+        bizType: SmsBizType.forgetPwd,
       );
 
       if (!mounted) return;
@@ -99,9 +121,16 @@ class _ChangeTransactionPasswordPageState
 
       setState(() => _isLoading = false);
 
-      final pendingPassword = _passController.text.trim();
-      _passController.clear();
-      _confirmPassController.clear();
+      final newPassword = _passController.text.trim();
+      
+      // Clear fields before showing sheet as per requirement
+      // _passController.clear();
+      // _confirmPassController.clear();
+      // WARNING: If we clear here, if user cancels OTP sheet, they have to re-type.
+      // Requirement says "clear textfields--> success dialog". So clearing AFTER success seems more appropriate or right before success dialog.
+      // However, "clear textfields" is listed in the flow arrow chain: 
+      // API called -> clear textfields -> success dialog
+      // So I will clear them upon successful verification.
 
       // Show Sheet
       showModalBottomSheet(
@@ -111,18 +140,28 @@ class _ChangeTransactionPasswordPageState
         builder: (context) => OtpBottomSheet(
           email: _email,
           otpLength: 6,
-          bizType: SmsBizType.bindTradePwd,
-          //  API verify here
+          // Using forgetPwd biztype
+          bizType: SmsBizType.forgetPwd,
+          
+          // API verification
           onVerifyPin: (pin) async {
             try {
-              await _userApi.bindTradePwd(
+              // Call forgetLoginPwd
+              await UserApi.forgetLoginPwd(
                 email: _email,
-                smsCode: pin,
-                tradePwd: pendingPassword,
+                smsCaptcha: pin,
+                loginPwd: newPassword,
               );
               return true;
             } catch (e) {
               print(e);
+              // Error snackbar is often handled by caller or we can show it here if we return false
+              // OtpBottomSheet usually shows error if this returns false? 
+              // Looking at OtpBottomSheet implementation (not provided in context but inferred), 
+              // if onVerifyPin throws or returns false, it might handle UI.
+              // Requirement: "If the otp verification fails --> show error snack bar with errorMsg from response."
+              // The API method rethrows, so we catch it here.
+              CustomSnackbar.showError(title: "Error", message: e.toString().replaceAll("Exception: ", ""));
               return false;
             }
           },
@@ -130,22 +169,40 @@ class _ChangeTransactionPasswordPageState
           onResend: () async {
             return await _userApi.sendOtp(
               email: _email,
-              bizType: SmsBizType.bindTradePwd,
+              bizType: SmsBizType.forgetPwd,
             );
           },
           onVerified: () {
-            Navigator.pop(context);
-            Get.back();
+            // Close OTP sheet
+            Navigator.pop(context); // or Get.back();
+
+            // Clear textfields
+            _passController.clear();
+            _confirmPassController.clear();
+
+            // Success Dialog
+            Get.dialog(
+              SuccessDialog(
+                title: "Successfully Changed",
+                description: "Your login password has changed successfully. Please use the new password for future logins.",
+                buttonText: "Done",
+                onButtonTap: () {
+                  Get.back(); // close dialog
+                  Get.back(); // navigate back from Change Page
+                },
+              ),
+              barrierDismissible: false,
+            );
+
             CustomSnackbar.showSuccess(
               title: "Success",
-              message: "Transaction Password Updated Successfully!",
+              message: "Login Password Changed Successfully!",
             );
           },
         ),
       );
     } catch (e) {
       if (mounted) {
-        // setState(() => _isLoading = false);
         setState(() => _isLoading = false);
         CustomSnackbar.showError(title: "Error", message: "$e");
       }
@@ -164,7 +221,7 @@ class _ChangeTransactionPasswordPageState
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          "Change Transaction Password",
+          "Change Login Password",
           style: TextStyle(
             fontSize: 18,
             fontFamily: 'Inter',
@@ -179,74 +236,78 @@ class _ChangeTransactionPasswordPageState
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _label("Email"),
-                    _label("Email"),
-                    TextFormField(
-                      initialValue: _email,
-                      enabled: false,
-                      style: const TextStyle(
-                        color: Color(0xFF151E2F),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Inter',
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFECEFF5),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: SvgPicture.asset(
-                            "assets/icons/sign_up/sms.svg",
-                            width: 20,
-                            height: 20,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF717F9A),
-                              BlendMode.srcIn,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _label("Email"),
+                      TextFormField(
+                        initialValue: _email,
+                        enabled: false,
+                        style: const TextStyle(
+                          color: Color(0xFF151E2F),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Inter',
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFECEFF5),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: SvgPicture.asset(
+                              "assets/icons/sign_up/sms.svg",
+                              width: 20,
+                              height: 20,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF717F9A),
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
-                        ),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 6,
-                            top: 6,
-                            bottom: 6,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 6,
+                              top: 6,
+                              bottom: 6,
+                            ),
+                            child: _verifyButton(
+                              text: "Verified",
+                              onPressed: () {},
+                              isEnabled: false,
+                              isVerified: true,
+                            ),
                           ),
-                          child: _verifyButton(
-                            text: "Verified",
-                            onPressed: () {},
-                            isEnabled: false,
-                            isVerified: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
                           ),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    _label("Transaction Password"),
-                    _passwordField(
-                      controller: _passController,
-                      placeholder: "Enter 6-Digit Password",
-                    ),
-                    const SizedBox(height: 24),
+                      _label("New Login Password"),
+                      _passwordField(
+                        controller: _passController,
+                        placeholder: "Enter New Password",
+                        validator: _validatePassword,
+                      ),
+                      const SizedBox(height: 24),
 
-                    _label("Confirm Transaction Password"),
-                    _passwordField(
-                      controller: _confirmPassController,
-                      placeholder: "Re-enter 6-Digit Password",
-                    ),
-                  ],
+                      _label("Confirm New Login Password"),
+                      _passwordField(
+                        controller: _confirmPassController,
+                        placeholder: "Re-Enter New Password",
+                        validator: _validateConfirmPassword,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -274,7 +335,7 @@ class _ChangeTransactionPasswordPageState
                           ),
                         )
                       : const Text(
-                          "Update Transaction Password",
+                          "Change Login Password",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -383,11 +444,12 @@ class _ChangeTransactionPasswordPageState
   Widget _passwordField({
     required TextEditingController controller,
     required String placeholder,
+    String? Function(String?)? validator,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: !_isPasswordVisible,
-      keyboardType: TextInputType.number,
+      // Removed keyboardType: TextInputType.number to allow alphanumeric passwords as per example "1qaz!QAZ"
       decoration: InputDecoration(
         hintText: placeholder,
         hintStyle: const TextStyle(
@@ -410,6 +472,14 @@ class _ChangeTransactionPasswordPageState
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF1D5DE5)),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
         ),
         prefixIcon: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -445,6 +515,11 @@ class _ChangeTransactionPasswordPageState
           ),
         ),
       ),
+      validator: validator,
+      onChanged: (_) {
+         // Optionally clear validation errors on type
+         // _formKey.currentState?.validate();
+      },
     );
   }
 }

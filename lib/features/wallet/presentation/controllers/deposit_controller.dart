@@ -14,6 +14,13 @@ class DepositController extends GetxController {
   var coinList = <ChainSymbolListRes>[].obs;
   var selectedCoin = Rxn<ChainSymbolListRes>();
   var depositAddress = ''.obs;
+  var networkList = <String>[
+    'Bitcoin (BTC)',
+    'Bitcoin SegWit',
+    'Bitcoin Taproot',
+    'BTC Lightning'
+  ].obs;
+  var selectedNetwork = ''.obs;
 
   @override
   void onInit() {
@@ -59,6 +66,10 @@ class DepositController extends GetxController {
   void onCoinSelected(ChainSymbolListRes coin) {
     selectedCoin.value = coin;
     fetchAddress();
+  }
+
+  void onNetworkSelected(String network) {
+    selectedNetwork.value = network;
   }
 
   final ScreenshotController screenshotController = ScreenshotController();

@@ -94,10 +94,17 @@ class _AddAddressPageState extends State<AddAddressPage> {
       _nameController.clear();
       _addressController.clear();
       _hasSaved = true;
+      
       CustomSnackbar.showSuccess(
         title: "Success",
         message: "Address saved successfully",
       );
+      
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
     } catch (e) {
       print("Save Address Error: $e");
       String errorMsg = e.toString();
@@ -123,118 +130,107 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Get.back(result: _hasSaved);
-        return false;
-      },
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F9FF),
+      appBar: AppBar(
         backgroundColor: const Color(0xFFF6F9FF),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFF6F9FF),
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          titleSpacing: 20,
-          title: Row(
-            children: [
-              GestureDetector(
-                onTap: () => Get.back(result: _hasSaved),
-                child: SvgPicture.asset(
-                  'assets/icons/merchant_details/arrow_left.svg',
-                  colorFilter: const ColorFilter.mode(
-                    Color(0xFF151E2F),
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                "Add Address",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: Color(0xFF151E2F),
-                ),
-              ),
-            ],
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        titleSpacing: 20,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/merchant_details/arrow_left.svg',
+            colorFilter: const ColorFilter.mode(
+              Color(0xFF151E2F),
+              BlendMode.srcIn,
+            ),
           ),
-          centerTitle: false,
+          onPressed: () => Navigator.pop(context, _hasSaved),
         ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //  Address Name
-                      _buildLabel("Address Name"),
-                      const SizedBox(height: 8),
-                      _buildInputField(
-                        controller: _nameController,
-                        hintText: "Enter Address Name",
-                      ),
-                      const SizedBox(height: 20),
-
-                      //Address symbol
-                      _buildLabel("Address Currency"),
-                      const SizedBox(height: 8),
-                      _buildDropdownField(),
-                      const SizedBox(height: 20),
-
-                      // Address
-                      _buildLabel("Address"),
-                      const SizedBox(height: 8),
-                      _buildInputField(
-                        controller: _addressController,
-                        hintText: "Enter Address",
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // save address btn
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 58,
-                  child: ElevatedButton(
-                    onPressed: _isSaving ? null : _saveAddress,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1D5DE5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: _isSaving
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            "Save Address",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
-                ),
-              ),
-            ],
+        title: const Text(
+          "Add Address",
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            color: Color(0xFF151E2F),
           ),
+        ),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Address Name
+                    _buildLabel("Address Name"),
+                    const SizedBox(height: 8),
+                    _buildInputField(
+                      controller: _nameController,
+                      hintText: "Enter Address Name",
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Address symbol
+                    _buildLabel("Address Currency"),
+                    const SizedBox(height: 8),
+                    _buildDropdownField(),
+                    const SizedBox(height: 20),
+
+                    // Address
+                    _buildLabel("Address"),
+                    const SizedBox(height: 8),
+                    _buildInputField(
+                      controller: _addressController,
+                      hintText: "Enter Address",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Save address button
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 58,
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : _saveAddress,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1D5DE5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Save Address",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -59,12 +59,14 @@ class ProfileScreen extends StatelessWidget {
             //   icon: Icons.person_add_alt_1_outlined,
             //   onTap: () {},
             // ),
-            // const SizedBox(width: 12),
-            // _buildCircleIconButton(
-            //   icon: Icons.notifications_none_outlined,
-            //   onTap: () {},
-            //   // badgeCount: 99,
-            // ),
+            const SizedBox(width: 12),
+            _buildCircleIconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/profile_page/notification.svg',
+              ),
+              onTap: () {},
+              badgeCount: 99,
+            ),
           ],
         ),
       ],
@@ -72,7 +74,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildCircleIconButton({
-    required IconData icon,
+    required Widget icon,
     required VoidCallback onTap,
     int? badgeCount,
   }) {
@@ -89,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFFECEFF5)),
             ),
-            child: Icon(icon, size: 20, color: const Color(0xFF151E2F)),
+            child: Center(child: icon),
           ),
           if (badgeCount != null)
             Positioned(
@@ -315,7 +317,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildMenuCards(BuildContext context) {
     return Column(
       children: [
@@ -323,7 +324,7 @@ class ProfileScreen extends StatelessWidget {
         ProfileGroupCard(
           children: [
             ProfileMenuItem(
-              iconPath: 'assets/icons/merchant_details/user_kyc.svg',
+              iconPath: 'assets/icons/profile_page/kyc.svg',
               title: "KYC",
               subtitle: "Know Your Customer verification",
               onTap: () {

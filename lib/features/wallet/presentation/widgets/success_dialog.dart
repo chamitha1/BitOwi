@@ -6,15 +6,25 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 class SuccessDialog extends StatelessWidget {
-  final String symbol;
-  final String accountNumber;
+  final String? symbol;
+  final String? accountNumber;
   final Jour? newTransaction;
+
+  // Generic props
+  final String? title;
+  final String? description;
+  final String? buttonText;
+  final VoidCallback? onButtonTap;
 
   const SuccessDialog({
     super.key,
-    required this.symbol,
-    required this.accountNumber,
+    this.symbol,
+    this.accountNumber,
     this.newTransaction,
+    this.title,
+    this.description,
+    this.buttonText,
+    this.onButtonTap,
   });
 
   @override
@@ -32,10 +42,7 @@ class SuccessDialog extends StatelessWidget {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () {
-                  Get.until(
-                    (route) =>
-                        Get.currentRoute == '/HomeScreen' || route.isFirst,
-                  );
+                  Get.back(); // Just close dialog
                 },
                 child: const Icon(
                   Icons.close,
@@ -51,10 +58,10 @@ class SuccessDialog extends StatelessWidget {
               height: 48,
             ),
             const SizedBox(height: 24),
-            const Text(
-              "Withdrawal Submitted Successfully",
+            Text(
+              title ?? "Withdrawal Submitted Successfully",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -62,10 +69,11 @@ class SuccessDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              "Your withdrawal request has been submitted and is being processed. You can track the status in Transaction History.",
+            Text(
+              description ??
+                  "Your withdrawal request has been submitted and is being processed. You can track the status in Transaction History.",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -78,17 +86,20 @@ class SuccessDialog extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  Get.back();
-                  Get.to(
-                    () => const BalanceHistoryPage(),
-                    arguments: {
-                      'symbol': symbol,
-                      'accountNumber': accountNumber,
-                      'newTransaction': newTransaction,
+                onPressed: onButtonTap ??
+                    () {
+                      Get.back();
+                      if (symbol != null && accountNumber != null) {
+                        Get.to(
+                          () => const BalanceHistoryPage(),
+                          arguments: {
+                            'symbol': symbol,
+                            'accountNumber': accountNumber,
+                            'newTransaction': newTransaction,
+                          },
+                        );
+                      }
                     },
-                  );
-                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1D5DE5),
                   shape: RoundedRectangleBorder(
@@ -96,9 +107,9 @@ class SuccessDialog extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  "Transaction History",
-                  style: TextStyle(
+                child: Text(
+                  buttonText ?? "Transaction History",
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

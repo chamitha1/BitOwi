@@ -220,6 +220,7 @@ class UserApi {
       rethrow;
     }
   }
+
   // Forget Login Password
   static Future<void> forgetLoginPwd({
     required String email,
@@ -233,12 +234,73 @@ class UserApi {
           "email": email,
           "smsCaptcha": smsCaptcha,
           "loginPwd": loginPwd,
-          "userKind": "C"
+          "userKind": "C",
         },
       );
       print("Forget Login Password Response: ${res.data}");
     } catch (e) {
       e.printError();
+      rethrow;
+    }
+  }
+
+  // Modify Email
+  Future<Map<String, dynamic>> modifyEmail({
+    required String newEmail,
+    required String otp,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/core/v1/user/modify_email',
+        data: {'newEmail': newEmail, 'otp': otp},
+      );
+      print("Modify Email Response: ${response.data}");
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      print("Modify Email error: $e");
+      rethrow;
+    }
+  }
+
+  // Get Google Secret
+  static Future<String> getGoogleSecret() async {
+    try {
+      final response = await ApiClient.dio.post(
+        "/core/v1/user/get_google_secret",
+      );
+      final data = response.data;
+      if (data['code'] == 200 || data['code'] == '200') {
+        return data['data']['googleSecret'];
+      }
+      throw Exception(data['errorMsg'] ?? 'Failed to get google secret');
+    } catch (e) {
+      print("Get Google Secret error: $e");
+      rethrow;
+    }
+  }
+
+  // Bind Google Secret
+  static Future<void> bindGoogleSecret({
+    required String googleCaptcha,
+    required String secret,
+    required String smsCaptcha,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/core/v1/user/bind_google_secret',
+        data: {
+          'googleCaptcha': googleCaptcha,
+          'secret': secret,
+          'smsCaptcha': smsCaptcha,
+        },
+      );
+      print("Bind Google Secret Response: ${response.data}");
+      final data = response.data;
+      if (data['code'] != 200 && data['code'] != '200') {
+        throw Exception(data['errorMsg'] ?? 'Failed to bind google secret');
+      }
+    } catch (e) {
+      print("Bind Google Secret error: $e");
       rethrow;
     }
   }

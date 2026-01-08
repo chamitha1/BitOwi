@@ -1,5 +1,6 @@
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 
@@ -61,7 +62,7 @@ class HomeHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        // _headerIconButton("assets/icons/home/notification.png"),
+        _headerIconButton("assets/icons/home/notification.svg"),
         const SizedBox(width: 12),
         // _headerIconButton("assets/icons/home/headphones.png"),
       ],
@@ -76,7 +77,7 @@ class HomeHeader extends StatelessWidget {
         color: Color(0xffECEFF5),
         shape: BoxShape.circle,
       ),
-      child: Center(child: Image.asset(iconPath, width: 20, height: 20)),
+      child: Center(child: SvgPicture.asset(iconPath, width: 20, height: 20)),
     );
   }
 }

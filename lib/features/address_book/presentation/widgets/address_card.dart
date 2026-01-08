@@ -58,7 +58,7 @@ class AddressCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Color(0xFFF6F9FF),
                 ),
-                padding: const EdgeInsets.all(8.0),
+                // padding: const EdgeInsets.all(8.0),
                 child: SvgPicture.asset(
                   iconPath,
                   width: 24,
@@ -95,12 +95,12 @@ class AddressCard extends StatelessWidget {
                 ),
               ),
               // 3-dot
-              GestureDetector(
-                onTap: onMoreTap,
-                child: SvgPicture.asset(
-                  'assets/icons/profile_page/address/dots.svg',
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: onMoreTap,
+              //   child: SvgPicture.asset(
+              //     'assets/icons/profile_page/address/dots.svg',
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 16),

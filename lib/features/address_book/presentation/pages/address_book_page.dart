@@ -62,9 +62,10 @@ class _AddressBookPageState extends State<AddressBookPage> {
       filteredAddresses = addresses.where((item) {
         final name = (item.name ?? '').toLowerCase();
         final symbol = (item.symbol ?? '').toLowerCase();
-        //final address = (item.address ?? '').toLowerCase();
-        return name.contains(lowerQuery) || symbol.contains(lowerQuery);
-        //|| address.contains(lowerQuery);
+        final address = (item.address ?? '').toLowerCase();
+        return name.contains(lowerQuery) ||
+            symbol.contains(lowerQuery) ||
+            address.contains(lowerQuery);
       }).toList();
     });
   }
@@ -129,11 +130,14 @@ class _AddressBookPageState extends State<AddressBookPage> {
                       color: Color(0xFF717F9A),
                     ),
                     prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
                       child: SvgPicture.asset(
                         'assets/icons/profile_page/address/search.svg',
-                        width: 20,
-                        height: 20,
+                        width: 16,
+                        height: 16,
                         colorFilter: const ColorFilter.mode(
                           Color(0xFF717F9A),
                           BlendMode.srcIn,

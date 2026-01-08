@@ -3,6 +3,7 @@ import 'package:BitOwi/features/profile/presentation/pages/change_transaction_pa
 import 'package:BitOwi/features/profile/presentation/widgets/profile_widgets.dart';
 import 'package:BitOwi/features/profile/presentation/pages/add_authenticator_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/change_email_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/change_login_password_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -114,7 +115,7 @@ class AccountAndSecurityPage extends StatelessWidget {
                     title: "Change Login Password",
                     subtitle: "Transaction password, payment options",
                     onTap: () {
-                      // TODO
+                      Get.to(() => const ChangeLoginPasswordPage());
                     },
                   ),
                   const _Divider(),
