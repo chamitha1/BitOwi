@@ -381,7 +381,7 @@ class ProfileScreen extends StatelessWidget {
               iconPath: 'assets/icons/profile_page/info_circle.svg',
               title: "Help Center ",
               subtitle: "Support, FAQs, and assistance",
-              onTap: () => Get.to(() => const HelpScreen()),
+              onTap: () => Get.to(() => const HelpCenter()),
             ),
             const Divider(height: 1, color: Color(0xFFF0F4FF)),
 

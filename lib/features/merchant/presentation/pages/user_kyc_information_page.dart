@@ -28,16 +28,20 @@ class UserKycInformationPage extends StatelessWidget {
       canPop: false, // prevent automatic pop
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        final status = controller.latestIdentifyOrderStatus.value;
-        Get.back(result: status != null && status != '-1');
+        //todo: noo need
+        // final status = controller.latestIdentifyOrderStatus.value;
+        // Get.back(result: status != null && status != '-1');
+        Get.back();
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FF),
         appBar: CommonAppBar(
           title: "Personal Information",
           onBack: () {
-            final status = controller.latestIdentifyOrderStatus.value;
-            Get.back(result: status != null && status != '-1');
+            //todo: noo need
+            // final status = controller.latestIdentifyOrderStatus.value;
+            // Get.back(result: status != null && status != '-1');
+            Get.back();
           },
         ),
         body: SafeArea(

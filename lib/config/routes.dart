@@ -4,6 +4,7 @@ import 'package:BitOwi/features/merchant/presentation/controllers/user_kyc_perso
 import 'package:BitOwi/features/merchant/presentation/pages/become_merchant_page.dart';
 import 'package:BitOwi/features/merchant/presentation/pages/personal_information_page.dart';
 import 'package:BitOwi/features/merchant/presentation/pages/user_kyc_information_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/help_center.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
@@ -35,6 +36,7 @@ class Routes {
   static const String kycPersonalInformation = '/kycPersonalInformation';
   static const String userKycPersonalInformation =
       '/userKycPersonalInformation';
+  static const String helpCenter = '/helpCenter';
 }
 
 class AppPages {
@@ -101,5 +103,6 @@ class AppPages {
         );
       },
     ),
+    GetPage(name: Routes.helpCenter, page: () => HelpCenter()),
   ];
 }

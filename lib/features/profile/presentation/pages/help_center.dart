@@ -1,22 +1,27 @@
 import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/models/article_type.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:get/get.dart';
 
-
-class HelpScreen extends StatefulWidget {
-  const HelpScreen({super.key});
+class HelpCenter extends StatefulWidget {
+  const HelpCenter({super.key});
 
   @override
-  State<HelpScreen> createState() => _HelpScreenState();
+  State<HelpCenter> createState() => _HelpCenterState();
 }
 
-class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
+class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
   List<ArticleType> helpCententList = [];
   late EasyRefreshController _controller;
 
   bool isLoading = true;
+
+  final userController = Get.find<UserController>();
 
   @override
   void initState() {
@@ -30,7 +35,7 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
     _controller.dispose();
     super.dispose();
   }
-  
+
   Future<void> onRefresh() async {
     try {
       final list = await CommonApi.getArticleList("0");
@@ -59,67 +64,100 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const BackButton(color: Colors.black),
-        title: const Text('Help', style: TextStyle(color: Colors.black)),
-      ),
-      body: EasyRefresh(
-        controller: _controller,
-        onRefresh: onRefresh,
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 16),
-                  ...List.generate(
-                    helpCententList.length,
-                    (index) => _buildSectionCard(
-                      section: helpCententList[index],
-                      sectionIndex: index,
-                    ),
+      appBar: CommonAppBar(title: "Help", onBack: () => Get.back()),
+      body: SafeArea(
+        top: false,
+        child: EasyRefresh(
+          controller: _controller,
+          onRefresh: onRefresh,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 16),
+              if (isLoading)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 100.0),
+                    child: CircularProgressIndicator(),
                   ),
-                ],
-              ),
+                )
+              else
+                ...List.generate(
+                  helpCententList.length,
+                  (index) => _buildSectionCard(
+                    section: helpCententList[index],
+                    sectionIndex: index,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      height: 120,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF5B8CFF), Color(0xFF6A4CFF)],
+          colors: [Color(0xFF28A6FF), Color(0xFF1D5DE5)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
-        children: const [
+        children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello, Jonathan',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Hello, ${userController.user.value?.nickname ?? userController.userName.value}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Inter',
+                      letterSpacing: -0.5,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Welcome to Help Center',
-                  style: TextStyle(color: Colors.white70),
-                ),
-              ],
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Welcome to ',
+                          style: TextStyle(fontWeight: FontWeight.w400),
+                        ),
+                        TextSpan(
+                          text: 'Help Center',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'Poppins',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          Icon(Icons.help_outline, color: Colors.white, size: 32),
+          SvgPicture.asset(
+            "assets/icons/merchant_details/help_question.svg",
+            height: 105,
+            width: 100,
+          ),
+          SizedBox(width: 4),
         ],
       ),
     );
@@ -130,6 +168,8 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
     required int sectionIndex,
   }) {
     final isExpanded = expandedSectionIndex == sectionIndex;
+    final SectionIconConfig config =
+        sectionIconConfigMap[section.name] ?? defaultSectionIconConfig;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -139,6 +179,7 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
       ),
       child: Column(
         children: [
+          // Section Title
           InkWell(
             borderRadius: BorderRadius.circular(14),
             onTap: () {
@@ -150,28 +191,49 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  _sectionIcon(),
+                  _sectionIcon(
+                    svgPath: config.svgPath,
+                    backgroundColor: config.backgroundColor,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      section.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          section.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF151E2F),
+                          ),
+                        ),
+                        Text(
+                          "${section.articleList.length.toString()} Questions",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF717F9A),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   AnimatedRotation(
-                    duration: const Duration(milliseconds: 200),
-                    turns: isExpanded ? 0.5 : 0,
-                    child: const Icon(Icons.keyboard_arrow_down),
+                    duration: const Duration(milliseconds: 500),
+                    turns: isExpanded ? -0.25 : 0,
+                    child: SvgPicture.asset(
+                      "assets/icons/merchant_details/arrow_down_keyboard.svg",
+                    ),
                   ),
                 ],
               ),
             ),
           ),
+          // Questions Section
           AnimatedSize(
-            duration: const Duration(milliseconds: 250),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
             child: isExpanded
                 ? _buildQuestions(section, sectionIndex)
@@ -189,16 +251,28 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
 
         return Column(
           children: [
-            const Divider(height: 1),
+            const Divider(height: 1, color: Color(0xFFECEFF5)),
             ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 4,
+              ),
+              // Question Title
               title: Text(
                 section.articleList[qIndex].title,
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF151E2F),
+                  fontFamily: 'Inter',
+                ),
               ),
               trailing: AnimatedRotation(
-                duration: const Duration(milliseconds: 200),
-                turns: isOpen ? 0.5 : 0,
-                child: const Icon(Icons.keyboard_arrow_down),
+                duration: const Duration(milliseconds: 500),
+                turns: isOpen ? -0.25 : 0,
+                child: SvgPicture.asset(
+                  "assets/icons/merchant_details/arrow_down_keyboard.svg",
+                ),
               ),
               onTap: () {
                 setState(() {
@@ -206,142 +280,106 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
                 });
               },
             ),
-            // AnimatedCrossFade(
-            //   duration: const Duration(milliseconds: 200),
-            //   crossFadeState: isOpen
-            //       ? CrossFadeState.showFirst
-            //       : CrossFadeState.showSecond,
-            //   firstChild: Padding(
-            //     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            //     child: Html(data: section.articles[qIndex].content),
-            //   ),
-            //   secondChild: const SizedBox.shrink(),
-            // ),
-            Container(
-              color: Colors.amber,
-              width: MediaQuery.of(context).size.width,
+            // Answer Section
+            SizedBox(
+              width: double.infinity,
               child: AnimatedSize(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
                 alignment: Alignment.topCenter,
                 child: isOpen
                     ? Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child:
-                            //   Html(
-                            //     data: normalizeHtml(section.articles[qIndex].content),
-                            //     shrinkWrap: true,
-                            //     // style: {
-                            //     //   "body": Style(
-                            //     //     margin: Margins.zero,
-                            //     //     padding: HtmlPaddings.zero,
-                            //     //     fontSize: FontSize(14),
-                            //     //     lineHeight: LineHeight.number(1.5),
-                            //     //   ),
-                            //     //   // ✅ TABLE FIXES
-                            //     //   "table": Style(
-                            //     //     width: Width(100, Unit.percent),
-                            //     //     border: Border.all(color: Colors.grey.shade300),
-                            //     //     margin: Margins.only(bottom: 12),
-                            //     //   ),
-                            //     //   "tr": Style(
-                            //     //     border: Border(
-                            //     //       bottom: BorderSide(color: Colors.grey.shade300),
-                            //     //     ),
-                            //     //   ),
-                            //     //   "td": Style(
-                            //     //     padding: HtmlPaddings.all(8),
-                            //     //     fontSize: FontSize(14),
-                            //     //   ),
-                            //     //   "th": Style(
-                            //     //     padding: HtmlPaddings.all(8),
-                            //     //     fontWeight: FontWeight.w600,
-                            //     //     backgroundColor: Colors.grey.shade100,
-                            //     //   ),
-                            //     // },
-                            //     style: {
-                            //       "body": Style(
-                            //         margin: Margins.zero,
-                            //         padding: HtmlPaddings.zero,
-                            //         fontSize: FontSize(14),
-                            //         lineHeight: LineHeight.number(1.5),
-                            //       ),
-                            //       // ✅ TABLE
-                            //       "table": Style(
-                            //         width: Width(100, Unit.percent),
-                            //         margin: Margins.only(bottom: 12),
-                            //       ),
-                            //       // ✅ ROW
-                            //       "tr": Style(
-                            //         display: Display.block, // 🔥 IMPORTANT
-                            //         width: Width(100, Unit.percent),
-                            //       ),
-                            //       // ✅ CELLS
-                            //       "td": Style(
-                            //         display: Display.block, // 🔥 IMPORTANT
-                            //         width: Width(100, Unit.percent),
-                            //         padding: HtmlPaddings.only(bottom: 8),
-                            //         fontSize: FontSize(14),
-                            //       ),
-                            //       "th": Style(
-                            //         display: Display.block, // 🔥 IMPORTANT
-                            //         width: Width(100, Unit.percent),
-                            //         padding: HtmlPaddings.only(bottom: 8),
-                            //         fontWeight: FontWeight.w600,
-                            //       ),
-                            //     },
-                            //     extensions: const [
-                            //       TableHtmlExtension(), // 🔥 REQUIRED
-                            //     ],
-                            //   ),
-                            Html(
-                              data: normalizeHtml(
-                                section.articleList[qIndex].content!,
-                              ),
-                              shrinkWrap: true,
-                              // style: {
-                              //   "body": Style(
-                              //     margin: Margins.zero,
-                              //     padding: HtmlPaddings.zero,
-                              //     fontSize: FontSize(14),
-                              //     lineHeight: LineHeight.number(1.5),
-                              //     // width: Width(100, Unit.percent),
-                              //     width: Width.auto(),
-                              //   ),
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 30),
+                        child: HtmlWidget(
+                          cleanHtml(section.articleList[qIndex].content ?? ''),
+                          textStyle: const TextStyle(
+                            fontSize: 14,
+                            height: 1.6,
+                            color: Color(0xFF151E2F),
+                            fontFamily: 'Inter',
+                          ),
 
-                              //   "p": Style(margin: Margins.only(bottom: 8)),
-                              // },
-                              style: {
-                                // Base document style
-                                "body": Style(
-                                  margin: Margins.zero,
-                                  padding: HtmlPaddings.zero,
-                                  fontSize: FontSize(14),
-                                  lineHeight: LineHeight.number(1.5),
-                                  width:
-                                      Width.auto(), // ✅ take maximum available width
+                          //  ✅ Prevent oversized images breaking accordion width
+                          customWidgetBuilder: (element) {
+                            if (element.localName == 'img') {
+                              final src = element.attributes['src'];
+                              if (src == null) return null;
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
                                 ),
-
-                                // Required because flutter_html internally uses divs
-                                "div": Style(
-                                  display: Display.block,
-                                  width:
-                                      Width.auto(), // ✅ max width, no percent
-                                  whiteSpace: WhiteSpace.normal,
+                                child: Image.network(
+                                  src,
+                                  fit: BoxFit.contain,
+                                  width: double.infinity,
                                 ),
+                              );
+                            }
+                            return null;
+                          },
 
-                                // Paragraphs (your flattened table rows)
-                                "p": Style(
-                                  display: Display.block,
-                                  width: Width.auto(), // ✅ max width
-                                  margin: Margins.only(bottom: 8),
-                                  whiteSpace: WhiteSpace.normal,
-                                ),
+                          // ✅ HTML styling (tables, paragraphs, emphasis)
+                          customStylesBuilder: (element) {
+                            switch (element.localName) {
+                              case 'p':
+                                return {'margin-bottom': '8px'};
 
-                                // Headings created from <th>
-                                "strong": Style(fontWeight: FontWeight.w600),
-                              },
-                            ),
+                              case 'br':
+                                return {'margin-bottom': '4px'};
+
+                              case 'strong':
+                              case 'b':
+                                return {'font-weight': '600'};
+
+                              case 'table':
+                                return {
+                                  'width': '100%',
+                                  'margin-bottom': '12px',
+                                };
+
+                              case 'td':
+                              case 'th':
+                                return {
+                                  'padding': '4px 0',
+                                  'vertical-align': 'top',
+                                };
+
+                              case 'a':
+                                return {
+                                  'color': '#1D5DE5',
+                                  'text-decoration': 'underline',
+                                  'font-weight': '500',
+                                };
+
+                              case 'span':
+                                return {'font-weight': '400'};
+                            }
+                            return null;
+                          },
+
+                          // ✅ Link handling (production-ready)
+                          onTapUrl: (url) async {
+                            debugPrint('Tapped link: $url');
+
+                            if (url.startsWith('mailto:')) {
+                              // Optional: open email app
+                              // await launchUrl(Uri.parse(url));
+                              return true;
+                            }
+
+                            if (url.startsWith('http')) {
+                              // Optional: open browser
+                              // await launchUrl(
+                              //   Uri.parse(url),
+                              //   mode: LaunchMode.externalApplication,
+                              // );
+                              return true;
+                            }
+
+                            return false;
+                          },
+                        ),
                       )
                     : const SizedBox.shrink(),
               ),
@@ -352,63 +390,95 @@ class _HelpScreenState extends State<HelpScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _sectionIcon() {
+  Widget _sectionIcon({
+    required Color backgroundColor,
+    required String svgPath,
+  }) {
     return Container(
-      height: 36,
-      width: 36,
+      height: 40,
+      width: 40,
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF2FF),
-        borderRadius: BorderRadius.circular(10),
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: const Icon(Icons.help_outline, color: Color(0xFF5B8CFF), size: 20),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(8),
+      child: SvgPicture.asset(
+        svgPath,
+        height: 24,
+        width: 24,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }
 
-// String normalizeHtml(String html) {
-//   // Force tables to be visible on mobile by converting them to divs.
-//   // This is a pragmatic solution when table rendering is not supported.
-
-//   var out = html;
-
-//   // Remove problematic fixed sizes
-//   out = out
-//       .replaceAll(RegExp(r'height:\s*\d+px;?'), '')
-//       .replaceAll(RegExp(r'width:\s*\d+%;?'), 'width: 100%;');
-
-//   // Convert table structure to simple block layout
-//   out = out
-//       .replaceAll(RegExp(r'<table[^>]*>'), '<div style="width:100%;">')
-//       .replaceAll('</table>', '</div>')
-//       .replaceAll(RegExp(r'<tbody[^>]*>'), '<div>')
-//       .replaceAll('</tbody>', '</div>')
-//       .replaceAll(RegExp(r'<tr[^>]*>'), '<div style="margin-bottom:12px;">')
-//       .replaceAll('</tr>', '</div>')
-//       .replaceAll(RegExp(r'<td[^>]*>'), '<div style="padding:6px 0;">')
-//       .replaceAll('</td>', '</div>')
-//       .replaceAll(
-//         RegExp(r'<th[^>]*>'),
-//         '<div style="padding:6px 0; font-weight:600;">',
-//       )
-//       .replaceAll('</th>', '</div>');
-
-//   return out;
-// }
-
-String normalizeHtml(String html) {
-  return html
-      // remove problematic fixed sizes
-      .replaceAll(RegExp(r'height:\s*\d+px;?'), '')
-      .replaceAll(RegExp(r'width:\s*\d+%;?'), '')
-      // flatten table structure into text blocks
-      .replaceAll(RegExp(r'<table[^>]*>'), '')
-      .replaceAll('</table>', '')
-      .replaceAll(RegExp(r'<tbody[^>]*>'), '')
-      .replaceAll('</tbody>', '')
-      .replaceAll(RegExp(r'<tr[^>]*>'), '<p>')
-      .replaceAll('</tr>', '</p>')
-      .replaceAll(RegExp(r'<td[^>]*>'), '')
-      .replaceAll('</td>', '')
-      .replaceAll(RegExp(r'<th[^>]*>'), '<strong>')
-      .replaceAll('</th>', '</strong>');
+String cleanHtml(String rawHtml) {
+  return rawHtml
+      // 1️⃣ Remove full document wrappers
+      .replaceAll(RegExp(r'<!DOCTYPE[^>]*>', caseSensitive: false), '')
+      .replaceAll(RegExp(r'<html[^>]*>', caseSensitive: false), '')
+      .replaceAll(RegExp(r'</html>', caseSensitive: false), '')
+      .replaceAll(
+        RegExp(r'<head[^>]*>.*?</head>', caseSensitive: false, dotAll: true),
+        '',
+      )
+      .replaceAll(RegExp(r'<body[^>]*>', caseSensitive: false), '')
+      .replaceAll(RegExp(r'</body>', caseSensitive: false), '')
+      // 2️⃣ Remove fixed sizes (root cause of spacing issues)
+      .replaceAll(RegExp(r'height:\s*[\d.]+px;?', caseSensitive: false), '')
+      .replaceAll(RegExp(r'width:\s*[\d.]+%;?', caseSensitive: false), '')
+      .replaceAll(RegExp(r'width:\s*[\d.]+px;?', caseSensitive: false), '')
+      // 3️⃣ Remove empty paragraphs (MAIN gap culprit)
+      .replaceAll(
+        RegExp(r'<p[^>]*>(&nbsp;|\s*)<\/p>', caseSensitive: false),
+        '',
+      )
+      // 4️⃣ Remove empty table rows (safe + precise)
+      .replaceAll(
+        RegExp(
+          r'<tr[^>]*>\s*<td[^>]*>(&nbsp;|\s*)<\/td>\s*<\/tr>',
+          caseSensitive: false,
+        ),
+        '',
+      )
+      .trim();
 }
+
+class SectionIconConfig {
+  final String svgPath;
+  final Color backgroundColor;
+
+  const SectionIconConfig({
+    required this.svgPath,
+    required this.backgroundColor,
+  });
+}
+
+const Map<String, SectionIconConfig> sectionIconConfigMap = {
+  "General": SectionIconConfig(
+    svgPath: "assets/icons/merchant_details/help_general.svg",
+    backgroundColor: Color(0xFFE9F6FF),
+  ),
+  "Authentication": SectionIconConfig(
+    svgPath: "assets/icons/merchant_details/help_auth.svg",
+    backgroundColor: Color(0xFFF4E9FE),
+  ),
+  "Trading": SectionIconConfig(
+    svgPath: "assets/icons/merchant_details/help_trading.svg",
+    backgroundColor: Color(0xFFE8EFFF),
+  ),
+  "Security": SectionIconConfig(
+    svgPath: "assets/icons/merchant_details/help_security.svg",
+    backgroundColor: Color(0xFFFFFBF6),
+  ),
+  "Support": SectionIconConfig(
+    svgPath: "assets/icons/merchant_details/help_support.svg",
+    backgroundColor: Color(0xFFEAF9F0),
+  ),
+};
+
+const SectionIconConfig defaultSectionIconConfig = SectionIconConfig(
+  svgPath: "assets/icons/merchant_details/help_general.svg",
+  backgroundColor: Color(0xFFE9F6FF),
+);
