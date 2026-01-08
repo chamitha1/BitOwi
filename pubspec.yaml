@@ -45,6 +45,8 @@
     easy_refresh: ^3.4.0
     flutter_widget_from_html: ^0.17.1
 
+    flutter_html: ^3.0.0
+
     flutter_localizations:
       sdk: flutter
     
