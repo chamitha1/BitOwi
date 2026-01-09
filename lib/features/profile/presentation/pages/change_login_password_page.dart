@@ -23,10 +23,10 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
   final _userApi = UserApi();
 
   String _email = '';
-  bool _isPasswordVisible = false;
+  bool _isNewPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
 
-  // Verification State
   String _verifiedOtp = "";
   bool _isEmailVerified = false;
   bool _isSendingOtp = false;
@@ -77,9 +77,8 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
       return;
     }
 
-    
     if (!_isEmailVerified) {
-       CustomSnackbar.showError(
+      CustomSnackbar.showError(
         title: "Error",
         message: "Please verify your email first",
       );
@@ -90,42 +89,41 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     setState(() => _isLoading = true);
 
     try {
-       final newPassword = _passController.text.trim();
-       await UserApi.forgetLoginPwd(
-          email: _email,
-          smsCaptcha: _verifiedOtp,
-          loginPwd: newPassword,
-        );
-        print("ChangeLoginPasswordPage: forgetLoginPwd success");
+      final newPassword = _passController.text.trim();
+      await UserApi.forgetLoginPwd(
+        email: _email,
+        smsCaptcha: _verifiedOtp,
+        loginPwd: newPassword,
+      );
+      print("ChangeLoginPasswordPage: forgetLoginPwd success");
 
-        setState(() => _isLoading = false);
+      setState(() => _isLoading = false);
 
-        // Success Dialog
-        Get.dialog(
-          SuccessDialog(
-            title: "Successfully Changed",
-            description:
-                "Your login password has changed successfully. Please use the new password for future logins.",
-            buttonText: "Done",
-            onButtonTap: () {
-              Get.back(); // close dialog
-              Get.back(); // navigate back from Change Page
-            },
-          ),
-          barrierDismissible: false,
-        );
+      // Success Dialog
+      Get.dialog(
+        SuccessDialog(
+          title: "Successfully Changed",
+          description:
+              "Your login password has changed successfully. Please use the new password for future logins.",
+          buttonText: "Done",
+          onButtonTap: () {
+            Get.back(); // close dialog
+            Get.back(); // navigate back from Change Page
+          },
+        ),
+        barrierDismissible: false,
+      );
 
-        CustomSnackbar.showSuccess(
-          title: "Success",
-          message: "Login Password Changed Successfully!",
-        );
-
+      CustomSnackbar.showSuccess(
+        title: "Success",
+        message: "Login Password Changed Successfully!",
+      );
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-         CustomSnackbar.showError(
-          title: "Error", 
-          message: e.toString().replaceAll("Exception: ", "")
+        CustomSnackbar.showError(
+          title: "Error",
+          message: e.toString().replaceAll("Exception: ", ""),
         );
       }
     }
@@ -151,21 +149,21 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         );
         return;
       }
-      
+
       CustomSnackbar.showSuccess(
         title: "Success",
         message: "OTP sent to your email!",
       );
 
-       await showModalBottomSheet(
+      await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (context) => OtpBottomSheet(
           email: _email,
           otpLength: 6,
-           bizType: SmsBizType.forgetPwd,
-           onVerifyPin: (pin) async {
+          bizType: SmsBizType.forgetPwd,
+          onVerifyPin: (pin) async {
             // Local verify only - save OTP
             _verifiedOtp = pin;
             return true;
@@ -179,7 +177,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
           onVerified: () {
             Navigator.pop(context); // Close OTP sheet
             setState(() => _isEmailVerified = true);
-             CustomSnackbar.showSuccess(
+            CustomSnackbar.showSuccess(
               title: "Verified",
               message: "Email verified successfully!",
             );
@@ -189,7 +187,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     } catch (e) {
       if (mounted) CustomSnackbar.showError(title: "Error", message: "$e");
     } finally {
-       if (mounted) setState(() => _isSendingOtp = false);
+      if (mounted) setState(() => _isSendingOtp = false);
     }
   }
 
@@ -214,8 +212,6 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     return null;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -224,7 +220,9 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: SvgPicture.asset(
+            'assets/icons/merchant_details/arrow_left.svg',
+          ),
           onPressed: () => Get.back(),
         ),
         title: const Text(
@@ -253,76 +251,78 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                       _label("Email"),
                       TextFormField(
                         initialValue: _email,
-                      readOnly: true,
+                        readOnly: true,
                         style: const TextStyle(
                           color: Color(0xFF151E2F),
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'Inter',
                         ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFECEFF5),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
-                        ),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 10.0,
-                            top: 14.0,
-                            bottom: 14.0,
-                            right: 4.0,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFECEFF5),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 15,
                           ),
-                          child: SvgPicture.asset(
-                            "assets/icons/sign_up/sms.svg",
-                            width: 24,
-                            height: 24,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF717F9A),
-                              BlendMode.srcIn,
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10.0,
+                              top: 14.0,
+                              bottom: 14.0,
+                              right: 4.0,
+                            ),
+                            child: SvgPicture.asset(
+                              "assets/icons/sign_up/sms.svg",
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF717F9A),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 6,
+                              top: 6,
+                              bottom: 6,
+                            ),
+                            child: _verifyButton(
+                              text: _isEmailVerified
+                                  ? "Verified"
+                                  : (_isSendingOtp
+                                        ? "Sending..."
+                                        : "Get a Code"),
+                              onPressed: _verifyEmail,
+                              isEnabled: _email.isNotEmpty && !_isSendingOtp,
+                              isVerified: _isEmailVerified,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
                             ),
                           ),
                         ),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 6,
-                            top: 6,
-                            bottom: 6,
-                          ),
-                          child: _verifyButton(
-                            text: _isEmailVerified
-                                ? "Verified"
-                                : (_isSendingOtp ? "Sending..." : "Verify"),
-                            onPressed: _verifyEmail,
-                            isEnabled: _email.isNotEmpty && !_isSendingOtp,
-                            isVerified: _isEmailVerified,
-                          ),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                      ),
                       ),
                       const SizedBox(height: 24),
 
@@ -331,8 +331,14 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                         controller: _passController,
                         placeholder: "Enter New Password",
                         validator: _validatePassword,
-                        showSuffix: false,
+                        showSuffix: true,
                         enabled: _isEmailVerified,
+                        isVisible: _isNewPasswordVisible,
+                        onToggleVisibility: () {
+                          setState(() {
+                            _isNewPasswordVisible = !_isNewPasswordVisible;
+                          });
+                        },
                       ),
                       const SizedBox(height: 24),
 
@@ -343,6 +349,13 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                         validator: _validateConfirmPassword,
                         showSuffix: true,
                         enabled: _isEmailVerified,
+                        isVisible: _isConfirmPasswordVisible,
+                        onToggleVisibility: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -355,7 +368,9 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: (_isEmailVerified && !_isLoading) ? _onUpdate : null,
+                  onPressed: (_isEmailVerified && !_isLoading)
+                      ? _onUpdate
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1D5DE5),
                     shape: RoundedRectangleBorder(
@@ -402,14 +417,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         decoration: BoxDecoration(
           color: isVerified
               ? const Color(0xffEAF9F0)
-              : (isEnabled ? null : const Color(0XFFB9C6E2)),
-          gradient: (isEnabled && !isVerified)
-              ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
-                )
-              : null,
+              : (isEnabled ? const Color(0xFF1D5DE5) : const Color(0XFFB9C6E2)),
           border: isVerified
               ? Border.all(color: const Color(0xFFABEAC6), width: 1.0)
               : null,
@@ -455,7 +463,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                   text,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'Inter',
                     color: Colors.white,
                   ),
@@ -486,32 +494,39 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     String? Function(String?)? validator,
     bool showSuffix = true,
     bool enabled = true,
+    bool isVisible = false,
+    VoidCallback? onToggleVisibility,
   }) {
     return TextFormField(
       controller: controller,
       enabled: enabled,
-      obscureText: !_isPasswordVisible,
+      obscureText: !isVisible,
       decoration: _inputDecoration(
         hint: placeholder,
         iconPath: "assets/icons/sign_up/lock.svg",
-        suffixIconPath: showSuffix && !_isPasswordVisible
+        suffixIconPath: showSuffix && !isVisible
             ? "assets/icons/sign_up/eye.svg"
             : (showSuffix ? "assets/icons/sign_up/eye-slash.svg" : null),
         isPassword: showSuffix,
         enabled: enabled,
+        isVisible: isVisible,
+        onToggleVisibility: onToggleVisibility,
       ),
-      validator: validator ?? (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your password';
-        }
-        if (value.length < 8) {
-          return 'Password must be at least 8 characters';
-        }
-        return null;
-      },
+      validator:
+          validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            if (value.length < 8) {
+              return 'Password must be at least 8 characters';
+            }
+            return null;
+          },
       onChanged: (_) {},
     );
   }
+
   InputDecoration _inputDecoration({
     required String hint,
     required String iconPath,
@@ -519,6 +534,8 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     String? suffixIconPath,
     Widget? suffixWidget,
     bool isPassword = false,
+    bool isVisible = false,
+    VoidCallback? onToggleVisibility,
   }) {
     return InputDecoration(
       hintText: hint,
@@ -526,7 +543,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         fontSize: 16,
         fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
-        color: Color(0xFF717F9A), // Matched
+        color: Color(0xFF717F9A),
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 14),
       errorStyle: const TextStyle(
@@ -567,11 +584,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
           ? Padding(
               padding: const EdgeInsets.only(right: 4.0),
               child: IconButton(
-                onPressed: enabled
-                    ? () => setState(
-                        () => _isPasswordVisible = !_isPasswordVisible,
-                      )
-                    : null,
+                onPressed: enabled ? onToggleVisibility : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 icon: Padding(

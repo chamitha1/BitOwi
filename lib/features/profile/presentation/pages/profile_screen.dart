@@ -142,11 +142,11 @@ class ProfileScreen extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 66,
+                  height: 66,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: Color(0xff779DEF), width: 3),
                   ),
                   child: Obx(() {
                     final avatarUrl = controller.user.value?.avatar;
@@ -242,10 +242,6 @@ class ProfileScreen extends StatelessWidget {
                       'assets/icons/profile_page/like.svg',
                       width: 14,
                       height: 14,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFFFFC107),
-                        BlendMode.srcIn,
-                      ),
                     ),
                     const SizedBox(width: 4),
                     Obx(

@@ -283,7 +283,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF151E2F)),
+          icon: SvgPicture.asset(
+            'assets/icons/merchant_details/arrow_left.svg',
+          ),
           onPressed: () => Get.back(),
         ),
         title: const Text(
@@ -362,7 +364,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                     child: _verifyButton(
                       text: _isOldEmailVerified
                           ? "Verified"
-                          : (_isSendingOtpOld ? "Sending..." : "Verify"),
+                          : (_isSendingOtpOld ? "Sending..." : "Get a Code"),
+
                       onPressed: _verifyOldEmail,
                       isEnabled: _currentEmail.isNotEmpty && !_isSendingOtpOld,
                       isVerified: _isOldEmailVerified,
@@ -415,7 +418,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                     child: _verifyButton(
                       text: _isNewEmailVerified
                           ? "Verified"
-                          : (_isSendingOtpNew ? "Sending..." : "Verify"),
+                          : (_isSendingOtpNew ? "Sending..." : "Get a Code"),
                       onPressed: _verifyNewEmail,
                       isEnabled: _isNewEmailPopulated && !_isSendingOtpNew,
                       isVerified: _isNewEmailVerified,
@@ -485,14 +488,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         decoration: BoxDecoration(
           color: isVerified
               ? const Color(0xffEAF9F0)
-              : (isEnabled ? null : const Color(0XFFB9C6E2)),
-          gradient: (isEnabled && !isVerified)
-              ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
-                )
-              : null,
+              : (isEnabled ? const Color(0xFF1D5DE5) : const Color(0XFFB9C6E2)),
           border: isVerified
               ? Border.all(color: const Color(0xFFABEAC6), width: 1.0)
               : null,
@@ -541,7 +537,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                   text,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'Inter',
                     color: Colors.white,
                   ),

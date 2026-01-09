@@ -180,7 +180,9 @@ class _ChangeTransactionPasswordPageState
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: SvgPicture.asset(
+            'assets/icons/merchant_details/arrow_left.svg',
+          ),
           onPressed: () => Get.back(),
         ),
         title: const Text(
@@ -246,7 +248,7 @@ class _ChangeTransactionPasswordPageState
                           child: _verifyButton(
                             text: _isEmailVerified
                                 ? "Verified"
-                                : (_isSendingOtp ? "Sending..." : "Verify"),
+                                : (_isSendingOtp ? "Sending..." : "Get a Code"),
                             onPressed: _verifyEmail,
                             isEnabled: _email.isNotEmpty && !_isSendingOtp,
                             isVerified: _isEmailVerified,
@@ -355,18 +357,11 @@ class _ChangeTransactionPasswordPageState
         decoration: BoxDecoration(
           color: isVerified
               ? const Color(0xffEAF9F0)
-              : (isEnabled ? null : const Color(0XFFB9C6E2)),
-          gradient: (isEnabled && !isVerified)
-              ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
-                )
-              : null,
+              : (isEnabled ? const Color(0xFF1D5DE5) : const Color(0XFFB9C6E2)),
+          borderRadius: BorderRadius.circular(8),
           border: isVerified
               ? Border.all(color: const Color(0xFFABEAC6), width: 1.0)
               : null,
-          borderRadius: BorderRadius.circular(8),
         ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -408,7 +403,7 @@ class _ChangeTransactionPasswordPageState
                   text,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'Inter',
                     color: Colors.white,
                   ),

@@ -316,7 +316,7 @@ class _WalletCardState extends State<WalletCard> {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: const Color(0xff28A6FF),
+          color: const Color(0xff1D5DE5),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(

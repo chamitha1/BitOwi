@@ -331,7 +331,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               fontSize: 16,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w500,
-                              color: Color(0XFF454F63),
+                              color: Color(0xff717F9A),
                             ),
                           ),
                           const SizedBox(height: 28),
@@ -428,6 +428,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
+                                  side: BorderSide(
+                                    color: Color(0xffDAE0EE),
+                                    width: 1.0,
+                                    style: BorderStyle.solid,
+                                  ),
+                                  fillColor: MaterialStateProperty.all(
+                                    Colors.white,
+                                  ), // Sets the fill color for all states
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -441,14 +449,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                         fontFamily: 'Inter',
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
-                                        color: Color(0XFF454F63),
+                                        color: Color(0xff717F9A),
                                       ),
                                       children: [
                                         const TextSpan(text: "I agree to the "),
                                         TextSpan(
                                           text: "Terms of Service",
                                           style: const TextStyle(
-                                            color: Color(0XFF28A6FF),
+                                            color: Color(0xff28A6FF),
                                           ),
                                           recognizer: _termsRec,
                                         ),
@@ -685,7 +693,7 @@ class _SignupScreenState extends State<SignupScreen> {
       hintStyle: const TextStyle(
         color: Color(0XFF717F9A),
         fontFamily: 'Inter',
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w400,
         fontSize: 16,
       ),
 

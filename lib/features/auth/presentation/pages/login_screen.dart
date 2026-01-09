@@ -171,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               .tr,
                           style: const TextStyle(
                             fontSize: 16,
-                            color: Color(0XFF454F63),
+                            color: Color(0xff717F9A),
                             height: 1.5,
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Inter',
@@ -357,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Text(
                                       " and ",
                                       style: const TextStyle(
-                                        color: Color(0XFF454F63),
+                                        color: Color(0xff717F9A),
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -589,7 +589,7 @@ class _LoginScreenState extends State<LoginScreen> {
           fontSize: 14,
           fontFamily: 'Inter',
           fontWeight: FontWeight.w400,
-          color: Color(0XFF2E3D5B),
+          color: Color(0xff2E3D5B),
         ),
       ),
     );

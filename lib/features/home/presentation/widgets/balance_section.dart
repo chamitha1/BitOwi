@@ -51,7 +51,7 @@ class _BalanceSectionState extends State<BalanceSection> {
                         "Hide Small Assets",
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xff454F63),
+                          color: Color(0xff717F9A),
                           fontWeight: FontWeight.w400,
                         ),
                       ),

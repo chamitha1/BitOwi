@@ -27,18 +27,17 @@ class HomeBottomNavBar extends StatelessWidget {
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onTap,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF1D5DE5),
-        unselectedItemColor: const Color(0xff454F63),
+        showSelectedLabels: false,
+        showUnselectedLabels: true,
+        selectedItemColor: const Color(0xffFFFFFF),
+        unselectedItemColor: const Color(0xff717F9A),
         selectedLabelStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
+          fontSize: 0, //hide
         ),
         unselectedLabelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: Color(0xff454F63),
+          color: Color(0xff717F9A),
         ),
         elevation: 0,
         items: [
@@ -48,13 +47,6 @@ class HomeBottomNavBar extends StatelessWidget {
             "Home",
             0,
           ),
-          // _navItem(
-          //   "assets/icons/home/p2p.svg",
-          //   "assets/icons/home/p2pSelected.svg",
-          //   "P2P",
-          //   1,
-          // ),
-          // _navItem("assets/icons/home/order.svg", "assets/icons/home/ordersSelected.svg", "Order", 2),
           _navItem(
             "assets/icons/home/profile.svg",
             "assets/icons/home/profileSelected.svg",
@@ -77,16 +69,30 @@ class HomeBottomNavBar extends StatelessWidget {
     return BottomNavigationBarItem(
       icon: isSelected
           ? Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xff1D5DE5), Color(0xff28A6FF)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: SvgPicture.asset(selectedIconPath, width: 20, height: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(selectedIconPath, width: 20, height: 20),
+                  const SizedBox(height: 2),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             )
           : SvgPicture.asset(iconPath, width: 22, height: 22),
       label: label,

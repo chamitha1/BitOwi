@@ -38,7 +38,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _submitted = false;
 
   String _verifiedSmsCode = "";
-  String? _verifiedEmail; // ✅ store verified email, so we only reset when it changes
+  String?
+  _verifiedEmail; // ✅ store verified email, so we only reset when it changes
 
   static const List<String> _emailDomains = <String>[
     'gmail.com',
@@ -321,7 +322,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 fontSize: 16,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w500,
-                                color: Color(0xff454F63),
+                                color: Color(0xff717F9A),
                                 height: 1.5,
                               ),
                             ),
@@ -341,8 +342,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 child: _verifyButton(
                                   text: _isEmailVerified
                                       ? "Verified"
-                                      : (_isSendingOtp ? "Sending..." : "Verify"),
-                                  isEnabled: _isEmailPopulated && !_isSendingOtp,
+                                      : (_isSendingOtp
+                                            ? "Sending..."
+                                            : "Verify"),
+                                  isEnabled:
+                                      _isEmailPopulated && !_isSendingOtp,
                                   isVerified: _isEmailVerified,
                                   onPressed: _sendOtpAndVerify,
                                 ),
@@ -480,8 +484,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: IconButton(
                 onPressed: enabled
                     ? () => setState(
-                          () => _isPasswordVisible = !_isPasswordVisible,
-                        )
+                        () => _isPasswordVisible = !_isPasswordVisible,
+                      )
                     : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -634,8 +638,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         final typedDomain = input.substring(atIndex + 1).toLowerCase();
         if (local.isEmpty) return const Iterable<String>.empty();
 
-        final matches =
-            _emailDomains.where((d) => d.toLowerCase().startsWith(typedDomain));
+        final matches = _emailDomains.where(
+          (d) => d.toLowerCase().startsWith(typedDomain),
+        );
         return matches.map((d) => '$local@$d');
       },
       onSelected: (String selection) {
@@ -657,7 +662,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             final populated = t.isNotEmpty;
 
             // ✅ reset ONLY if email actually changed from verified email
-            if (_isEmailVerified && _verifiedEmail != null && t != _verifiedEmail) {
+            if (_isEmailVerified &&
+                _verifiedEmail != null &&
+                t != _verifiedEmail) {
               setState(() {
                 _isEmailVerified = false;
                 _verifiedSmsCode = "";

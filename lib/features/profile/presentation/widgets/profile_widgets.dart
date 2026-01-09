@@ -47,7 +47,7 @@ class ProfileMenuItem extends StatelessWidget {
           color: const Color(0xFFE8EFFF),
           borderRadius: BorderRadius.circular(12),
         ),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         child: SvgPicture.asset(
           iconPath,
           colorFilter: const ColorFilter.mode(
@@ -78,12 +78,8 @@ class ProfileMenuItem extends StatelessWidget {
           trailing ??
           SvgPicture.asset(
             'assets/icons/profile_page/arrow-right.svg',
-            width: 20,
-            height: 20,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF909DAD),
-              BlendMode.srcIn,
-            ),
+            width: 18,
+            height: 18,
           ),
     );
   }

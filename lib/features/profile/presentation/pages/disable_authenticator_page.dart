@@ -51,7 +51,8 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
 
   Future<void> _sendOtp() async {
     final userController = Get.find<UserController>();
-    final email = userController.user.value?.loginName ??
+    final email =
+        userController.user.value?.loginName ??
         userController.user.value?.email ??
         "";
 
@@ -114,7 +115,7 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
 
       // Refresh
       final userController = Get.find<UserController>();
-      await userController.loadUser(); 
+      await userController.loadUser();
 
       setState(() => _isLoading = false);
       _googleCodeController.clear();
@@ -122,13 +123,14 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
 
       Get.dialog(
         SuccessDialog(
-            title: "Successfully Disabled",
-            description: "Google Authenticator has been disabled successfully.",
-            buttonText: "OK",
-            onButtonTap: () {
-              Get.back(); // Close Dialog
-              Get.back(); // Close Page
-            }),
+          title: "Successfully Disabled",
+          description: "Google Authenticator has been disabled successfully.",
+          buttonText: "OK",
+          onButtonTap: () {
+            Get.back(); // Close Dialog
+            Get.back(); // Close Page
+          },
+        ),
         barrierDismissible: false,
       );
     } catch (e) {
@@ -145,7 +147,9 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF151E2F)),
+          icon: SvgPicture.asset(
+            'assets/icons/merchant_details/arrow_left.svg',
+          ),
           onPressed: () => Get.back(),
         ),
         title: const Text(
@@ -268,9 +272,11 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                                 onPressed: _countdown > 0 ? null : _sendOtp,
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
+                                    horizontal: 12,
+                                  ),
                                   side: const BorderSide(
-                                      color: Color(0xFF1D5DE5)),
+                                    color: Color(0xFF1D5DE5),
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),

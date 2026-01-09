@@ -26,7 +26,9 @@ class AccountAndSecurityPage extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF151E2F)),
+          icon: SvgPicture.asset(
+            'assets/icons/merchant_details/arrow_left.svg',
+          ),
           onPressed: () => Get.back(),
         ),
         title: const Text(
