@@ -43,10 +43,16 @@ class HomeBottomNavBar extends StatelessWidget {
                 1,
               ),
               _navItem(
+                "assets/icons/home/orders.svg",
+                "assets/icons/home/ordersSelected.svg",
+                "Order",
+                2,
+              ),
+              _navItem(
                 "assets/icons/home/profile.svg",
                 "assets/icons/home/profileSelected.svg",
                 "Profile",
-                2,
+                3,
               ),
             ],
           ),

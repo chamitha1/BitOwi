@@ -1,3 +1,4 @@
+import 'package:BitOwi/features/p2p/presentation/pages/p2p_buy_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -265,7 +266,18 @@ class P2POrderCard extends StatelessWidget {
                 width: 52,
                 height: 32,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (isBuy) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const P2PBuyScreen(),
+                        ),
+                      );
+                    } else {
+                      // Handle Sell action
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1D5DE5),
                     shape: RoundedRectangleBorder(

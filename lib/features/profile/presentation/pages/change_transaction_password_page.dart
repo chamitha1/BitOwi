@@ -27,6 +27,9 @@ class _ChangeTransactionPasswordPageState
   bool _isConfirmTransactionPasswordVisible = false;
   bool _isLoading = false;
 
+  final _formKey = GlobalKey<FormState>();
+  bool _submitted = false;
+
   String _verifiedOtp = "";
   bool _isEmailVerified = false;
   bool _isSendingOtp = false;
@@ -62,10 +65,13 @@ class _ChangeTransactionPasswordPageState
     final pass = _passController.text.trim();
     final confirm = _confirmPassController.text.trim();
 
-    if (pass.isEmpty || pass.length != 6 || int.tryParse(pass) == null) {
+    setState(() => _submitted = true);
+    _formKey.currentState?.validate();
+
+    if (pass.isEmpty || pass.length != 6) {
       CustomSnackbar.showError(
         title: "Error",
-        message: "Please enter a valid 6-digit number password",
+        message: "Please enter 6 digit password",
       );
       return;
     }
@@ -204,116 +210,141 @@ class _ChangeTransactionPasswordPageState
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _label("Email"),
-                    TextFormField(
-                      initialValue: _email,
-                      readOnly: true,
-                      style: const TextStyle(
-                        color: Color(0xFF151E2F),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Inter',
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFECEFF5),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15,
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: _submitted
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _label("Email"),
+                      TextFormField(
+                        initialValue: _email,
+                        readOnly: true,
+                        style: const TextStyle(
+                          color: Color(0XFF717F9A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Inter',
                         ),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 10.0,
-                            top: 14.0,
-                            bottom: 14.0,
-                            right: 4.0,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFECEFF5),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 15,
                           ),
-                          child: SvgPicture.asset(
-                            "assets/icons/sign_up/sms.svg",
-                            width: 24,
-                            height: 24,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF717F9A),
-                              BlendMode.srcIn,
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10.0,
+                              top: 14.0,
+                              bottom: 14.0,
+                              right: 4.0,
+                            ),
+                            child: SvgPicture.asset(
+                              "assets/icons/sign_up/sms.svg",
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF717F9A),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 6,
+                              top: 6,
+                              bottom: 6,
+                            ),
+                            child: _verifyButton(
+                              text: _isEmailVerified
+                                  ? "Verified"
+                                  : (_isSendingOtp
+                                        ? "Sending..."
+                                        : "Get a Code"),
+                              onPressed: _verifyEmail,
+                              isEnabled: _email.isNotEmpty && !_isSendingOtp,
+                              isVerified: _isEmailVerified,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
                             ),
                           ),
                         ),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 6,
-                            top: 6,
-                            bottom: 6,
-                          ),
-                          child: _verifyButton(
-                            text: _isEmailVerified
-                                ? "Verified"
-                                : (_isSendingOtp ? "Sending..." : "Get a Code"),
-                            onPressed: _verifyEmail,
-                            isEnabled: _email.isNotEmpty && !_isSendingOtp,
-                            isVerified: _isEmailVerified,
-                          ),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    _label("Transaction Password"),
-                    _passwordField(
-                      controller: _passController,
-                      placeholder: "Enter 6-Digit Password",
-                      showSuffix: true,
-                      enabled: _isEmailVerified,
-                      isVisible: _isTransactionPasswordVisible,
-                      onToggleVisibility: () {
-                        setState(() {
-                          _isTransactionPasswordVisible =
-                              !_isTransactionPasswordVisible;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 24),
+                      _label("Transaction Password"),
+                      _passwordField(
+                        controller: _passController,
+                        placeholder: "Enter 6-Digit Password",
+                        showSuffix: true,
+                        enabled: _isEmailVerified,
+                        isVisible: _isTransactionPasswordVisible,
+                        validator: (val) {
+                          if (!_isEmailVerified) return null;
+                          final pass = (val ?? "").trim();
+                          if (pass.isEmpty || pass.length != 6) {
+                            return "Please enter 6 digit password";
+                          }
+                          return null;
+                        },
+                        onToggleVisibility: () {
+                          setState(() {
+                            _isTransactionPasswordVisible =
+                                !_isTransactionPasswordVisible;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
 
-                    _label("Confirm Transaction Password"),
-                    _passwordField(
-                      controller: _confirmPassController,
-                      placeholder: "Re-enter 6-Digit Password",
-                      showSuffix: true,
-                      enabled: _isEmailVerified,
-                      isVisible: _isConfirmTransactionPasswordVisible,
-                      onToggleVisibility: () {
-                        setState(() {
-                          _isConfirmTransactionPasswordVisible =
-                              !_isConfirmTransactionPasswordVisible;
-                        });
-                      },
-                    ),
-                  ],
+                      _label("Confirm Transaction Password"),
+                      _passwordField(
+                        controller: _confirmPassController,
+                        placeholder: "Re-enter 6-Digit Password",
+                        showSuffix: true,
+                        enabled: _isEmailVerified,
+                        isVisible: _isConfirmTransactionPasswordVisible,
+                        validator: (val) {
+                          if (!_isEmailVerified) return null;
+                          final confirm = (val ?? "").trim();
+                          final pass = _passController.text.trim();
+                          if (confirm != pass) {
+                            return "Passwords do not match";
+                          }
+                          return null;
+                        },
+                        onToggleVisibility: () {
+                          setState(() {
+                            _isConfirmTransactionPasswordVisible =
+                                !_isConfirmTransactionPasswordVisible;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -450,16 +481,16 @@ class _ChangeTransactionPasswordPageState
     bool enabled = true,
     bool isVisible = false,
     VoidCallback? onToggleVisibility,
+    String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       enabled: enabled,
       obscureText: !isVisible,
       keyboardType: TextInputType.number,
-      validator: (val) {
-        if (val == null || val.isEmpty) return "Required";
-        if (val.length != 6) return "Must be 6 digits";
-        return null;
+      validator: validator,
+      onChanged: (_) {
+        if (_submitted) setState(() {});
       },
       decoration: _inputDecoration(
         hint: placeholder,
