@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pinput.dart';
 
 class OtpBottomSheet extends StatefulWidget {
@@ -89,7 +90,10 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
     final pin = _pinController.text.trim();
 
     if (pin.length != widget.otpLength) {
-      CustomSnackbar.showError(title: "Error", message: "Please enter valid OTP");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter valid OTP",
+      );
       return;
     }
 
@@ -166,7 +170,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       ),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xffE1E1EC)),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         color: Colors.white,
       ),
     );
@@ -180,9 +184,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
       child: Padding(
         padding: EdgeInsets.only(bottom: viewInsets.bottom),
         child: Container(
-          constraints: BoxConstraints(
-            maxHeight: size.height * 0.88,
-          ),
+          constraints: BoxConstraints(maxHeight: size.height * 0.88),
           padding: const EdgeInsets.all(24.0),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -197,10 +199,39 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 12),
-                Image.asset(
-                  "assets/icons/verify_email/shield.png",
-                  height: 64,
-                  width: 64,
+                Container(
+                  decoration: BoxDecoration(
+                    //box-shadow: 0px 6px 24px var(--FontSize-16) #1D5DE533;
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromARGB(
+                          255,
+                          140,
+                          178,
+                          255,
+                        ).withOpacity(0.2),
+                        offset: Offset(0, 6),
+                        blurRadius: 12,
+                        spreadRadius: 8,
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [Color(0xff28A6FF), Color(0xff1D5DE5)],
+                      begin: AlignmentGeometry.topCenter,
+                      end: AlignmentGeometry.bottomCenter,
+                    ),
+                  ),
+
+                  width: 65,
+                  height: 65,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/verify_email/shield.svg',
+                      width: 44,
+                      height: 44,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -230,6 +261,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
                   length: widget.otpLength,
                   controller: _pinController,
                   defaultPinTheme: defaultPinTheme,
+
                   focusedPinTheme: focusedPinTheme,
                   showCursor: true,
                   onCompleted: (_) => _verify(),
