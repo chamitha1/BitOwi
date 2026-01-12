@@ -77,6 +77,16 @@ class CommonImage extends StatelessWidget {
         height: height,
       );
     }
+    if (url.startsWith('assets/') || url.startsWith('lib/')) {
+      return Image.asset(
+        url,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) =>
+            errorWidgetChild ?? Image.asset(defaultImg, fit: BoxFit.cover),
+      );
+    }
     _checkMemory();
     return CachedNetworkImage(
       // imageUrl: CommonUtils.formatImg(url),

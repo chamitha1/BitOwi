@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class P2PBuyScreen extends StatefulWidget {
-  const P2PBuyScreen({super.key});
+class P2PSellScreen extends StatefulWidget {
+  const P2PSellScreen({super.key});
 
   @override
-  State<P2PBuyScreen> createState() => _P2PBuyScreenState();
+  State<P2PSellScreen> createState() => _P2PSellScreenState();
 }
 
-class _P2PBuyScreenState extends State<P2PBuyScreen> {
-  bool isBuyQuantityMode = true;
+class _P2PSellScreenState extends State<P2PSellScreen> {
+  bool isSellQuantityMode = true;
   final TextEditingController _amountController = TextEditingController();
   bool _isMaxChecked = false;
 
-  // Mock Data
   final String _maxLimitStr = "113788237.00";
   final String _assetName = "BTC";
   final String _fiatName = "NGN";
-  final double _pricePerUnit = 23493.02;
-  
+  final double _pricePerUnit = 3566878988.00; 
+
   @override
   void initState() {
     super.initState();
     _amountController.addListener(() {
-      setState(() {});
+      setState(
+        () {},
+      ); 
     });
   }
 
@@ -37,7 +38,9 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
     setState(() {
       _isMaxChecked = value ?? false;
       if (_isMaxChecked) {
-        _amountController.text = _maxLimitStr;
+        _amountController.text = isSellQuantityMode
+            ? "9.990007843"
+            : _maxLimitStr;
       } else {
         _amountController.clear();
       }
@@ -51,7 +54,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
         title: const Text(
-          "Buy",
+          "Sell",
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
@@ -155,29 +158,27 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Toggle Row
           Row(
             children: [
               Expanded(
                 child: _buildToggleButton(
-                  "Buy Quantity",
-                  isBuyQuantityMode,
-                  () => setState(() => isBuyQuantityMode = true),
+                  "Sell Quantity",
+                  isSellQuantityMode,
+                  () => setState(() => isSellQuantityMode = true),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildToggleButton(
-                  "Buy Amount",
-                  !isBuyQuantityMode,
-                  () => setState(() => isBuyQuantityMode = false),
+                  "Sell Amount",
+                  !isSellQuantityMode,
+                  () => setState(() => isSellQuantityMode = false),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // Balance Info
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -191,7 +192,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                 ),
               ),
               Text(
-                "0.00544$_assetName",
+                "0.00544$_assetName", 
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
@@ -203,8 +204,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Input Field Area
-          _buildLabel(isBuyQuantityMode ? "Buy Quantity" : "Buy Amount"),
+          _buildLabel(isSellQuantityMode ? "Sell Quantity" : "Sell Amount"),
           const SizedBox(height: 8),
           TextField(
             controller: _amountController,
@@ -223,7 +223,9 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                 horizontal: 16,
                 vertical: 14,
               ),
-              suffixText: isBuyQuantityMode ? "BTN" : "NGN",
+              suffixText: isSellQuantityMode
+                  ? "BTC"
+                  : "NGN",
               suffixStyle: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -271,20 +273,30 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                 ),
               ),
               const Spacer(),
-              const Text(
-                "Limit : 113788237.00 - 2883888",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF2E3D5B),
-                ),
-              ),
             ],
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            "Limit : 113788237.00 - 2883888",
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF717F9A), 
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Available Balance : 9.990.0007843 BTC",
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF717F9A),
+            ),
           ),
           const SizedBox(height: 16),
 
-          // Calculation Result Row
           _buildCalculationRow(),
         ],
       ),
@@ -292,47 +304,53 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
   }
 
   Widget _buildCalculationRow() {
-    if (isBuyQuantityMode) {
+    double inputVal = double.tryParse(_amountController.text) ?? 0.0;
+
+    if (isSellQuantityMode) {
+      String receivable = (inputVal * _pricePerUnit).toStringAsFixed(2);
+
       return Container(
         padding: const EdgeInsets.only(top: 16),
         decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: Color(0xFFECEFF5))),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "Payable",
+            const Text(
+              "Receivable",
               style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black, 
+              ),
+            ),
+            Text(
+              "₦ $receivable",
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF151E2F),
               ),
             ),
-            Text(
-              "₦ 0.00",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF717F9A),
-              ),
-            ),
           ],
         ),
       );
     } else {
+      String sellCrypto = (inputVal / _pricePerUnit).toStringAsFixed(8);
+
       return Container(
         padding: const EdgeInsets.only(top: 16),
         decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: Color(0xFFECEFF5))),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "Pay",
+            const Text(
+              "Sell",
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 18,
@@ -341,8 +359,8 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
               ),
             ),
             Text(
-              "₦ 0.0001 BTC",
-              style: TextStyle(
+              "$sellCrypto BTC",
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -397,7 +415,6 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           const Text(
             "Merchant Info",
             style: TextStyle(
@@ -408,7 +425,6 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          // User Row
           Row(
             children: [
               const CircleAvatar(
@@ -464,7 +480,6 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          // Stats Row
           Row(
             children: [
               SvgPicture.asset(
@@ -498,7 +513,6 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Ads Message
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -518,7 +532,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                     color: Color(0xFF151E2F),
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   "Selling USDT with quick confirmation.\nSecure Escrow No Delays Verified Merchant",
                   style: TextStyle(
@@ -588,7 +602,9 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
 
   Widget _buildBottomActions() {
     // Validate Input
-    bool isValid = _amountController.text.isNotEmpty && (double.tryParse(_amountController.text) ?? 0) > 0;
+    bool isValid =
+        _amountController.text.isNotEmpty &&
+        (double.tryParse(_amountController.text) ?? 0) > 0;
 
     return Row(
       children: [
@@ -618,14 +634,20 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
           ),
         ),
         const SizedBox(width: 16),
-        // Buy Button
+        // Sell Button
         Expanded(
           child: SizedBox(
             height: 48,
             child: ElevatedButton(
-              onPressed: isValid ? () {} : null,
+              onPressed: isValid
+                  ? () {
+                      // Sell Action
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isValid ? const Color(0xFF1D5DE5) : const Color(0xFFB9C6E2),
+                backgroundColor: isValid
+                    ? const Color(0xFF1D5DE5)
+                    : const Color(0xFFB9C6E2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -634,12 +656,16 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                 disabledForegroundColor: Colors.white,
               ),
               child: Text(
-                "Buy",
+                "Sell",
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isValid ? Colors.white : const Color(0xFF717F9A),
+                  color: isValid
+                      ? Colors.white
+                      : const Color(
+                          0xFF717F9A,
+                        ),
                 ),
               ),
             ),

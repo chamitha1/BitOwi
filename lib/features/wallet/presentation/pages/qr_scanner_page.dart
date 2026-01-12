@@ -76,6 +76,11 @@ class _QrScannerPageState extends State<QrScannerPage> {
         "Camera Permission",
         "Camera permission is required to scan QR codes.",
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFFDF4F5),
+        colorText: const Color(0xFFCF4436),
+        borderColor: const Color(0xFFF5B7B1),
+        borderWidth: 1,
+        icon: const Icon(Icons.error_outline, color: Color(0xFFCF4436)),
       );
       Future.delayed(const Duration(milliseconds: 300), () {
         if (Get.isOverlaysOpen) Get.back();

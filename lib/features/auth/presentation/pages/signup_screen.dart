@@ -105,12 +105,12 @@ class _SignupScreenState extends State<SignupScreen> {
       message,
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      backgroundColor: Colors.white,
-      colorText: const Color(0xFF151E2F),
-      borderColor: const Color(0xFFE74C3C),
+      backgroundColor: const Color(0xFFFDF4F5),
+      colorText: const Color(0xFFCF4436),
+      borderColor: const Color(0xFFF5B7B1),
       borderWidth: 1,
       duration: const Duration(seconds: 4),
-      icon: const Icon(Icons.error_outline, color: Color(0xFFE74C3C)),
+      icon: const Icon(Icons.error_outline, color: Color(0xFFCF4436)),
     );
   }
 
@@ -436,18 +436,25 @@ class _SignupScreenState extends State<SignupScreen> {
                                           () => _agreedToTerms = v ?? false,
                                         )
                                       : null,
-                                  activeColor: const Color(0xFF2F5599),
+                                  checkColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  side: BorderSide(
+                                  side: const BorderSide(
                                     color: Color(0xffDAE0EE),
                                     width: 1.0,
                                     style: BorderStyle.solid,
                                   ),
-                                  fillColor: MaterialStateProperty.all(
-                                    Colors.white,
-                                  ), // Sets the fill color for all states
+                                  fillColor: MaterialStateProperty.resolveWith(
+                                    (states) {
+                                      if (states.contains(
+                                        MaterialState.selected,
+                                      )) {
+                                        return const Color(0xFF1D5DE5);
+                                      }
+                                      return Colors.white;
+                                    },
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 8),

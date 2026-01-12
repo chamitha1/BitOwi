@@ -10,6 +10,7 @@ import 'package:BitOwi/features/profile/presentation/widgets/profile_widgets.dar
 import 'package:BitOwi/features/profile/presentation/pages/account_security_page.dart';
 import 'package:BitOwi/features/merchant/presentation/controllers/user_kyc_personal_information_controller.dart';
 import 'package:BitOwi/features/notifications/presentation/pages/notifications_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/partners_page.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -29,7 +30,7 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(height: 56, child: _buildTopBar(userController)),
               const SizedBox(height: 20),
               _buildProfileCard(userController),
-              // const SizedBox(height: 24),
+              const SizedBox(height: 24),
               _buildQuickActionsRow(),
               const SizedBox(height: 24),
               _buildMenuCards(context),
@@ -56,10 +57,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         Row(
           children: [
-            // _buildCircleIconButton(
-            //   icon: Icons.person_add_alt_1_outlined,
-            //   onTap: () {},
-            // ),
+          
             const SizedBox(width: 12),
             Obx(
               () => _buildCircleIconButton(
@@ -309,11 +307,55 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildQuickActionsRow() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (commented out code)
+        _buildQuickActionItem(
+          iconPath: 'assets/icons/profile_page/partners.svg',
+          label: "My Partners",
+          bgColor: const Color(0xFFFFFBF6),
+          borderColor: const Color(0xFFFFEFDC),
+          onTap: () => Get.to(() => const PartnersPage()),
+        ),
       ],
+    );
+  }
+
+  Widget _buildQuickActionItem({
+    required String iconPath,
+    required String label,
+    required VoidCallback onTap,
+    required Color bgColor,
+    required Color borderColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderColor),
+            ),
+            child: SvgPicture.asset(iconPath, width: 40, height: 40),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+              color: Color(0xFF717F9A),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -339,7 +381,6 @@ class ProfileScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        // Account and security and address book
         ProfileGroupCard(
           children: [
             const Divider(height: 1, color: Color(0xFFF0F4FF)),
@@ -356,14 +397,7 @@ class ProfileScreen extends StatelessWidget {
               subtitle: "Manage your saved addresses",
               onTap: () => Get.to(() => AddressBookPage()),
             ),
-            // const Divider(height: 1, color: Color(0xFFF0F4FF)),
-
-            // ProfileMenuItem(
-            //   iconPath: 'assets/icons/profile_page/security.svg',
-            //   title: "Change Transaction Password",
-            //   subtitle: "",
-            //   onTap: () => Get.to(() => const ChangeTransactionPasswordPage()),
-            // ),
+           
             const Divider(height: 1, color: Color(0xFFF0F4FF)),
           ],
         ),

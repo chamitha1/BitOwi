@@ -333,7 +333,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                 initialValue: _currentEmail,
                 readOnly: true,
                 style: const TextStyle(
-                  color: Color(0xFF151E2F),
+                  color: Color(0xFF717F9A),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   fontFamily: 'Inter',

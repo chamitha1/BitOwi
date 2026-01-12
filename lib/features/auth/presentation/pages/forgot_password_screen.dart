@@ -73,12 +73,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       message,
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      backgroundColor: Colors.white,
-      colorText: const Color(0xFF151E2F),
-      borderColor: const Color(0xFFE74C3C),
+      backgroundColor: const Color(0xFFFDF4F5),
+      colorText: const Color(0xFFCF4436),
+      borderColor: const Color(0xFFF5B7B1),
       borderWidth: 1,
       duration: const Duration(seconds: 4),
-      icon: const Icon(Icons.error_outline, color: Color(0xFFE74C3C)),
+      icon: const Icon(Icons.error_outline, color: Color(0xFFCF4436)),
     );
   }
 

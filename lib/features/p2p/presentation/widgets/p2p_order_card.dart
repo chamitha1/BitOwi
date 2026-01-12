@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_buy_screen.dart';
+import 'package:BitOwi/features/p2p/presentation/pages/p2p_sell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -275,7 +276,12 @@ class P2POrderCard extends StatelessWidget {
                         ),
                       );
                     } else {
-                      // Handle Sell action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const P2PSellScreen(),
+                        ),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -286,11 +292,11 @@ class P2POrderCard extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Buy",
-                    style: TextStyle(
+                  child: Text(
+                    isBuy ? "Buy" : "Sell",
+                    style: const TextStyle(
                       fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       fontSize: 14,
                       color: Colors.white,
                     ),
