@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../widgets/p2p_order_card.dart';
+import '../widgets/filter_bottom_sheet.dart';
+import '../widgets/p2p_empty_state.dart';
 
 class P2PPage extends StatefulWidget {
   const P2PPage({super.key});
@@ -33,16 +35,32 @@ class _P2PPageState extends State<P2PPage> {
               ),
             ),
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 0,
-                ),
-                itemCount: 4,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  return P2POrderCard(isBuy: isBuySelected);
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  bool isEmpty = false;
+
+                  // if (isEmpty) {
+                  //   return SingleChildScrollView(
+                  //     physics: const AlwaysScrollableScrollPhysics(),
+                  //     child: SizedBox(
+                  //       height: constraints.maxHeight,
+                  //       child: const P2PEmptyState(),
+                  //     ),
+                  //   );
+                  // }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 0,
+                    ),
+                    itemCount: 4,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      return P2POrderCard(isBuy: isBuySelected);
+                    },
+                  );
                 },
               ),
             ),
@@ -109,7 +127,7 @@ class _P2PPageState extends State<P2PPage> {
           child: GestureDetector(
             onTap: () => setState(() => isBuySelected = true),
             child: Container(
-              height: 44, // Typical touch height
+              height: 44, 
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: isBuySelected
@@ -118,7 +136,7 @@ class _P2PPageState extends State<P2PPage> {
                 borderRadius: BorderRadius.circular(12),
                 // borderRadius: BorderRadius.circular(8),
               ),
-              margin: const EdgeInsets.only(right: 8), 
+              margin: const EdgeInsets.only(right: 8),
               child: Text(
                 "Buy",
                 style: TextStyle(
@@ -147,8 +165,7 @@ class _P2PPageState extends State<P2PPage> {
                 "Sell",
                 style: TextStyle(
                   fontFamily: 'Inter',
-                  fontWeight: FontWeight
-                      .w700, 
+                  fontWeight: FontWeight.w700,
                   fontSize: 16,
                   color: !isBuySelected
                       ? Colors.white
@@ -172,7 +189,6 @@ class _P2PPageState extends State<P2PPage> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
-         
           ),
           child: Row(
             children: [
@@ -243,17 +259,30 @@ class _P2PPageState extends State<P2PPage> {
         ),
         const SizedBox(width: 8),
         // Filter Button
-        Container(
-          height: 48,
-          width: 48,
-          decoration: BoxDecoration(
-            color: const Color(0xFF1D5DE5),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.all(12),
-          child: SvgPicture.asset(
-            'assets/icons/p2p/filter.svg',
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+        GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              isScrollControlled: true,
+              builder: (context) => const FilterBottomSheet(),
+            );
+          },
+          child: Container(
+            height: 48,
+            width: 48,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1D5DE5),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: SvgPicture.asset(
+              'assets/icons/p2p/filter.svg',
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
         ),
       ],

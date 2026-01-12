@@ -37,10 +37,16 @@ class HomeBottomNavBar extends StatelessWidget {
                 0,
               ),
               _navItem(
+                "assets/icons/home/p2p.svg",
+                "assets/icons/home/p2pSelected.svg",
+                "P2P",
+                1,
+              ),
+              _navItem(
                 "assets/icons/home/profile.svg",
                 "assets/icons/home/profileSelected.svg",
                 "Profile",
-                1,
+                2,
               ),
             ],
           ),
@@ -57,50 +63,59 @@ class HomeBottomNavBar extends StatelessWidget {
   ) {
     final isSelected = currentIndex == index;
 
-    return GestureDetector(
-      onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
-      child: isSelected
-          ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xff1D5DE5), Color(0xff28A6FF)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(selectedIconPath, width: 20, height: 20),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onTap(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: double.infinity,
+          color: Colors.transparent,
+          alignment: Alignment.center,
+          child: isSelected
+              ? Container(
+                  width: 60,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xff1D5DE5), Color(0xff28A6FF)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ],
-              ),
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(iconPath, width: 22, height: 22),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Color(0xff717F9A),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(selectedIconPath, width: 20, height: 20),
+                      const SizedBox(height: 2),
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(iconPath, width: 22, height: 22),
+                    const SizedBox(height: 2),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Color(0xff717F9A),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+        ),
+      ),
     );
   }
 }

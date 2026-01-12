@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class P2POrderCard extends StatelessWidget {
-  final bool
-  isBuy; 
+  final bool isBuy;
 
   const P2POrderCard({super.key, this.isBuy = true});
 
@@ -16,9 +15,7 @@ class P2POrderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(
-              0xFF717F9A,
-            ).withOpacity(0.07),
+            color: const Color(0xFF717F9A).withOpacity(0.07),
             blurRadius: 9,
             offset: const Offset(0, 3),
           ),
@@ -27,163 +24,165 @@ class P2POrderCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Row User Info
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // Avatar
-                  Stack(
-                    children: [
-                      const CircleAvatar(
-                        radius: 16,
-                        backgroundImage: AssetImage(
-                          'assets/images/home/avatar.png',
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0x4DECEFF5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Stack(
+                      children: [
+                        const CircleAvatar(
+                          radius: 16,
+                          backgroundImage: AssetImage(
+                            'assets/images/home/avatar.png',
+                          ),
+                          backgroundColor: Color(0xFFE8ECF4),
                         ),
-                        backgroundColor: Color(0xFFE8ECF4),
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF4CAF50), 
-                            shape: BoxShape.circle,
-                            border: Border.fromBorderSide(
-                              BorderSide(color: Colors.white, width: 1.5),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF4CAF50),
+                              shape: BoxShape.circle,
+                              border: Border.fromBorderSide(
+                                BorderSide(color: Colors.white, width: 1.5),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 8),
-                  // Name
-                  const Text(
-                    "Byron Hartmann",
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Color(0xFF151E2F),
-                    ),
-                  ),
-                  const Spacer(),
-                  // Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8EFFF),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/p2p/certified.svg',
-                          width: 12,
-                          height: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          "Certified",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            color: Color(0xFF1D5DE5),
-                          ),
-                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              // Stats
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/p2p/like.svg',
-                    width: 12, 
-                    height: 12,
-                    color: const Color(0xFFFF9B29), 
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "100.0%",
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: Color(0xFF717F9A), 
+                    const SizedBox(width: 8),
+                    const Text(
+                      "Byron Hartmann",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Color(0xFF151E2F),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Separator
-                  Container(
-                    width: 1,
-                    height: 10,
-                    color: const Color(0xFFDAE0EE),
-                  ),
-                  const SizedBox(width: 8),
+                    const Spacer(),
+                    // Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8EFFF),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/p2p/certified.svg',
+                            width: 12,
+                            height: 12,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            "Certified",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Stats
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/p2p/like.svg',
+                      width: 12,
+                      height: 12,
+                      color: const Color(0xFFFF9B29),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      "100.0%",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF717F9A),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 1,
+                      height: 10,
+                      color: const Color(0xFFDAE0EE),
+                    ),
+                    const SizedBox(width: 8),
 
-                  RichText(
-                    text: const TextSpan(
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 12,
-                        color: Color(0xFF717F9A),
-                      ),
-                      children: [
-                        TextSpan(text: "Trust "),
-                        TextSpan(
-                          text: "453,657",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF151E2F),
-                          ), 
+                    RichText(
+                      text: const TextSpan(
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: Color(0xFF717F9A),
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 1,
-                    height: 10,
-                    color: const Color(0xFFDAE0EE),
-                  ),
-                  const SizedBox(width: 8),
-                  RichText(
-                    text: const TextSpan(
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 12,
-                        color: Color(0xFF717F9A),
-                      ),
-                      children: [
-                        TextSpan(text: "Trade "),
-                        TextSpan(
-                          text: "453,657 / 99.9%",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF151E2F),
+                        children: [
+                          TextSpan(text: "Trust "),
+                          TextSpan(
+                            text: "453,657",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF151E2F),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 1,
+                      height: 10,
+                      color: const Color(0xFFDAE0EE),
+                    ),
+                    const SizedBox(width: 8),
+                    RichText(
+                      text: const TextSpan(
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: Color(0xFF717F9A),
+                        ),
+                        children: [
+                          TextSpan(text: "Trade "),
+                          TextSpan(
+                            text: "453,657 / 99.9%",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF151E2F),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
-          // Price Row
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
@@ -192,7 +191,7 @@ class P2POrderCard extends StatelessWidget {
                 "₦ 23,493.02",
                 style: TextStyle(
                   fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700, 
+                  fontWeight: FontWeight.w700,
                   fontSize: 20,
                   color: Color(0xFF151E2F),
                 ),
@@ -202,7 +201,7 @@ class P2POrderCard extends StatelessWidget {
                 "Per USDT",
                 style: TextStyle(
                   fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400, 
+                  fontWeight: FontWeight.w400,
                   fontSize: 12,
                   color: Color(0xFF717F9A),
                 ),
@@ -210,11 +209,9 @@ class P2POrderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // Limits Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Left Total
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -239,7 +236,6 @@ class P2POrderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Middle Limit
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -254,7 +250,7 @@ class P2POrderCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    "453,657 / 99.9%", 
+                    "453,657 / 99.9%",
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
@@ -266,16 +262,14 @@ class P2POrderCard extends StatelessWidget {
               ),
               // Right Button
               SizedBox(
-                width: 80,
-                height: 36,
+                width: 52,
+                height: 32,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1D5DE5),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        8,
-                      ),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     padding: EdgeInsets.zero,
                     elevation: 0,
@@ -293,7 +287,7 @@ class P2POrderCard extends StatelessWidget {
               ),
             ],
           ),
-          // Payment Methods Row
+          // Payment Methods
           Container(
             margin: const EdgeInsets.only(top: 16),
             padding: const EdgeInsets.only(top: 10),
@@ -335,9 +329,7 @@ class P2POrderCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(
-          4,
-        ), 
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         text,
