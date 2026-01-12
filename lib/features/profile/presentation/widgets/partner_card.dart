@@ -252,7 +252,7 @@ class PartnerCard extends StatelessWidget {
     return TextStyle(
       fontSize: 12,
       fontFamily: 'Inter',
-      color: const Color(0xFF717F9A), 
+      color: const Color(0xFF717F9A),
       fontWeight: fontWeight,
     );
   }

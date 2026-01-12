@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'l10n/translations.dart';
 import 'config/routes.dart';

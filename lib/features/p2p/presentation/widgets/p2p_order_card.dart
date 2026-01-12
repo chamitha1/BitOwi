@@ -1,15 +1,19 @@
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_buy_screen.dart';
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_sell_screen.dart';
+import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class P2POrderCard extends StatelessWidget {
   final bool isBuy;
+  final AdItem? adItem;
 
-  const P2POrderCard({super.key, this.isBuy = true});
+  const P2POrderCard({super.key, this.isBuy = true, this.adItem});
 
   @override
   Widget build(BuildContext context) {
+    if (adItem == null) return const SizedBox();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -39,13 +43,17 @@ class P2POrderCard extends StatelessWidget {
                   children: [
                     Stack(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 16,
-                          backgroundImage: AssetImage(
-                            'assets/images/home/avatar.png',
-                          ),
-                          backgroundColor: Color(0xFFE8ECF4),
+                          backgroundImage: adItem?.photo != null
+                              ? NetworkImage(adItem!.photo!)
+                              : const AssetImage(
+                                      'assets/images/home/avatar.png',
+                                    )
+                                    as ImageProvider,
+                          backgroundColor: const Color(0xFFE8ECF4),
                         ),
+                        // Online Status
                         Positioned(
                           right: 0,
                           bottom: 0,
@@ -64,9 +72,9 @@ class P2POrderCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      "Byron Hartmann",
-                      style: TextStyle(
+                    Text(
+                      adItem?.nickname ?? "User",
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -74,36 +82,37 @@ class P2POrderCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    // Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8EFFF),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/p2p/certified.svg',
-                            width: 12,
-                            height: 12,
-                          ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            "Certified",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Color(0xFF1D5DE5),
+                    // Badge Logic
+                    if (adItem?.userStatistics?.isTrust == '1')
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8EFFF),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/p2p/certified.svg',
+                              width: 12,
+                              height: 12,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            const Text(
+                              "Certified",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                color: Color(0xFF1D5DE5),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -114,12 +123,15 @@ class P2POrderCard extends StatelessWidget {
                       'assets/icons/p2p/like.svg',
                       width: 12,
                       height: 12,
-                      color: const Color(0xFFFF9B29),
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFFFF9B29),
+                        BlendMode.srcIn,
+                      ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      "100.0%",
-                      style: TextStyle(
+                    Text(
+                      "${adItem?.userStatistics?.commentGoodCount ?? 0}%",
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
@@ -133,19 +145,18 @@ class P2POrderCard extends StatelessWidget {
                       color: const Color(0xFFDAE0EE),
                     ),
                     const SizedBox(width: 8),
-
                     RichText(
-                      text: const TextSpan(
-                        style: TextStyle(
+                      text: TextSpan(
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
                           color: Color(0xFF717F9A),
                         ),
                         children: [
-                          TextSpan(text: "Trust "),
+                          const TextSpan(text: "Trust "),
                           TextSpan(
-                            text: "453,657",
-                            style: TextStyle(
+                            text: "${adItem?.userStatistics?.orderCount ?? 0}",
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF151E2F),
                             ),
@@ -161,17 +172,18 @@ class P2POrderCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     RichText(
-                      text: const TextSpan(
-                        style: TextStyle(
+                      text: TextSpan(
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
                           color: Color(0xFF717F9A),
                         ),
                         children: [
-                          TextSpan(text: "Trade "),
+                          const TextSpan(text: "Trade "),
                           TextSpan(
-                            text: "453,657 / 99.9%",
-                            style: TextStyle(
+                            text:
+                                "${adItem?.userStatistics?.orderCount ?? 0} / ${adItem?.userStatistics?.orderFinishCount ?? 0}%",
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF151E2F),
                             ),
@@ -185,13 +197,14 @@ class P2POrderCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          // Price
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              const Text(
-                "₦ 23,493.02",
-                style: TextStyle(
+              Text(
+                "${_getCurrencySymbol(adItem?.tradeCurrency)} ${double.tryParse(adItem?.truePrice ?? '0')?.toStringAsFixed(2)}",
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w700,
                   fontSize: 20,
@@ -199,9 +212,9 @@ class P2POrderCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
-                "Per USDT",
-                style: TextStyle(
+              Text(
+                "Per ${adItem?.tradeCoin ?? 'USDT'}",
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w400,
                   fontSize: 12,
@@ -211,8 +224,8 @@ class P2POrderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
+          // Info & Action Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,9 +240,9 @@ class P2POrderCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    "2,53,657 USDT",
-                    style: TextStyle(
+                  Text(
+                    "${adItem?.leftCount} ${adItem?.tradeCoin ?? ''}",
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
@@ -238,6 +251,7 @@ class P2POrderCard extends StatelessWidget {
                   ),
                 ],
               ),
+              const Spacer(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -251,9 +265,9 @@ class P2POrderCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    "453,657 / 99.9%",
-                    style: TextStyle(
+                  Text(
+                    "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade}",
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
@@ -262,9 +276,9 @@ class P2POrderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Right Button
+              const Spacer(),
               SizedBox(
-                width: 52,
+                width: 76,
                 height: 32,
                 child: ElevatedButton(
                   onPressed: () {
@@ -285,11 +299,13 @@ class P2POrderCard extends StatelessWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1D5DE5),
+                    backgroundColor: const Color(
+                      0xFF1D5DE5,
+                    ), 
+                    padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    padding: EdgeInsets.zero,
                     elevation: 0,
                   ),
                   child: Text(
@@ -305,11 +321,11 @@ class P2POrderCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 16),
           // Payment Methods
           Container(
-            margin: const EdgeInsets.only(top: 16),
-            padding: const EdgeInsets.only(top: 10),
             width: double.infinity,
+            padding: const EdgeInsets.only(top: 16),
             decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(color: Color(0xFFECEFF5), width: 1),
@@ -320,19 +336,9 @@ class P2POrderCard extends StatelessWidget {
               runSpacing: 8,
               children: [
                 _buildPaymentTag(
-                  "Bank Transfer",
-                  const Color(0xFFFFFBF6),
-                  const Color(0xFFFF9B29),
-                ),
-                _buildPaymentTag(
-                  "Airtel Money",
-                  const Color(0xFFFDF4F5),
-                  const Color(0xFFE74C3C),
-                ),
-                _buildPaymentTag(
-                  "MTN Money",
-                  const Color(0xFFE8EFFF),
-                  const Color(0xFF1D5DE5),
+                  adItem?.bankName ?? "Bank Transfer",
+                  const Color(0xFFFFF9C4),
+                  const Color(0xFFFBC02D),
                 ),
               ],
             ),
@@ -340,6 +346,17 @@ class P2POrderCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _getCurrencySymbol(String? currency) {
+    switch (currency) {
+      case 'NGN':
+        return '₦';
+      case 'USD':
+        return '\$';
+      default:
+        return '';
+    }
   }
 
   Widget _buildPaymentTag(String text, Color bgColor, Color textColor) {

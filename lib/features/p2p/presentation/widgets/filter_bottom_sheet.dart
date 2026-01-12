@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class FilterBottomSheet extends StatefulWidget {
-  const FilterBottomSheet({super.key});
+  final String? initialAmount;
+  final String? initialCurrency;
+
+  const FilterBottomSheet({
+    super.key,
+    this.initialAmount,
+    this.initialCurrency,
+  });
 
   @override
   State<FilterBottomSheet> createState() => _FilterBottomSheetState();
@@ -12,6 +19,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   String _selectedCurrency = "NGN";
 
   final List<String> _multipliers = ["1X", "5X", "10X", "20X", "50X", "100X"];
+
   final List<String> _currencies = ["NGN", "USD", "CHA"];
 
   late TextEditingController _amountController;
@@ -19,7 +27,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(text: "700");
+    _amountController = TextEditingController(text: widget.initialAmount ?? "");
+    if (widget.initialCurrency != null &&
+        _currencies.contains(widget.initialCurrency)) {
+      _selectedCurrency = widget.initialCurrency!;
+    }
   }
 
   @override
@@ -32,16 +44,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      // Rounded top corners (approx 32px)
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Modal bottom sheet behavior
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 2. Header Section
+          // Header Section
           _buildHeader(context),
           const SizedBox(height: 24),
 
@@ -231,11 +242,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             height: 54,
             child: OutlinedButton(
               onPressed: () {
-                // Reset logic
-                setState(() {
-                  _selectedMultiplier = "";
-                  _selectedCurrency = "NGN";
-                });
+                Navigator.pop(context, {'type': 'reset'});
               },
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
@@ -271,8 +278,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
             child: ElevatedButton(
               onPressed: () {
-                // Filter action
-                Navigator.pop(context);
+                Navigator.pop(context, {
+                  'type': 'filter',
+                  'amount': _amountController.text,
+                  'currency': _selectedCurrency,
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,

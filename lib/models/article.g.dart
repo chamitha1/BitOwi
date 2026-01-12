@@ -23,16 +23,16 @@ Article _$ArticleFromJson(Map<String, dynamic> json) => Article()
       .toList();
 
 Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
-      'id': instance.id,
-      'typeId': instance.typeId,
-      'type': instance.type,
-      'title': instance.title,
-      'contentType': instance.contentType,
-      'content': instance.content,
-      'status': instance.status,
-      'orderNo': instance.orderNo,
-      'updater': instance.updater,
-      'updaterName': instance.updaterName,
-      'updateDatetime': instance.updateDatetime,
-      'articleDetailList': instance.articleDetailList,
-    };
+  'id': instance.id,
+  'typeId': instance.typeId,
+  'type': instance.type,
+  'title': instance.title,
+  'contentType': instance.contentType,
+  'content': instance.content,
+  'status': instance.status,
+  'orderNo': instance.orderNo,
+  'updater': instance.updater,
+  'updaterName': instance.updaterName,
+  'updateDatetime': instance.updateDatetime,
+  'articleDetailList': instance.articleDetailList,
+};

@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/models/identify_order_list_res.dart';
+import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/models/user_model.dart';
+import 'package:BitOwi/models/user_relation_page_res.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/src/extensions/dynamic_extensions.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
@@ -355,6 +357,35 @@ class UserApi {
       }
     } catch (e) {
       print("Close Google Secret error: $e");
+      rethrow;
+    }
+  }
+
+  /// Get User Relation Page List (Partners)
+  static Future<PageInfo<UserRelationPageRes>> getUserRelationPageList(
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      print("getUserRelationPageList Request: $data");
+      final res = await ApiClient.dio.post(
+        '/core/v1/user_relation/page_front',
+        data: data,
+      );
+      print("getUserRelationPageList Response: ${res.data}");
+
+      final responseData = res.data as Map<String, dynamic>;
+      if (responseData['code'] == 200 || responseData['code'] == '200') {
+        return PageInfo<UserRelationPageRes>.fromJson(
+          responseData,
+          (json) => UserRelationPageRes.fromJson(json),
+        );
+      } else {
+        throw Exception(
+          responseData['errorMsg'] ?? 'Failed to get partner list',
+        );
+      }
+    } catch (e) {
+      print('getUserRelationPageList Error: $e');
       rethrow;
     }
   }

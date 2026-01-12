@@ -22,6 +22,8 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
   final _confirmPassController = TextEditingController();
   final _userApi = UserApi();
 
+  bool _submitted = false;
+
   String _email = '';
   bool _isNewPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
@@ -63,6 +65,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     FocusScope.of(context).unfocus();
 
     // Trigger validation
+    setState(() => _submitted = true);
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
 
@@ -245,6 +248,9 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                 padding: const EdgeInsets.all(20.0),
                 child: Form(
                   key: _formKey,
+                  autovalidateMode: _submitted
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -523,7 +529,9 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
             }
             return null;
           },
-      onChanged: (_) {},
+      onChanged: (_) {
+         if (_submitted) setState(() {});
+      },
     );
   }
 

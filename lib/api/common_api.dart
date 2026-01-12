@@ -24,6 +24,7 @@ class CommonApi {
       );
 
       final resData = res.data;
+      print("getDictList Raw Response: $resData");
       if (resData is List) {
         return resData.map((item) => Dict.fromJson(item)).toList();
       } else if (resData is Map<String, dynamic> && resData['data'] is List) {

@@ -29,6 +29,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   bool _isNewEmailVerified = false;
   bool _isSendingOtpNew = false;
 
+  final _formKey = GlobalKey<FormState>();
+  bool _submitted = false;
+
   bool _isNewEmailPopulated = false;
 
   @override
@@ -183,6 +186,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     if (_isSendingOtpNew || _isNewEmailVerified) return;
     final newEmail = _newEmailController.text.trim();
 
+    setState(() => _submitted = true);
+    if (!_formKey.currentState!.validate()) return;
+
     if (!GetUtils.isEmail(newEmail)) {
       CustomSnackbar.showError(
         title: "Error",
@@ -318,112 +324,157 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               ),
               const SizedBox(height: 32),
 
-              // Current Email
-              const Text(
-                "Current Email",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF2E3D5B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                initialValue: _currentEmail,
-                readOnly: true,
-                style: const TextStyle(
-                  color: Color(0xFF717F9A),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'Inter',
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color(0xFFECEFF5), // Disabled color
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 10.0,
-                      top: 14.0,
-                      bottom: 14.0,
-                      right: 4.0,
-                    ),
-                    child: SvgPicture.asset(
-                      'assets/icons/login/sms.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF717F9A),
-                        BlendMode.srcIn,
+              Form(
+                key: _formKey,
+                autovalidateMode: _submitted
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Current Email
+                    const Text(
+                      "Current Email",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF2E3D5B),
                       ),
                     ),
-                  ),
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.only(right: 6, top: 6, bottom: 6),
-                    child: _verifyButton(
-                      text: _isOldEmailVerified
-                          ? "Verified"
-                          : (_isSendingOtpOld ? "Sending..." : "Get a Code"),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      initialValue: _currentEmail,
+                      readOnly: true,
+                      style: const TextStyle(
+                        color: Color(0xFF717F9A),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFECEFF5), 
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                        ),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 10.0,
+                            top: 14.0,
+                            bottom: 14.0,
+                            right: 4.0,
+                          ),
+                          child: SvgPicture.asset(
+                            'assets/icons/login/sms.svg',
+                            width: 24,
+                            height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF717F9A),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(
+                            right: 6,
+                            top: 6,
+                            bottom: 6,
+                          ),
+                          child: _verifyButton(
+                            text: _isOldEmailVerified
+                                ? "Verified"
+                                : (_isSendingOtpOld
+                                      ? "Sending..."
+                                      : "Get a Code"),
 
-                      onPressed: _verifyOldEmail,
-                      isEnabled: _currentEmail.isNotEmpty && !_isSendingOtpOld,
-                      isVerified: _isOldEmailVerified,
+                            onPressed: _verifyOldEmail,
+                            isEnabled:
+                                _currentEmail.isNotEmpty && !_isSendingOtpOld,
+                            isVerified: _isOldEmailVerified,
+                          ),
+                        ),
+                        // Borders
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDAE0EE),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDAE0EE),
+                          ),
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDAE0EE),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  // Borders
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
-                  ),
-                ),
-              ),
 
-              const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-              // New Email
-              const Text(
-                "New Email",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF2E3D5B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _newEmailController,
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                  color: Color(0xFF151E2F),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'Inter',
-                ),
-                decoration: _inputDecoration(
-                  hint: "Enter New Email",
-                  iconPath: "assets/icons/login/sms.svg",
-                  enabled: true,
-                  suffixWidget: Padding(
-                    padding: const EdgeInsets.only(right: 6, top: 6, bottom: 6),
-                    child: _verifyButton(
-                      text: _isNewEmailVerified
-                          ? "Verified"
-                          : (_isSendingOtpNew ? "Sending..." : "Get a Code"),
-                      onPressed: _verifyNewEmail,
-                      isEnabled: _isNewEmailPopulated && !_isSendingOtpNew,
-                      isVerified: _isNewEmailVerified,
+                    // New Email
+                    const Text(
+                      "New Email",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF2E3D5B),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _newEmailController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(
+                        color: Color(0xFF151E2F),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                      ),
+                      validator: (value) {
+                        final email = (value ?? "").trim();
+                        if (email.isEmpty) return "Please enter email";
+                        if (!GetUtils.isEmail(email))
+                          return "Invalid email address";
+                        if (email == _currentEmail)
+                          return "New email cannot be the same as current email";
+                        return null;
+                      },
+                      onChanged: (_) {
+                        if (_submitted) setState(() {});
+                      },
+                      decoration: _inputDecoration(
+                        hint: "Enter New Email",
+                        iconPath: "assets/icons/login/sms.svg",
+                        enabled: true,
+                        suffixWidget: Padding(
+                          padding: const EdgeInsets.only(
+                            right: 6,
+                            top: 6,
+                            bottom: 6,
+                          ),
+                          child: _verifyButton(
+                            text: _isNewEmailVerified
+                                ? "Verified"
+                                : (_isSendingOtpNew
+                                      ? "Sending..."
+                                      : "Get a Code"),
+                            onPressed: _verifyNewEmail,
+                            isEnabled:
+                                _isNewEmailPopulated && !_isSendingOtpNew,
+                            isVerified: _isNewEmailVerified,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
