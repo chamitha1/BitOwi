@@ -422,7 +422,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           const SizedBox(height: 22),
 
-                          // ✅ ONE LINE Terms (auto scale down if needed)
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
