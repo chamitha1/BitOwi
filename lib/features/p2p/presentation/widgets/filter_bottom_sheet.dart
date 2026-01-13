@@ -17,19 +17,28 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  String _selectedMultiplier = "10X";
+  String? _selectedMultiplier;
   final List<String> _multipliers = const ["1X", "5X", "10X", "20X", "50X", "100X"];
-
   List<Dict> _currencyList = [];
   Dict? _selectedCurrency;
   bool _loadingCurrencies = true;
 
   late final TextEditingController _amountController;
 
+  String _rawAmount = "";       // what user typed (base amount)
+  bool _updatingAmount = false; // prevent listener loop
+
   @override
   void initState() {
     super.initState();
+
     _amountController = TextEditingController(text: widget.initialAmount ?? "");
+    _rawAmount = _amountController.text.trim();
+    _amountController.addListener(() {
+      if (_updatingAmount) return; // ignore programmatic updates
+      _rawAmount = _amountController.text.trim();
+    });
+
     _fetchCurrencies();
   }
 
@@ -43,39 +52,86 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     try {
       final list = await CommonApi.getDictList(parentKey: 'ads_trade_currency');
       if (!mounted) return;
+      final filtered = list.where((e) => e.key == 'NGN' || e.key == 'USD').toList();
 
       Dict? selected;
 
-      // prefer initial currency
+      // prefer initial currency if exists
       final initKey = (widget.initialCurrency ?? "").trim();
       if (initKey.isNotEmpty) {
         try {
-          selected = list.firstWhere((e) => e.key == initKey);
+          selected = filtered.firstWhere((e) => e.key == initKey);
         } catch (_) {}
       }
 
       // else default NGN, else first
-      selected ??= list.isNotEmpty
-          ? list.firstWhere((e) => e.key == 'NGN', orElse: () => list.first)
+      selected ??= filtered.isNotEmpty
+          ? filtered.firstWhere((e) => e.key == 'NGN', orElse: () => filtered.first)
           : null;
 
       setState(() {
-        _currencyList = list;
+        _currencyList = filtered;
         _selectedCurrency = selected;
         _loadingCurrencies = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _currencyList = [];
-        _selectedCurrency = null;
+        _currencyList = [
+          Dict(key: 'NGN', value: 'NGN'),
+          Dict(key: 'USD', value: 'USD'),
+        ];
+        _selectedCurrency = Dict(key: 'NGN', value: 'NGN');
         _loadingCurrencies = false;
       });
+
       debugPrint("Error fetching currencies: $e");
     }
   }
 
+  int _multiplierValue(String m) {
+    return int.tryParse(m.replaceAll("X", "")) ?? 1;
+  }
+
+  void _applyMultiplier(String m) {
+    setState(() => _selectedMultiplier = m);
+
+    final base = double.tryParse(_rawAmount);
+    if (base == null) return; // user can type any amount
+
+    final mul = _multiplierValue(m);
+    final updated = base * mul;
+
+    final text =
+        (updated % 1 == 0) ? updated.toInt().toString() : updated.toString();
+
+    _updatingAmount = true;
+    _amountController.text = text;
+    _amountController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _amountController.text.length),
+    );
+    _updatingAmount = false;
+  }
+
   void _onReset() {
+    setState(() {
+      _selectedMultiplier = null;
+
+      _updatingAmount = true;
+      _amountController.clear();
+      _updatingAmount = false;
+
+      _rawAmount = "";
+
+      // default NGN if exists
+      _selectedCurrency = _currencyList.firstWhere(
+        (e) => e.key == 'NGN',
+        orElse: () => _currencyList.isNotEmpty
+            ? _currencyList.first
+            : Dict(key: 'NGN', value: 'NGN'),
+      );
+    });
+
     Navigator.pop(context, {'type': 'reset'});
   }
 
@@ -83,9 +139,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     Navigator.pop(context, {
       'type': 'filter',
       'amount': _amountController.text.trim(),
-      'currency': _selectedCurrency?.key,
-      // if later needed:
-      // 'multiplier': _selectedMultiplier,
+      'currency': _selectedCurrency?.key ?? 'NGN',
+      'multiplier': _selectedMultiplier,
     });
   }
 
@@ -93,36 +148,44 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 24),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                const SizedBox(height: 24),
 
-              _buildLabel("Amount"),
-              const SizedBox(height: 8),
-              _buildAmountInput(),
-              const SizedBox(height: 16),
+                _buildLabel("Amount"),
+                const SizedBox(height: 8),
+                _buildAmountInput(),
+                const SizedBox(height: 16),
 
-              _buildMultiplierRow(),
-              const SizedBox(height: 18),
+                _buildMultiplierRow(),
+                const SizedBox(height: 18),
 
-              _buildLabel("Currency"),
-              const SizedBox(height: 8),
-              _buildCurrencySection(),
-              const SizedBox(height: 24),
+                _buildLabel("Currency"),
+                const SizedBox(height: 8),
+                _buildCurrencySection(),
+                const SizedBox(height: 24),
 
-              _buildFooterButtons(),
-              const SizedBox(height: 10),
-            ],
+                _buildFooterButtons(),
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),
@@ -166,6 +229,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     return TextField(
       controller: _amountController,
       keyboardType: TextInputType.number,
+      scrollPadding: const EdgeInsets.only(bottom: 140),
       style: const TextStyle(
         fontFamily: 'Inter',
         fontSize: 16,
@@ -173,7 +237,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         color: Color(0xFF151E2F),
       ),
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintText: "Enter amount",
+        hintStyle: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: Color(0xFF717F9A),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         isDense: true,
         filled: true,
         fillColor: Colors.white,
@@ -202,7 +274,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           return Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: GestureDetector(
-              onTap: () => setState(() => _selectedMultiplier = m),
+              onTap: () => _applyMultiplier(m),
               child: _buildMultiplierChip(m, isSelected),
             ),
           );
@@ -217,7 +289,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF151E2F) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: isActive ? null : Border.all(color: const Color(0xFFECEFF5), width: 1),
+        border: isActive
+            ? null
+            : Border.all(color: const Color(0xFFECEFF5), width: 1),
         boxShadow: [
           if (!isActive)
             BoxShadow(
@@ -238,7 +312,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     );
   }
-  
+
   Widget _buildCurrencySection() {
     if (_loadingCurrencies) {
       return Container(
@@ -252,39 +326,26 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       );
     }
 
-    // ✅ If API fails / empty list, fallback to NGN + USD buttons
-    final List<String> keys = (_currencyList.isEmpty)
-        ? const ["NGN", "USD"]
-        : _currencyList
-            .map((e) => e.key)
-            .where((k) => k == "NGN" || k == "USD")
-            .toList();
-
-    // ✅ Ensure only NGN + USD shown, and always in correct order
-    final List<String> currencies = [
-      if (keys.contains("NGN")) "NGN",
-      if (keys.contains("USD")) "USD",
+    final currencies = <String>[
+      if (_currencyList.any((e) => e.key == 'NGN')) 'NGN',
+      if (_currencyList.any((e) => e.key == 'USD')) 'USD',
     ];
 
-    // default selection if none
+    // safety fallback
+    final safeCurrencies = currencies.isEmpty ? <String>['NGN', 'USD'] : currencies;
+
     final selectedKey = _selectedCurrency?.key;
     final activeKey =
-        (selectedKey == "NGN" || selectedKey == "USD") ? selectedKey : "NGN";
+        (selectedKey == 'NGN' || selectedKey == 'USD') ? selectedKey : 'NGN';
 
     return Row(
-      children: currencies.map((c) {
+      children: safeCurrencies.map((c) {
         final isActive = activeKey == c;
-
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(right: c != currencies.last ? 12 : 0),
+            padding: EdgeInsets.only(right: c != safeCurrencies.last ? 12 : 0),
             child: GestureDetector(
-              onTap: () {
-                // ✅ set selected currency as Dict for return payload
-                setState(() {
-                  _selectedCurrency = Dict(key: c, value: c);
-                });
-              },
+              onTap: () => setState(() => _selectedCurrency = Dict(key: c, value: c)),
               child: _buildCurrencyButtonSmall(c, isActive),
             ),
           ),
@@ -294,105 +355,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   Widget _buildCurrencyButtonSmall(String text, bool isActive) {
-    return Container(
-      height: 48,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF151E2F) : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFECEFF5), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF000000).withOpacity(0.11),
-            offset: const Offset(0, 4),
-            blurRadius: isActive ? 7 : 4,
-          ),
-        ],
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: isActive ? Colors.white : const Color(0xFF717F9A),
-        ),
-      ),
-    );
-  }
-  
-  // BIG icon button (for NGN + USD)
-  Widget _buildCurrencyIconButton(String key, bool isActive) {
-    final String emoji = key == 'USD' ? '🇺🇸' : '🇳🇬';
-    final String subtitle = key == 'USD' ? 'US Dollar' : 'Naira';
-
-    return Container(
-      height: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF151E2F) : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isActive ? const Color(0xFF151E2F) : const Color(0xFFECEFF5),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF000000).withOpacity(0.10),
-            offset: const Offset(0, 4),
-            blurRadius: isActive ? 10 : 6,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 44,
-            width: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: isActive ? Colors.white.withOpacity(0.12) : const Color(0xFFF6F9FF),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(emoji, style: const TextStyle(fontSize: 22)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  key,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: isActive ? Colors.white : const Color(0xFF151E2F),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: isActive ? Colors.white70 : const Color(0xFF717F9A),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (isActive)
-            const Icon(Icons.check_circle, color: Color(0xFF40A372), size: 20),
-        ],
-      ),
-    );
-  }
-
-  // Small button (screenshot style)
-  Widget _buildSmallCurrencyButton(String text, bool isActive) {
     return Container(
       height: 48,
       alignment: Alignment.center,
