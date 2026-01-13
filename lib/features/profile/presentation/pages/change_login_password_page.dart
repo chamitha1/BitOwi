@@ -618,7 +618,6 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         return Colors.white;
       }),
 
-      // ✅ normal + focused (blue) borders
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFFDAE0EE), width: 1.0),

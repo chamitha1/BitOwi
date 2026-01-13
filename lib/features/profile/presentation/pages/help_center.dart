@@ -280,7 +280,6 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
                             color: Color(0xFF151E2F),
                             fontFamily: 'Inter',
                           ),
-                          //  ✅ Prevent oversized images breaking accordion width
                           customWidgetBuilder: (element) {
                             if (element.localName == 'img') {
                               final src = element.attributes['src'];
@@ -299,8 +298,6 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
                             }
                             return null;
                           },
-
-                          // ✅ HTML styling (tables, paragraphs, emphasis)
                           customStylesBuilder: (element) {
                             switch (element.localName) {
                               case 'p':
@@ -338,8 +335,6 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
                             }
                             return null;
                           },
-
-                          // ✅ Link handling (production-ready)
                           onTapUrl: (url) async {
                             debugPrint('Tapped link: $url');
 
@@ -378,7 +373,6 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
 
 String cleanHtml(String rawHtml) {
   return rawHtml
-      // 1️⃣ Remove full document wrappers
       .replaceAll(RegExp(r'<!DOCTYPE[^>]*>', caseSensitive: false), '')
       .replaceAll(RegExp(r'<html[^>]*>', caseSensitive: false), '')
       .replaceAll(RegExp(r'</html>', caseSensitive: false), '')
@@ -388,16 +382,13 @@ String cleanHtml(String rawHtml) {
       )
       .replaceAll(RegExp(r'<body[^>]*>', caseSensitive: false), '')
       .replaceAll(RegExp(r'</body>', caseSensitive: false), '')
-      // 2️⃣ Remove fixed sizes (root cause of spacing issues)
       .replaceAll(RegExp(r'height:\s*[\d.]+px;?', caseSensitive: false), '')
       .replaceAll(RegExp(r'width:\s*[\d.]+%;?', caseSensitive: false), '')
       .replaceAll(RegExp(r'width:\s*[\d.]+px;?', caseSensitive: false), '')
-      // 3️⃣ Remove empty paragraphs (MAIN gap culprit)
       .replaceAll(
         RegExp(r'<p[^>]*>(&nbsp;|\s*)<\/p>', caseSensitive: false),
         '',
       )
-      // 4️⃣ Remove empty table rows (safe + precise)
       .replaceAll(
         RegExp(
           r'<tr[^>]*>\s*<td[^>]*>(&nbsp;|\s*)<\/td>\s*<\/tr>',

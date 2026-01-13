@@ -17,11 +17,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final userApi = UserApi();
-
-  // Only use Form for UI error rendering, but we will validate email separately on Verify
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController? _emailController; // Autocomplete manages it
+  TextEditingController? _emailController;
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
 
@@ -40,7 +38,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   String _verifiedSmsCode = "";
   String?
-  _verifiedEmail; // ✅ store verified email, so we only reset when it changes
+  _verifiedEmail;
 
   static const List<String> _emailDomains = <String>[
     'gmail.com',
@@ -61,10 +59,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     _confirmFocus.dispose();
     super.dispose();
   }
-
-  // ----------------------------
-  // UI helpers
-  // ----------------------------
 
   void _showTopError(String message) {
     // works on web + mobile (requires GetMaterialApp)
@@ -106,7 +100,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return e.toString().replaceFirst("Exception: ", "");
   }
 
-  // ✅ validate email only (used on Verify)
   String? _validateEmail(String? v) {
     final email = (v ?? "").trim();
     if (email.isEmpty) return "Please enter your email";
@@ -114,7 +107,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return null;
   }
 
-  // ✅ IMPORTANT: do not show password errors until email is verified
   String? _validatePassword(String? v) {
     if (!_isEmailVerified) return null;
     final pass = (v ?? "").trim();
@@ -183,7 +175,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           bizType: SmsBizType.forgetPwd,
           onVerifyPin: (pin) async {
             _verifiedSmsCode = pin;
-            return true; // if you have real verify endpoint, call it here
+            return true;
           },
           onResend: () async {
             return await userApi.sendOtp(
@@ -195,7 +187,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             Navigator.pop(context);
             setState(() {
               _isEmailVerified = true;
-              _verifiedEmail = email; // ✅ keep what was verified
+              _verifiedEmail = email; 
             });
             CustomSnackbar.showSuccess(
               title: "Success",
@@ -223,7 +215,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
-    // now validate passwords only
     final ok = _formKey.currentState?.validate() ?? false;
     if (!ok) return;
 
@@ -254,10 +245,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
-
-  // ----------------------------
-  // Build
-  // ----------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -430,10 +417,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
-
-  // ----------------------------
-  // Widgets
-  // ----------------------------
 
   Widget _textLabel(String text) {
     return Padding(
@@ -670,8 +653,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           _emailController!.addListener(() {
             final t = _emailController!.text.trim();
             final populated = t.isNotEmpty;
-
-            // ✅ reset ONLY if email actually changed from verified email
             if (_isEmailVerified &&
                 _verifiedEmail != null &&
                 t != _verifiedEmail) {

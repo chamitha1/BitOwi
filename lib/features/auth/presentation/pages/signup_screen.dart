@@ -95,10 +95,6 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  // ----------------------------
-  // Helpers
-  // ----------------------------
-
   void _showTopError(String message) {
     Get.snackbar(
       "Error",
@@ -142,10 +138,6 @@ class _SignupScreenState extends State<SignupScreen> {
     if (confirm != pass) return "Passwords do not match";
     return null;
   }
-
-  // ----------------------------
-  // OTP + Signup
-  // ----------------------------
 
   Future<void> _openOtpSheet() async {
     if (_sendingOtp) return;
@@ -191,7 +183,6 @@ class _SignupScreenState extends State<SignupScreen> {
           otpLength: 6,
           bizType: SmsBizType.register,
           onVerifyPin: (pin) async {
-            // ✅ If you have a real verify endpoint, call it here and return true/false.
             // final ok = await userApi.verifyOtp(email: email, bizType: SmsBizType.register, smsCode: pin);
             // return ok;
 
@@ -286,10 +277,6 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  // ----------------------------
-  // Build
-  // ----------------------------
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -342,7 +329,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             hint: "Enter your email",
                             iconPath: "assets/icons/sign_up/sms.svg",
                             suffixWidget: Padding(
-                              // ✅ SAME padding for Verify + Verified
                               padding: const EdgeInsets.only(
                                 right: 8,
                                 top: 8,
@@ -563,10 +549,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // ----------------------------
-  // Widgets
-  // ----------------------------
-
   Widget _textLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -624,8 +606,6 @@ class _SignupScreenState extends State<SignupScreen> {
           controller.addListener(() {
             final now = controller.text.trim();
             final populated = now.isNotEmpty;
-
-            // ✅ only reset verification if email actually changed
             if (_isEmailVerified && now != _lastEmail) {
               setState(() {
                 _isEmailVerified = false;
@@ -716,7 +696,6 @@ class _SignupScreenState extends State<SignupScreen> {
         fontSize: 16,
       ),
 
-      // ✅ error style + red borders
       errorStyle: const TextStyle(
         color: Color(0xFFE74C3C),
         fontSize: 12,
@@ -775,7 +754,6 @@ class _SignupScreenState extends State<SignupScreen> {
         return Colors.white;
       }),
 
-      // ✅ normal + focused (blue) borders
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFFDAE0EE), width: 1.0),

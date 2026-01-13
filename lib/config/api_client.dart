@@ -13,7 +13,7 @@ class ApiClient {
             connectTimeout: const Duration(seconds: 5),
             receiveTimeout: const Duration(seconds: 3),
             headers: {'Content-Type': 'application/json'},
-            responseType: ResponseType.plain, // as string to avoid MIME issues
+            responseType: ResponseType.plain, 
           ),
         )
         ..interceptors.add(
@@ -21,7 +21,6 @@ class ApiClient {
             onRequest: (options, handler) async {
               final token = await _getToken();
 
-              // ✅ FIXED: Only add Authorization header if token exists
               if (token != null && token.isNotEmpty && token != ' ') {
                 options.headers['Authorization'] = token;
                 print("Token being sent: '$token'");
