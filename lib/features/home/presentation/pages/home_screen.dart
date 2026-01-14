@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _navIndex,
         onTap: (index) {
           setState(() => _navIndex = index);
-          if (index == 3) {
+          if (index == 1) {
             // Profile index
             Get.find<UserController>().fetchNotificationCount();
           }
