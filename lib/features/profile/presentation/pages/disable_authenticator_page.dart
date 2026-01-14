@@ -224,7 +224,7 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
 
                       // Verification Code Field
                       const Text(
-                        "Verification Code",
+                        "Email Verification Code",
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Inter',
@@ -237,7 +237,7 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                         controller: _smsCodeController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          hintText: "Enter verification code",
+                          hintText: "Enter code",
                           hintStyle: const TextStyle(
                             fontSize: 16,
                             fontFamily: 'Inter',
