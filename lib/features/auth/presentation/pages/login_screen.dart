@@ -221,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(width: 8),
 
                             Text(
-                              'Remind me'.tr,
+                              'Remember me'.tr,
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,

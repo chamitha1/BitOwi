@@ -36,12 +36,28 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
   bool _isWithdrawAll = false;
   bool _isPasswordObscure = true;
-  final double _balance = 543488384.94;
+
+  final _verificationCodeController = TextEditingController();
+  final _authenticatorCodeController = TextEditingController();
+
+  // Verification State
+  bool _isSendingOtp = false;
+  bool _isVerified = false;
+  String _verifiedOtp = "";
+  String _userEmail = "";
 
   @override
   void initState() {
     super.initState();
     controller.setArgs(widget.symbol, widget.accountNumber);
+    _loadUserEmail();
+  }
+
+  void _loadUserEmail() {
+    final userController = Get.find<UserController>();
+    final user = userController.user.value;
+    _userEmail = user?.loginName ?? user?.email ?? "jonothan@gmail.com";
+    print("GOOGLE STATUS : ${user?.googleStatus}");
   }
 
   void _toggleWithdrawAll() {
@@ -74,66 +90,51 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
   bool _isWithdrawEnabled() {
     final amount = double.tryParse(controller.amountController.text) ?? 0.0;
+
+    final isGoogleEnabled = controller.googleStatus.value == '1';
+    final isGoogleCodeEntered =
+        !isGoogleEnabled || _authenticatorCodeController.text.isNotEmpty;
+
     return controller.addrController.text.isNotEmpty &&
         amount >= 10 &&
-        controller.tradeController.text.isNotEmpty;
+        controller.tradeController.text.isNotEmpty &&
+        _isVerified &&
+        isGoogleCodeEntered;
   }
 
   void _handleWithdraw() async {
     if (!_isWithdrawEnabled()) return;
 
-    if (!await controller.beforeSend()) return;
+    final googleCode = _authenticatorCodeController.text.trim();
 
-    if (!await controller.sendOtp(type: SmsBizType.withdraw)) return;
-
-    controller.clearInputs();
-    setState(() {
-      controller.calculateFee('');
-      _isWithdrawAll = false;
-    });
-
-    final userController = Get.find<UserController>();
-    final email =
-        userController.user.value?.loginName ??
-        userController.user.value?.email ??
-        '';
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: const Color(0xFF000000).withOpacity(0.4),
-      builder: (context) => OtpBottomSheet(
-        email: email,
-        otpLength: 6,
-        bizType: SmsBizType.withdraw,
-
-        onVerifyPin: (pin) async {
-          controller.emailController.text = pin;
-          return await controller.finalizeWithdrawal(pin);
-        },
-
-        onResend: () async {
-          return await controller.sendOtp();
-        },
-
-        onVerified: () {
-          Navigator.pop(context);
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            barrierColor: const Color(0xFF000000).withOpacity(0.4),
-            builder: (context) => SuccessDialog(
-              symbol: widget.symbol,
-              accountNumber: widget.accountNumber,
-              newTransaction: controller.lastWithdrawTransaction.value,
-            ),
-          );
-        },
-      ),
+    final success = await controller.createWithdrawRequest(
+      otp: _verifiedOtp,
+      googleCode: googleCode,
     );
+
+    if (success) {
+      controller.clearInputs();
+      _authenticatorCodeController.clear();
+      _verificationCodeController.clear();
+
+      setState(() {
+        controller.calculateFee('');
+        _isWithdrawAll = false;
+        _isVerified = false;
+        _verifiedOtp = "";
+      });
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: const Color(0xFF000000).withOpacity(0.4),
+        builder: (context) => SuccessDialog(
+          symbol: widget.symbol,
+          accountNumber: widget.accountNumber,
+          newTransaction: controller.lastWithdrawTransaction.value,
+        ),
+      );
+    }
   }
 
   @override
@@ -181,13 +182,14 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         fillColor: Colors.white,
                         hintText: "Enter withdraw address or scan code",
                         hintStyle: const TextStyle(
-                          color: Color(0xFFB9C6E2),
+                          color: Color(0xFF717F9A),
                           fontFamily: 'Inter',
-                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 16,
+                        contentPadding: const EdgeInsets.only(
+                          left: 10,
+                          right: 16,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -210,24 +212,26 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         suffixIcon: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  final result = await Get.to(
-                                    () => const AddressBookPage(isSelectionMode: true),
-                                  );
-                                  if (result != null && result is String) {
-                                    controller.addrController.text = result;
-                                  }
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/withdrawal/book.svg',
-                                    width: 20,
-                                    height: 20,
+                            GestureDetector(
+                              onTap: () async {
+                                final result = await Get.to(
+                                  () => const AddressBookPage(
+                                    isSelectionMode: true,
                                   ),
+                                );
+                                if (result != null && result is String) {
+                                  controller.addrController.text = result;
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: SvgPicture.asset(
+                                  'assets/icons/withdrawal/book.svg',
+                                  width: 20,
+                                  height: 20,
                                 ),
                               ),
+                            ),
                             GestureDetector(
                               onTap: () async {
                                 var status = await Permission.camera.request();
@@ -305,13 +309,14 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         fillColor: Colors.white,
                         hintText: "0.00",
                         hintStyle: const TextStyle(
-                          color: Color(0xFFB9C6E2),
+                          color: Color(0xFF717F9A),
                           fontFamily: 'Inter',
-                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 16,
+                        contentPadding: const EdgeInsets.only(
+                          left: 10,
+                          right: 16,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -410,12 +415,12 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         hintStyle: const TextStyle(
                           color: Color(0xFF717F9A),
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w400,
                           fontSize: 16,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 16,
+                        contentPadding: const EdgeInsets.only(
+                          left: 10,
+                          right: 16,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -456,7 +461,67 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     ),
                     const SizedBox(height: 24),
 
+                    // Verification Code
+                    _label("Verification code"),
+                    TextFormField(
+                      controller: _verificationCodeController,
+                      style: const TextStyle(
+                        color: Color(0xFF151E2F),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                      ),
+                      readOnly: true,
+                      decoration: _inputDecoration(
+                        hint: _userEmail,
+                        suffixWidget: Padding(
+                          padding: const EdgeInsets.only(
+                            right: 6,
+                            top: 6,
+                            bottom: 6,
+                          ),
+                          child: _verifyButton(
+                            text: _isVerified
+                                ? "Verified"
+                                : (_isSendingOtp ? "Sending..." : "Get a code"),
+                            onPressed: _handleGetCode,
+                            isEnabled: !_isSendingOtp && !_isVerified,
+                            isVerified: _isVerified,
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 24),
+
+                    Obx(() {
+                      final isGoogleEnabled =
+                          controller.googleStatus.value == '1';
+                      if (!isGoogleEnabled) return const SizedBox.shrink();
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _label("Authenticator code"),
+                          TextFormField(
+                            controller: _authenticatorCodeController,
+                            keyboardType: TextInputType.number,
+                            style: const TextStyle(
+                              color: Color(0xFF151E2F),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'Inter',
+                            ),
+                            decoration: _inputDecoration(
+                              hint: "Enter Authenticator Code",
+                            ),
+                            onChanged: (_) => setState(
+                              () {},
+                            ), // Refresh state to enable button
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      );
+                    }),
 
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -507,25 +572,16 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 130),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       height: 52,
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          gradient: _isWithdrawEnabled()
-                              ? const LinearGradient(
-                                  colors: [
-                                    Color(0xFF1D5DE5),
-                                    Color(0xFF174AB7),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                )
-                              : null,
+
                           color: _isWithdrawEnabled()
-                              ? null
+                              ? const Color(0xff1D5DE5)
                               : const Color(0xFFB9C6E2),
                         ),
                         child: ElevatedButton(
@@ -624,6 +680,229 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _label(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Color(0xFF2E3D5B),
+          fontFamily: 'Inter',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleGetCode() async {
+    if (_isSendingOtp || _isVerified) return;
+
+    setState(() => _isSendingOtp = true);
+
+    //OTP Send
+    final success = await controller.sendOtp(type: SmsBizType.withdraw);
+
+    if (!success) {
+      if (mounted) setState(() => _isSendingOtp = false);
+      return;
+    }
+
+    if (mounted) {
+      setState(() => _isSendingOtp = false);
+
+      final userController = Get.find<UserController>();
+      final email =
+          userController.user.value?.loginName ??
+          userController.user.value?.email ??
+          '';
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        barrierColor: const Color(0xFF000000).withOpacity(0.4),
+        builder: (context) => OtpBottomSheet(
+          email: email,
+          otpLength: 6,
+          bizType: SmsBizType.withdraw,
+
+          onVerifyPin: (pin) async {
+            final isValid = await controller.verifyOtp(pin);
+            if (isValid) {
+              _verifiedOtp = pin;
+            }
+            return isValid;
+          },
+
+          onResend: () async {
+            return await controller.sendOtp();
+          },
+
+          onVerified: () {
+            Navigator.pop(context);
+            setState(() {
+              _isVerified = true;
+              _verificationCodeController.text = _verifiedOtp;
+            });
+          },
+        ),
+      );
+    }
+  }
+
+  Widget _verifyButton({
+    required String text,
+    required VoidCallback onPressed,
+    required bool isEnabled,
+    bool isVerified = false,
+  }) {
+    return SizedBox(
+      height: 32,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isVerified
+              ? const Color(0xffEAF9F0)
+              : (isEnabled ? null : const Color(0XFFB9C6E2)),
+          gradient: (isEnabled && !isVerified)
+              ? const LinearGradient(
+                  colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(8),
+          border: isVerified
+              ? Border.all(color: const Color(0xFFABEAC6), width: 1.0)
+              : null,
+        ),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            disabledBackgroundColor: Colors.transparent,
+            disabledForegroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: isVerified ? 10 : 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: (isEnabled && !isVerified) ? onPressed : null,
+          child: isVerified
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/forgot_password/check_circle.svg",
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF40A372),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      text,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                        color: Color(0xFF40A372),
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                    color: Colors.white,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration({
+    required String hint,
+    bool enabled = true,
+    String? suffixIconPath,
+    Widget? suffixWidget,
+    bool isPassword = false,
+    bool isVisible = false,
+    VoidCallback? onToggleVisibility,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(
+        fontSize: 16,
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w400,
+        color: Color(0xFF717F9A),
+      ),
+      contentPadding: const EdgeInsets.only(left: 10, right: 16),
+      errorStyle: const TextStyle(
+        fontSize: 12,
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w400,
+        color: Color(0xFFE74C3C),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE74C3C), width: 1.0),
+      ),
+      suffixIcon: isPassword && suffixIconPath != null
+          ? Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: IconButton(
+                onPressed: enabled ? onToggleVisibility : null,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset(
+                    suffixIconPath,
+                    width: 20,
+                    height: 20,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xff2E3D5B),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : suffixWidget,
+      filled: true,
+      fillColor: Colors.white,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFDAE0EE), width: 1.0),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFDAE0EE), width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: Color.fromARGB(255, 112, 152, 221),
+          width: 1.0,
+        ),
       ),
     );
   }

@@ -102,6 +102,9 @@ class _ChangeTransactionPasswordPageState
       );
       print("ChangeTransactionPasswordPage: bindTradePwd result: $result");
 
+      //update tradePwdFlag
+      await Get.find<UserController>().loadUser();
+
       setState(() => _isLoading = false);
 
       Navigator.pop(context); // Go back

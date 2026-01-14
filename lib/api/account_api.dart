@@ -153,7 +153,6 @@ class AccountApi {
     return map;
   }
 
-  /// 📝TODO
   static Future<void> withdrawCheck(Map<String, dynamic> params) async {
     try {
       final res = await ApiClient.dio.post(
@@ -172,7 +171,6 @@ class AccountApi {
     }
   }
 
-  /// 📝TODO
   static Future<void> createWithdraw(Map<String, dynamic> params) async {
     try {
       final res = await ApiClient.dio.post(
@@ -235,7 +233,8 @@ class AccountApi {
           }
         }
       }
-
+      print(data);
+      // print(data['user']);
       return Account.fromJson(data);
     } catch (e) {
       print("getDetailAccount error: $e");
@@ -401,11 +400,17 @@ class AccountApi {
 
   static Future<List<CoinListRes>> getCoinList() async {
     try {
-      final res = await ApiClient.dio.post('/core/v1/coin/list_front', data: {});
+      final res = await ApiClient.dio.post(
+        '/core/v1/coin/list_front',
+        data: {},
+      );
       final data = res.data;
-      if (data is Map<String, dynamic> && (data['code'] == 200 || data['code'] == '200')) {
+      if (data is Map<String, dynamic> &&
+          (data['code'] == 200 || data['code'] == '200')) {
         final list = data['data'] as List<dynamic>;
-        return list.map((e) => CoinListRes.fromJson(e as Map<String, dynamic>)).toList();
+        return list
+            .map((e) => CoinListRes.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
       return [];
     } catch (e) {
@@ -416,13 +421,16 @@ class AccountApi {
 
   static Future<void> createAddress(Map<String, dynamic> params) async {
     try {
-      final res = await ApiClient.dio.post('/core/v1/personal_address/create', data: params);
+      final res = await ApiClient.dio.post(
+        '/core/v1/personal_address/create',
+        data: params,
+      );
       final data = res.data;
-       if (data['code'] == 200 || data['code'] == '200') {
-         return;
-       } else {
-         throw Exception(data['errorMsg'] ?? 'Failed to create address');
-       }
+      if (data['code'] == 200 || data['code'] == '200') {
+        return;
+      } else {
+        throw Exception(data['errorMsg'] ?? 'Failed to create address');
+      }
     } catch (e) {
       print("createAddress error: $e");
       rethrow;

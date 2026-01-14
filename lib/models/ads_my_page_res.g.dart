@@ -23,8 +23,9 @@ AdsMyPageRes _$AdsMyPageResFromJson(Map<String, dynamic> json) => AdsMyPageRes()
   ..status = json['status'] as String
   ..bankName = json['bankName'] as String?
   ..bankPic = json['bankPic'] as String?
-  ..userStatistics =
-      AdsHomeRes.fromJson(json['userStatistics'] as Map<String, dynamic>);
+  ..userStatistics = AdsHomeRes.fromJson(
+    json['userStatistics'] as Map<String, dynamic>,
+  );
 
 Map<String, dynamic> _$AdsMyPageResToJson(AdsMyPageRes instance) =>
     <String, dynamic>{
@@ -42,7 +43,7 @@ Map<String, dynamic> _$AdsMyPageResToJson(AdsMyPageRes instance) =>
       'userId': instance.userId,
       'leftCount': instance.leftCount,
       'status': instance.status,
-      'userStatistics': instance.userStatistics,
       'bankName': instance.bankName,
       'bankPic': instance.bankPic,
+      'userStatistics': instance.userStatistics,
     };

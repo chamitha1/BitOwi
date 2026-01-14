@@ -1,7 +1,7 @@
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
-import 'package:BitOwi/models/account.dart'; 
+import 'package:BitOwi/models/account.dart';
 import 'package:BitOwi/models/chain_symbol_list_res.dart'; // Added
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,6 +29,7 @@ class WithdrawController extends GetxController {
   var symbol = ''.obs;
   var accountNumber = ''.obs;
   var lastWithdrawTransaction = Rxn<Jour>();
+  var googleStatus = ''.obs;
 
   var coinList = <ChainSymbolListRes>[].obs;
   var selectedCoin = Rxn<ChainSymbolListRes>();
@@ -49,67 +50,68 @@ class WithdrawController extends GetxController {
     if (accountNumVal.isNotEmpty) {
       accountNumber.value = accountNumVal;
     } else {
-      // Fallback: Try to get from storage
+      // Fallback Try to get from storage
       final storedAcc = await StorageService.getAccountNumber();
-      print("WithdrawController: args account empty, fetched from storage: $storedAcc");
+      print(
+        "WithdrawController: args account empty, fetched from storage: $storedAcc",
+      );
       if (storedAcc != null) {
         accountNumber.value = storedAcc;
       }
     }
     getInitData();
-    
-    if(coinList.isNotEmpty && symbol.value.isNotEmpty){
-       final match = coinList.firstWhereOrNull((c) => c.symbol == symbol.value);
-       if(match != null) selectedCoin.value = match;
+
+    if (coinList.isNotEmpty && symbol.value.isNotEmpty) {
+      final match = coinList.firstWhereOrNull((c) => c.symbol == symbol.value);
+      if (match != null) selectedCoin.value = match;
     }
   }
 
   Future<void> fetchCoinList() async {
     try {
-      // isLoading.value = true; 
+      // isLoading.value = true;
       final list = await AccountApi.getChainSymbolList(withdrawFlag: '1');
       coinList.value = list;
 
       if (symbol.value.isNotEmpty) {
-           final match = coinList.firstWhereOrNull((c) => c.symbol == symbol.value);
-           if(match != null) selectedCoin.value = match;
+        final match = coinList.firstWhereOrNull(
+          (c) => c.symbol == symbol.value,
+        );
+        if (match != null) selectedCoin.value = match;
       } else if (coinList.isNotEmpty) {
-         
-         selectedCoin.value = coinList.first;
-         symbol.value = coinList.first.symbol ?? '';
-         getInitData();
+        selectedCoin.value = coinList.first;
+        symbol.value = coinList.first.symbol ?? '';
+        getInitData();
       }
-
     } catch (e) {
       print("Error fetching coin list: $e");
-    } 
+    }
   }
 
   var fee = 0.0.obs;
 
   void onCoinSelected(ChainSymbolListRes coin) {
-    if(coin.symbol == symbol.value) return;
+    if (coin.symbol == symbol.value) return;
 
     selectedCoin.value = coin;
     symbol.value = coin.symbol ?? '';
-    
+
     // Clear inputs when switching coins
     addrController.clear();
     amountController.clear();
     tradeController.clear();
     availableAmount.value = '0.00';
-    fee.value = 0.0; 
+    fee.value = 0.0;
 
     getInitData();
   }
 
   void calculateFee(String value) {
-    
-     if(ruleInfo.value?.withdrawFee != null){
-         fee.value = double.tryParse(ruleInfo.value!.withdrawFee!) ?? 0.0;
-     } else {
-        fee.value = 0.0;
-     }
+    if (ruleInfo.value?.withdrawFee != null) {
+      fee.value = double.tryParse(ruleInfo.value!.withdrawFee!) ?? 0.0;
+    } else {
+      fee.value = 0.0;
+    }
   }
 
   void getInitData() async {
@@ -124,24 +126,40 @@ class WithdrawController extends GetxController {
       // Fetch Rules
       print("Fetching rules for ${symbol.value}...");
       final ruleRes = await AccountApi.getWithdrawRuleDetail(symbol.value);
-      ruleInfo.value = ruleRes; 
-      
+      ruleInfo.value = ruleRes;
+
       // Update Fee from Rule
-      if(ruleRes.withdrawFee != null) {
-          fee.value = double.tryParse(ruleRes.withdrawFee!) ?? 0.0;
+      if (ruleRes.withdrawFee != null) {
+        fee.value = double.tryParse(ruleRes.withdrawFee!) ?? 0.0;
       }
 
       // Fetch Account Balance
       // print("Fetching details for ${symbol.value}...");
       final accountRes = await AccountApi.getDetailAccount(symbol.value);
 
-      note.value = ruleRes.withdrawRule ?? ''; 
-    
-      
+      note.value = ruleRes.withdrawRule ?? '';
+
       availableAmount.value = accountRes.availableAmount?.toString() ?? '0.00';
+      if (accountRes.user != null) {
+        googleStatus.value = accountRes.user?.googleStatus ?? '';
+        print(
+          "googleStatus from AccountRes ${googleStatus.value}",
+        );
+      }
+
+      // Fallback: If googleStatus is empt check global User state
+      if (googleStatus.value.isEmpty) {
+        final userController = Get.find<UserController>();
+        final globalStatus = userController.user.value?.googleStatus;
+        if (globalStatus != null && globalStatus.isNotEmpty) {
+          googleStatus.value = globalStatus;
+          print(
+            "googleStatus from UserController ${googleStatus.value}",
+          );
+        }
+      }
     } catch (e) {
       print("Error fetching withdraw init data: $e");
-      
     } finally {
       isLoading.value = false;
     }
@@ -153,16 +171,25 @@ class WithdrawController extends GetxController {
     final tradePwd = tradeController.text.trim();
 
     if (payCardNo.isEmpty) {
-      CustomSnackbar.showError(title: "Error", message: "Please enter withdrawal address or scan QR");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter withdrawal address or scan QR",
+      );
       return false;
     } else if (amount.isEmpty) {
-      CustomSnackbar.showError(title: "Error", message: "Please enter withdrawal amount");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter withdrawal amount",
+      );
       return false;
     } else if (double.tryParse(amount) == null) {
       CustomSnackbar.showError(title: "Error", message: "Invalid amount");
       return false;
     } else if (tradePwd.isEmpty) {
-      CustomSnackbar.showError(title: "Error", message: "Please enter transaction password");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please enter transaction password",
+      );
       return false;
     }
 
@@ -199,65 +226,83 @@ class WithdrawController extends GetxController {
 
   Future<bool> sendOtp({SmsBizType type = SmsBizType.withdraw}) async {
     final userController = Get.find<UserController>();
-    final email = userController.user.value?.loginName ??
+    final email =
+        userController.user.value?.loginName ??
         userController.user.value?.email;
 
     if (email == null) {
-      CustomSnackbar.showError(title: "Error", message: "Could not retrieve user email");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Could not retrieve user email",
+      );
       return false;
     }
 
     try {
       final res = await UserApi().sendOtp(email: email, bizType: type);
       if (res) {
-        CustomSnackbar.showSuccess(title: "Success", message: "OTP sent successfully");
+        CustomSnackbar.showSuccess(
+          title: "Success",
+          message: "OTP sent successfully",
+        );
         return true;
       } else {
         CustomSnackbar.showError(title: "Error", message: "Failed to send OTP");
         return false;
       }
     } catch (e) {
-      CustomSnackbar.showError(title: "Error", message: "Error sending OTP: $e");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Error sending OTP: $e",
+      );
       return false;
     }
   }
 
-  Future<bool> finalizeWithdrawal(String otp) async {
+  Future<bool> verifyOtp(String otp) async {
+   
+    return true;
+  }
+
+  Future<bool> createWithdrawRequest({
+    required String otp,
+    required String googleCode,
+  }) async {
     isLoading.value = true;
     try {
-      // Retrieve saved data
-      final tempData = await StorageService.getTempWithdrawData();
-      final savedAddr = tempData['addr'];
-      final savedAmount = tempData['amount'];
-      final savedPwd = tempData['pwd'];
+      final payCardNo = addrController.text.trim();
+      final amount = amountController.text.trim();
+      final tradePwd = tradeController.text.trim();
 
-      if (savedAddr == null || savedAmount == null || savedPwd == null) {
-        CustomSnackbar.showError(title: "Error", message: "Session expired. Please try again.");
+      if (payCardNo.isEmpty || amount.isEmpty || tradePwd.isEmpty) {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Please fill all fields",
+        );
         return false;
       }
 
-      print("Finalizing Withdrawal: Creating Withdrawal directly...");
+      print("Creating Withdrawal Request");
 
-      // Create Withdrawal
       final params = {
         "accountNumber": accountNumber.value,
-        "amount": savedAmount,
-        "payCardNo": savedAddr,
-        "tradePwd": savedPwd,
+        "amount": amount,
+        "payCardNo": payCardNo,
+        "tradePwd": tradePwd,
         "smsCaptcha": otp,
-        "googleSecret": googleController.text.trim(),
-        // "currency": symbol.value,
       };
 
-      await AccountApi.createWithdraw(params);
+      if (googleCode.isNotEmpty) {
+        params["googleSecret"] = googleCode;
+      }
 
-      await StorageService.clearTempWithdrawData();
+      await AccountApi.createWithdraw(params);
 
       //  Balance Update
       try {
         final currentBalance =
             double.tryParse(availableAmount.value.replaceAll(',', '')) ?? 0.0;
-        final withdrawAmount = double.tryParse(savedAmount) ?? 0.0;
+        final withdrawAmount = double.tryParse(amount) ?? 0.0;
         final newBalance = currentBalance - withdrawAmount;
         availableAmount.value = newBalance.toStringAsFixed(8);
 
@@ -273,7 +318,7 @@ class WithdrawController extends GetxController {
 
       final newTx = Jour(
         id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-        transAmount: "-$savedAmount",
+        transAmount: "-$amount",
         bizType: '2',
         currency: symbol.value,
         createDatetime: DateTime.now().millisecondsSinceEpoch,
@@ -285,9 +330,15 @@ class WithdrawController extends GetxController {
       );
 
       lastWithdrawTransaction.value = newTx;
+
+      CustomSnackbar.showSuccess(
+        title: "Success",
+        message: "Withdrawal request created successfully",
+      );
+
       return true;
     } catch (e) {
-      print("Finalize withdrawal error: $e");
+      print("Create withdrawal error: $e");
       String errorMsg = e.toString();
       if (errorMsg.startsWith("Exception: ")) {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");
@@ -299,9 +350,6 @@ class WithdrawController extends GetxController {
     }
   }
 
-  // Deprecated onApplyTap - kept empty or removed.
-  // rename it to avoid confusion or remove it if not overridden.
-  // Since the UI calls it via OtpBottomSheet, we should update the UI call in WithdrawScreen.
   Future<bool> onApplyTap() async {
     return false;
   }

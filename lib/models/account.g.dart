@@ -13,6 +13,9 @@ Account _$AccountFromJson(Map<String, dynamic> json) => Account(
   availableAmount: json['availableAmount'] as String?,
   frozenAmount: json['frozenAmount'] as String?,
   usableAmount: json['usableAmount'] as String?,
+  user: json['user'] == null
+      ? null
+      : User.fromJson(json['user'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
@@ -22,4 +25,5 @@ Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
   'availableAmount': instance.availableAmount,
   'frozenAmount': instance.frozenAmount,
   'usableAmount': instance.usableAmount,
+  'user': instance.user,
 };

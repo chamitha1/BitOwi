@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:BitOwi/models/user_model.dart';
 
 part 'account.g.dart';
 
@@ -10,6 +11,7 @@ class Account {
   final String? availableAmount;
   final String? frozenAmount;
   final String? usableAmount; 
+  final User? user;
 
   Account({
     this.accountType,
@@ -18,6 +20,7 @@ class Account {
     this.availableAmount,
     this.frozenAmount,
     this.usableAmount,
+    this.user,
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => _$AccountFromJson(json);

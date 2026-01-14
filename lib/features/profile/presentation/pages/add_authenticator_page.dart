@@ -139,8 +139,9 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
             print("AddAuthenticatorPage: Resend sendOtp success: $success");
             return success;
           },
-          onVerified: () {
+          onVerified: () async {
             Navigator.pop(context); // Close OTP Sheet
+            await Get.find<UserController>().loadUser();
             _showSuccessDialog();
           },
         ),
