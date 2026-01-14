@@ -479,7 +479,7 @@ class KycPersonalInformationPage extends StatelessWidget {
                             child: Row(
                               children: [
                                 SvgPicture.asset(
-                                  idType.value == "passport"
+                                  idType.value.toLowerCase() == "passport"
                                       ? "assets/icons/merchant_details/passport.svg"
                                       : "assets/icons/merchant_details/personalcard.svg",
                                   height: 48,

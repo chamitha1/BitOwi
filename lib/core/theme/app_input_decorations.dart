@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 
 class AppInputDecorations {
   static InputDecoration textField({
-    required String hintText,
+    String? hintText, // ← optional
     Widget? suffixIcon,
     Widget? prefixIcon,
   }) {
     return InputDecoration(
       hintText: hintText,
-      hintStyle: const TextStyle(
-        fontFamily: 'Inter',
-        fontWeight: FontWeight.w400,
-        fontSize: 14,
-        color: Color(0xFF717F9A),
-      ),
+      hintStyle: hintText == null
+          ? null
+          : const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+              color: Color(0xFF717F9A),
+            ),
       filled: true,
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

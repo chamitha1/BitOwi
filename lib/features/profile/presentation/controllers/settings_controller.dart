@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
-  /// ----------------------- Me -----------------------
+  /// ====================== Me ======================
 
   final RxBool userAvatarLoading = false.obs;
   final RxBool userNicknameLoading = false.obs;
@@ -136,7 +136,7 @@ class SettingsController extends GetxController {
     userController.userName.value = nickname;
   }
 
-  /// ----------------------- Preferred Currency -----------------------
+  /// ====================== Preferred Currency ======================
 
   final RxBool currencyLoading = false.obs;
 
@@ -200,4 +200,7 @@ class SettingsController extends GetxController {
       currencyUpdating.value = false;
     }
   }
+
+  /// ====================== ADD BANK CARD ======================
+  
 }
