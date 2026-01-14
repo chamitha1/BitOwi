@@ -11,4 +11,8 @@ class StringUtils {
             word[0].toUpperCase() + word.substring(1))
         .join(' ');
   }
+  static String removeAllHtmlTags(String htmlText) {
+    RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+    return htmlText.replaceAll(exp, '');
+  }
 }

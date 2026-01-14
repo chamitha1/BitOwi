@@ -76,8 +76,47 @@ class HomeHeader extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         GestureDetector(
-          onTap: () => Get.to(() => const NotificationsPage()),
-          child: _headerIconButton("assets/icons/home/notification.svg"),
+          onTap: () {
+            Get.to(() => const NotificationsPage())?.then((_) {
+              controller.fetchNotificationCount();
+            });
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              _headerIconButton("assets/icons/home/notification.svg"),
+              Obx(() {
+                if (controller.notificationCount.value > 0) {
+                  return Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFF4D4F),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          controller.notificationCount.value.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox();
+              }),
+            ],
+          ),
         ),
         const SizedBox(width: 12),
         // _headerIconButton("assets/icons/home/headphones.png"),

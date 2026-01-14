@@ -2,6 +2,7 @@ import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/models/sms_model.dart';
 import 'package:BitOwi/features/notifications/presentation/pages/notification_detail_page.dart';
 import 'package:BitOwi/features/notifications/presentation/widgets/confirm_read_dialog.dart';
+import 'package:BitOwi/utils/string_utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -295,7 +296,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            item.content,
+            StringUtils.removeAllHtmlTags(item.content),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
