@@ -12,6 +12,13 @@ import 'package:get/get.dart';
 class BalanceHistoryPage extends GetView<BalanceHistoryController> {
   const BalanceHistoryPage({super.key});
 
+  String _shortRemark(String text, int max) {
+    final t = text.trim();
+    if (t.length <= max) return t;
+    return '${t.substring(0, max)}...';
+  }
+
+
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<BalanceHistoryController>()) {
@@ -400,17 +407,19 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                if (tx.remark != null && tx.remark!.isNotEmpty)
-                  Text(
-                    tx.remark!,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: Color(0xFF717F9A),
-                    ),
+                if (tx.remark != null && tx.remark!.trim().isNotEmpty)
+                Text(
+                  _shortRemark(tx.remark!, 15),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    color: Color(0xFF717F9A),
                   ),
-              ],
+                ),
+              ]
             ),
           ],
         ),
