@@ -8,8 +8,16 @@ class AddressCard extends StatelessWidget {
   final PersonalAddressListRes? apiItem;
 
   final VoidCallback? onMoreTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
-  const AddressCard({super.key, required this.apiItem, this.onMoreTap});
+  const AddressCard({
+    super.key,
+    required this.apiItem,
+    this.onMoreTap,
+    this.onEdit,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,13 +102,22 @@ class AddressCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // 3-dot
-              // GestureDetector(
-              //   onTap: onMoreTap,
-              //   child: SvgPicture.asset(
-              //     'assets/icons/profile_page/address/dots.svg',
-              //   ),
-              // ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: onDelete,
+                child: _buildActionIcon(
+                  'assets/icons/profile_page/address/trash.svg',
+                  const Color(0xFFFDF4F5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: onEdit,
+                child: _buildActionIcon(
+                  'assets/icons/profile_page/address/edit.svg',
+                  const Color(0xFFF6F9FF),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -204,6 +221,19 @@ class AddressCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildActionIcon(String iconPath, Color bgColor) {
+    return Container(
+      width: 26,
+      height: 26,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: SvgPicture.asset(iconPath, width: 20, height: 20),
     );
   }
 }

@@ -436,42 +436,59 @@ class AccountApi {
     }
   }
 
-  /// 📝TODO
   static Future<void> editAddress(Map<String, dynamic> params) async {
-    // try {
-    //   final id = await HttpUtil.post(
-    //     '/core/v1/personal_address/modify',
-    //     params,
-    //   );
-    //   return id;
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/personal_address/modify',
+        data: params,
+      );
+      final data = res.data;
+      if (data['code'] == 200 || data['code'] == '200') {
+        return;
+      } else {
+        throw Exception(data['errorMsg'] ?? 'Failed to update address');
+      }
+    } catch (e) {
+      print("editAddress error: $e");
+      rethrow;
+    }
   }
 
-  /// 📝TODO
   static Future<void> deleteAddress(String id) async {
-    // try {
-    //   await HttpUtil.post('/core/v1/personal_address/remove/$id');
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/personal_address/remove/$id',
+      );
+      final data = res.data;
+      if (data['code'] == 200 || data['code'] == '200') {
+        return;
+      } else {
+        throw Exception(data['errorMsg'] ?? 'Failed to delete address');
+      }
+    } catch (e) {
+      print("deleteAddress error: $e");
+      rethrow;
+    }
   }
 
-  /// 📝TODO
-  // static Future<PersonalAddressListRes> getAddressDetail(String id) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post(
-  //   //     '/core/v1/personal_address/detail_front/$id',
-  //   //   );
-  //   //   return PersonalAddressListRes.fromJson(CommonUtils.removeNullKeys(res));
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
+  static Future<PersonalAddressListRes> getAddressDetail(String id) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/personal_address/detail_front/$id',
+      );
+      final resData = res.data;
+      if (resData['code'] == 200 || resData['code'] == '200') {
+        return PersonalAddressListRes.fromJson(resData['data']);
+      } else {
+        throw Exception(
+          resData['errorMsg'] ?? 'Failed to fetching address detail',
+        );
+      }
+    } catch (e) {
+      print("getAddressDetail error: $e");
+      rethrow;
+    }
+  }
 
   /// 📝TODO
   // static Future<AccountAssetRes> getHomeAsset([String? currency]) async {

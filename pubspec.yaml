@@ -126,6 +126,7 @@
       - assets/app_icons/
       - assets/images/public/
       - assets/icons/profile_page/about_us/
+      - assets/icons/orders/
 
 
     # An image asset can refer to one or more resolution-specific "variants", see

@@ -6,7 +6,8 @@ import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 
 class AddAddressPage extends StatefulWidget {
-  const AddAddressPage({super.key});
+  final String? editId;
+  const AddAddressPage({super.key, this.editId});
 
   @override
   State<AddAddressPage> createState() => _AddAddressPageState();
@@ -34,14 +35,22 @@ class _AddAddressPageState extends State<AddAddressPage> {
     });
     try {
       final list = await AccountApi.getCoinList();
+      
+      if (widget.editId != null) {
+        final detail = await AccountApi.getAddressDetail(widget.editId!);
+        _nameController.text = detail.name;
+        _addressController.text = detail.address;
+        
+        if (list.isNotEmpty) {
+           final coin = list.firstWhereOrNull(
+            (e) => e.symbol?.toUpperCase() == detail.symbol.toUpperCase(),
+          );
+          _selectedCoin = coin ?? list.first;
+        }
+      }
+
       setState(() {
         _coins = list;
-        if (_coins.isNotEmpty) {
-          final usdt = _coins.firstWhereOrNull(
-            (e) => e.symbol?.toUpperCase() == 'USDT',
-          );
-          _selectedCoin = usdt ?? _coins.first;
-        }
         _isLoadingConfig = false;
       });
       print("Fetched ${_coins.length} coins");
@@ -49,10 +58,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
       setState(() {
         _isLoadingConfig = false;
       });
-      print("Error fetching coins: $e");
+      print("Error fetching data: $e");
       CustomSnackbar.showError(
         title: "Error",
-        message: "Failed to load currencies",
+        message: "Failed to load data",
       );
     }
   }
@@ -85,11 +94,20 @@ class _AddAddressPageState extends State<AddAddressPage> {
     });
 
     try {
-      await AccountApi.createAddress({
-        "name": name,
-        "address": address,
-        "symbol": _selectedCoin!.symbol,
-      });
+      if (widget.editId != null) {
+        await AccountApi.editAddress({
+          "id": widget.editId,
+          "name": name,
+          "address": address,
+          "symbol": _selectedCoin!.symbol,
+        });
+      } else {
+        await AccountApi.createAddress({
+          "name": name,
+          "address": address,
+          "symbol": _selectedCoin!.symbol,
+        });
+      }
 
       _nameController.clear();
       _addressController.clear();
@@ -97,7 +115,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
       
       CustomSnackbar.showSuccess(
         title: "Success",
-        message: "Address saved successfully",
+        message: widget.editId != null ? "Address updated successfully" : "Address saved successfully",
       );
       
       await Future.delayed(const Duration(milliseconds: 500));
@@ -136,7 +154,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
         automaticallyImplyLeading: false,
-        titleSpacing: 20,
+        titleSpacing: 0,
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/merchant_details/arrow_left.svg',
@@ -147,9 +165,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
           ),
           onPressed: () => Navigator.pop(context, _hasSaved),
         ),
-        title: const Text(
-          "Add Address",
-          style: TextStyle(
+        title: Text(
+          widget.editId != null ? "Edit Address" : "Add Address",
+          style: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
             fontSize: 20,
@@ -218,9 +236,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          "Save Address",
-                          style: TextStyle(
+                      : Text(
+                          widget.editId != null ? "Confirm" : "Save Address",
+                          style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
@@ -254,7 +272,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xffF6F9FF),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFDAE0EE)),
       ),
@@ -320,7 +338,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Color(0xffF6F9FF),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFDAE0EE)),
             ),

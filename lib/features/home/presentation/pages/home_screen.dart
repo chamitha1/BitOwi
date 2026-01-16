@@ -11,6 +11,7 @@ import '../../../../features/profile/presentation/pages/profile_screen.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import '../../../../features/p2p/presentation/pages/p2p_page.dart';
 import 'dart:convert';
+import 'package:BitOwi/features/orders/presentation/pages/orders_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -94,9 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               // Index 1: P2P
-              // const P2PPage(),
-              // Index 2: Order (Placeholder)
-              // const P2PPage(),
+              const P2PPage(),
+              // Index 2: Order
+              const OrdersPage(),
               // Index 3: Profile
               const ProfileScreen(),
             ],

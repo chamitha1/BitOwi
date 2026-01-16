@@ -3,6 +3,8 @@ import 'package:BitOwi/features/address_book/data/models/address_item.dart';
 import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:BitOwi/features/address_book/presentation/widgets/address_card.dart';
 import 'package:BitOwi/features/address_book/presentation/pages/add_address_page.dart';
+import 'package:BitOwi/features/address_book/presentation/widgets/delete_confirmation_dialog.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -196,7 +198,57 @@ class _AddressBookPageState extends State<AddressBookPage> {
                               Get.back(result: item.address);
                             }
                           },
-                          child: AddressCard(apiItem: item),
+                          child: AddressCard(
+                            apiItem: item,
+                            onEdit: () async {
+                              final result = await Get.to(
+                                () => AddAddressPage(editId: item.id),
+                              );
+                              if (result == true) {
+                                _fetchAddresses();
+                              }
+                            },
+                            onDelete: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  bool isDeleting = false;
+                                  return StatefulBuilder(
+                                    builder: (context, setDialogState) {
+                                      return DeleteConfirmationDialog(
+                                        isDeleting: isDeleting,
+                                        onConfirm: () async {
+                                          setDialogState(() {
+                                            isDeleting = true;
+                                          });
+                                          try {
+                                            await AccountApi.deleteAddress(item.id);
+                                            if (context.mounted) {
+                                              Navigator.pop(context);
+                                            }
+                                            _fetchAddresses();
+                                            CustomSnackbar.showSuccess(
+                                              title: "Success",
+                                              message: "Address deleted successfully",
+                                            );
+                                          } catch (e) {
+                                            print("Delete error: $e");
+                                            setDialogState(() {
+                                              isDeleting = false;
+                                            });
+                                            CustomSnackbar.showError(
+                                              title: "Error",
+                                              message: e.toString().replaceFirst("Exception: ", ""),
+                                            );
+                                          }
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         );
                       },
                     ),
