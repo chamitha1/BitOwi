@@ -312,16 +312,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               color: Color(0XFF151E2F),
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            "Set up your profile with strong protection for safe crypto trading and storage.",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff717F9A),
-                            ),
-                          ),
                           const SizedBox(height: 28),
 
                           _textLabel("Email"),
@@ -365,7 +355,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               enabled: _isEmailVerified,
                               onToggleVisibility: () {
                                 setState(() {
-                                  _isNewPasswordVisible = !_isNewPasswordVisible;
+                                  _isNewPasswordVisible =
+                                      !_isNewPasswordVisible;
                                 });
                               },
                             ),
@@ -430,16 +421,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                     width: 1.0,
                                     style: BorderStyle.solid,
                                   ),
-                                  fillColor: MaterialStateProperty.resolveWith(
-                                    (states) {
-                                      if (states.contains(
-                                        MaterialState.selected,
-                                      )) {
-                                        return const Color(0xFF1D5DE5);
-                                      }
-                                      return Colors.white;
-                                    },
-                                  ),
+                                  fillColor: MaterialStateProperty.resolveWith((
+                                    states,
+                                  ) {
+                                    if (states.contains(
+                                      MaterialState.selected,
+                                    )) {
+                                      return const Color(0xFF1D5DE5);
+                                    }
+                                    return Colors.white;
+                                  }),
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -738,7 +729,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     width: 20,
                     height: 20,
                     colorFilter: const ColorFilter.mode(
-                      Color(0xff2E3D5B),
+                      Color(0xff717F9A),
                       BlendMode.srcIn,
                     ),
                   ),
