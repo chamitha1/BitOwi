@@ -1,8 +1,11 @@
 import 'package:BitOwi/features/orders/presentation/widgets/order_card.dart';
 import 'package:BitOwi/features/orders/presentation/controllers/orders_controller.dart';
+import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
+import 'package:BitOwi/features/orders/utils/order_helper.dart';
+import 'package:BitOwi/models/trade_order_page_res.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
 
 class OrdersPage extends GetView<OrdersController> {
   const OrdersPage({super.key});
@@ -50,107 +53,75 @@ class OrdersPage extends GetView<OrdersController> {
 
               const SizedBox(height: 24),
 
-              // order cards
+              // Order Cards
               Expanded(
                 child: Obx(() {
-                  List<Widget> orders = [];
-
-                  if (controller.currentTabIndex.value == 0) {
-                    orders = [
-                      OrderCard(
-                        orderNo: "19714381",
-                        status: OrderStatus.pending,
-                        title: "Sell ETH",
-                        date: "03/26, 10.30",
-                        quantity: "1.00000845",
-                        total: "3,578,584.95",
-                        userName: "Brandy Schimmel",
-                        userAvatar: "assets/icons/orders/Avatar.png",
-                        isCertified: true,
-                        hasUnreadMessages: true,
-                        onTap: () => Get.to(() => OrderDetailsPage(
-                              status: OrderStatus.pendingPayment,
-                            )),
-                      ),
-                      OrderCard(
-                        orderNo: "19714382",
-                        status: OrderStatus.pendingPayment,
-                        title: "Sell ETH",
-                        date: "03/26, 11.15",
-                        quantity: "0.005",
-                        total: "2,000,000.00",
-                        userName: "John Doe",
-                        userAvatar: "assets/icons/orders/Avatar1.png",
-                        isCertified: false,
-                        hasUnreadMessages: false,
-                        onTap: () => Get.to(() => OrderDetailsPage(
-                              status: OrderStatus.pendingPayment,
-                            )),
-                      ),
-                      OrderCard(
-                        orderNo: "19714385",
-                        status: OrderStatus.arbitration,
-                        title: "Sell ETH",
-                        date: "03/25, 14.20",
-                        quantity: "500.00",
-                        total: "750,000.00",
-                        userName: "Alex Smith",
-                        userAvatar: "assets/icons/orders/Avatar1.png",
-                        isCertified: true,
-                        hasUnreadMessages: true,
-                        onTap: () => Get.to(() => OrderDetailsPage(
-                              status: OrderStatus.arbitration,
-                            )),
-                      ),
-                    ];
-                  } else if (controller.currentTabIndex.value == 1) {
-                    // Completed
-                    orders = [
-                      OrderCard(
-                        orderNo: "19714383",
-                        status: OrderStatus.completed,
-                        title: "Sell ETH",
-                        date: "03/25, 09.30",
-                        quantity: "0.5",
-                        total: "1,789,292.47",
-                        userName: "Jane Tech",
-                        userAvatar: "assets/icons/orders/Avatar.png",
-                        isCertified: true,
-                        hasUnreadMessages: false,
-                        onTap: () => Get.to(() => OrderDetailsPage(
-                              status: OrderStatus.completed,
-                            )),
-                      ),
-                    ];
-                  } else {
-                    // Cancelled
-                    orders = [
-                      OrderCard(
-                        orderNo: "19714384",
-                        status: OrderStatus.cancelled,
-                        title: "Sell ETH",
-                        date: "03/24, 18.00",
-                        quantity: "10.0",
-                        total: "150,000.00",
-                        userName: "Crypto King",
-                        userAvatar: "assets/icons/orders/Avatar1.png",
-                        isCertified: false,
-                        hasUnreadMessages: false,
-                        onTap: () => Get.to(() => OrderDetailsPage(
-                              status: OrderStatus.cancelled,
-                            )),
-                      ),
-                    ];
+                  if (controller.isLoading.value &&
+                      controller.ordersList.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
                   }
 
-                  return ListView(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    children: orders,
+                  if (controller.ordersList.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No records',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF717F9A),
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    );
+                  }
+
+                  return EasyRefresh(
+                    onRefresh: () async {
+                      await controller.refresh();
+                    },
+                    onLoad: controller.isEnd.value
+                        ? null
+                        : () async {
+                            await controller.loadMore();
+                          },
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      itemCount: controller.ordersList.length,
+                      itemBuilder: (context, index) {
+                        return _buildOrderCard(controller.ordersList[index]);
+                      },
+                    ),
                   );
                 }),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(TradeOrderItem orderItem) {
+    // is user buyer or seller
+    final isBuyer = orderItem.buyUser != null;
+
+    return OrderCard(
+      orderNo: orderItem.id ?? '',
+      status: OrderHelper.mapApiStatusToOrderStatus(orderItem.status),
+      title: '${isBuyer ? 'Buy' : 'Sell'} ${orderItem.tradeCoin ?? ''}',
+      date: OrderHelper.formatDateTime(orderItem.createDatetime),
+      quantity: orderItem.count ?? '0',
+      total: orderItem.tradeAmount ?? '0',
+      userName: isBuyer
+          ? (orderItem.sellerNickname ?? 'Unknown')
+          : (orderItem.buyerNickname ?? 'Unknown'),
+      userAvatar: isBuyer
+          ? (orderItem.sellerPhoto ?? '')
+          : (orderItem.buyerPhoto ?? ''),
+      isCertified: false, 
+      hasUnreadMessages: false, 
+      onTap: () => Get.to(
+        () => OrderDetailsPage(
+          status: OrderHelper.mapApiStatusToOrderStatus(orderItem.status),
         ),
       ),
     );

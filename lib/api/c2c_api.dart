@@ -56,3 +56,17 @@ class C2CApi {
     }
   }
 }
+
+  // static Future<PageInfo<TradeOrderPageRes>> getTradeOrderPageList(
+  //     Map<String, dynamic> data) async {
+  //   try {
+  //     final res =
+  //         await HttpUtil.post('/core/v1/trade_order/my_page_front', data);
+  //     return PageInfo.fromJson<TradeOrderPageRes>(
+  //         res, TradeOrderPageRes.fromJson);
+  //   } catch (e) {
+  //     e.printError();
+  //     rethrow;
+  //   }
+  // }
+

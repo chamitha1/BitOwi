@@ -12,8 +12,8 @@ BankcardListRes _$BankcardListResFromJson(Map<String, dynamic> json) =>
       ..bankcardNumber = json['bankcardNumber'] as String?
       ..bankName = json['bankName'] as String?
       ..realName = json['realName'] as String
-      ..currency = json['currency'] as String?
       ..bindMobile = json['bindMobile'] as String?
+      ..currency = json['currency'] as String?
       ..type = json['type'] as String?
       ..pic = json['pic'] as String?;
 
@@ -23,8 +23,8 @@ Map<String, dynamic> _$BankcardListResToJson(BankcardListRes instance) =>
       'bankcardNumber': instance.bankcardNumber,
       'bankName': instance.bankName,
       'realName': instance.realName,
-      'currency': instance.currency,
       'bindMobile': instance.bindMobile,
+      'currency': instance.currency,
       'type': instance.type,
-      'pic': instance.pic
+      'pic': instance.pic,
     };

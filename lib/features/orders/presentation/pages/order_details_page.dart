@@ -6,11 +6,8 @@ import 'package:BitOwi/features/orders/presentation/widgets/order_card.dart';
 
 class OrderDetailsPage extends StatelessWidget {
   final OrderStatus status;
-  
-  const OrderDetailsPage({
-    super.key,
-    this.status = OrderStatus.pendingPayment,
-  });
+
+  const OrderDetailsPage({super.key, this.status = OrderStatus.pendingPayment});
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +170,8 @@ class OrderDetailsPage extends StatelessWidget {
         iconPath = 'assets/icons/orders/clock.svg';
         bgColor = const Color(0xFFFFFBF6);
         title = 'Payment Pending';
-        subtitle = 'Order will be held until 12:00:00 and will be cancelled after deadline';
+        subtitle =
+            'Order will be held until 12:00:00 and will be cancelled after deadline';
         break;
       case OrderStatus.pendingReleased:
         iconPath = 'assets/icons/orders/lock.svg';
@@ -213,16 +211,9 @@ class OrderDetailsPage extends StatelessWidget {
         Container(
           width: 64,
           height: 64,
-          decoration: BoxDecoration(
-            color: bgColor,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
           child: Center(
-            child: SvgPicture.asset(
-              iconPath,
-              width: 32,
-              height: 32,
-            ),
+            child: SvgPicture.asset(iconPath, width: 32, height: 32),
           ),
         ),
         const SizedBox(height: 16),
@@ -528,8 +519,7 @@ class OrderDetailsPage extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {
-                },
+                onPressed: () {},
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
@@ -551,9 +541,7 @@ class OrderDetailsPage extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-      
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1D5DE5),
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -578,8 +566,7 @@ class OrderDetailsPage extends StatelessWidget {
       case OrderStatus.pendingReleased:
         //outlined button
         return OutlinedButton(
-          onPressed: () {
-          },
+          onPressed: () {},
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
@@ -601,8 +588,7 @@ class OrderDetailsPage extends StatelessWidget {
       case OrderStatus.cryptoReleased:
         // filled button
         return ElevatedButton(
-          onPressed: () {
-          },
+          onPressed: () {},
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1D5DE5),
             padding: const EdgeInsets.symmetric(vertical: 16),
