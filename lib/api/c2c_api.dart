@@ -1,10 +1,66 @@
 import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
 import 'package:BitOwi/models/ads_my_page_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:flutter/material.dart';
 
 class C2CApi {
+  //  /// Add new ad
+  // static Future<void> createAds(Map<String, dynamic> data) async {
+  //   try {
+  //     await ApiClient.dio.post('/core/v1/ads/create', data);
+  //   } catch (e) {
+  //     e.printError();
+  //     rethrow;
+  //   }
+  // }
+
+  /// get price
+  static Future<String> getPrice(Map<String, dynamic> data) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/ads/get_price',
+        data: data,
+      );
+
+      final responseData = res.data['data'];
+      return responseData["truePrice"];
+    } catch (e) {
+      print("getPrice error: $e");
+      rethrow;
+    }
+  }
+
+  /// Get ad details
+  static Future<AdsDetailRes> getAdsInfo(
+    String id, {
+    String? tradeAmount,
+    String? count,
+  }) async {
+    try {
+      final res = await ApiClient.dio.post(
+        "/core/v1/ads/detail_front",
+        data: {"id": id, "tradeAmount": tradeAmount, "count": count},
+      );
+      final resData = res.data;
+      return AdsDetailRes.fromJson(resData['data']);
+    } catch (e) {
+      print("getAdsInfo error: $e");
+      rethrow;
+    }
+  }
+
+  // /// Edit ad
+  // static Future<void> editAds(Map<String, dynamic> data) async {
+  //   try {
+  //     await ApiClient.dio.post('/core/v1/ads/edit_ads', data);
+  //   } catch (e) {
+  //     e.printError();
+  //     rethrow;
+  //   }
+  // }
+
   static Future<AdsHomeRes> getOtherUserAdsHome(String master) async {
     try {
       final res = await ApiClient.dio.post(
@@ -61,7 +117,7 @@ class C2CApi {
   //     Map<String, dynamic> data) async {
   //   try {
   //     final res =
-  //         await HttpUtil.post('/core/v1/trade_order/my_page_front', data);
+  //         await ApiClient.dio.post('/core/v1/trade_order/my_page_front', data);
   //     return PageInfo.fromJson<TradeOrderPageRes>(
   //         res, TradeOrderPageRes.fromJson);
   //   } catch (e) {

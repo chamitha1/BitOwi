@@ -43,7 +43,7 @@ class BitOwi extends StatelessWidget {
             Get.put(UserController(), permanent: true);
             Get.put(SettingsController(), permanent: true);
           }),
-          home: null,
+          // home: null,
           initialRoute: Routes.splash,
           getPages: AppPages.routes,
         );

@@ -1,3 +1,4 @@
+import 'package:BitOwi/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -6,6 +7,7 @@ import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/dict.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
+import 'package:get/get.dart';
 
 import '../widgets/p2p_order_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
@@ -226,7 +228,7 @@ class _P2PPageState extends State<P2PPage> {
         ),
         GestureDetector(
           onTap: () {
-            // TODO: Navigate to Post Ad
+            Get.toNamed(Routes.postAdsPage);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

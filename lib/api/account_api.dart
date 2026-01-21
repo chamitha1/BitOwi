@@ -2,6 +2,7 @@ import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/models/account.dart';
 import 'package:BitOwi/models/account_asset_res.dart';
 import 'package:BitOwi/models/account_detail_res.dart';
+import 'package:BitOwi/models/bankcard_channel_list_res.dart';
 import 'package:BitOwi/models/bankcard_list_res.dart';
 import 'package:BitOwi/models/chain_symbol_list_res.dart';
 import 'package:BitOwi/models/withdraw_page_res.dart';
@@ -13,6 +14,7 @@ import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
 import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
+import 'package:dio/dio.dart';
 
 class AccountApi {
   static Future<AccountDetailAssetRes> getBalanceAccount({
@@ -267,7 +269,6 @@ class AccountApi {
       );
       final data = res.data;
       print('AddressBook Response: $data');
-
       if (data is Map<String, dynamic> && data['code'] == '200') {
         final listData = data['data'] as List<dynamic>;
         return listData
@@ -289,60 +290,78 @@ class AccountApi {
     }
   }
 
-  //📝TODO
-  static Future<void> createBankCard(Map<String, dynamic> params) async {
-    // try {
-    //   final id = await HttpUtil.post('/core/v1/bankcard/create', params);
-    //   return id;
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+  /// Add new bank card
+  static Future<Response<dynamic>> createBankCard(
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/core/v1/bankcard/create',
+        data: params,
+      );
+      return response;
+    } catch (e) {
+      print("createBankCard error: $e");
+      rethrow;
+    }
   }
 
-  //📝TODO
-  static Future<void> editBankCard(Map<String, dynamic> params) async {
-    // try {
-    //   final id = await HttpUtil.post('/core/v1/bankcard/modify', params);
-    //   return id;
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+  /// Modify bank card
+  static Future<Response<dynamic>> editBankCard(
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/core/v1/bankcard/modify',
+        data: params,
+      );
+      return response;
+    } catch (e) {
+      print("editBankCard error: $e");
+      rethrow;
+    }
   }
 
   //📝TODO
   static Future<void> deleteBankCard(String id) async {
-    // try {
-    //   await HttpUtil.post('/core/v1/bankcard/remove/$id');
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+    try {
+      await ApiClient.dio.post('/core/v1/bankcard/remove/$id');
+    } catch (e) {
+      print("deleteBankCard error: $e");
+      rethrow;
+    }
   }
 
   //📝TODO
-  static Future<void> createMobileBankCard(Map<String, dynamic> params) async {
-    // try {
-    //   final id =
-    //       await HttpUtil.post('/core/v1/bankcard/mobile_money/create', params);
-    //   return id;
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+  static Future<Response<dynamic>> createMobileBankCard(
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/core/v1/bankcard/mobile_money/create',
+        data: params,
+      );
+      return response;
+    } catch (e) {
+      print("createMobileBankCard error: $e");
+      rethrow;
+    }
   }
 
   //📝TODO
-  static Future<void> editeMobileBankCard(Map<String, dynamic> params) async {
-    // try {
-    //   final id =
-    //       await HttpUtil.post('/core/v1/bankcard/mobile_money/modify', params);
-    //   return id;
-    // } catch (e) {
-    //   e.printError();
-    //   rethrow;
-    // }
+  static Future<Response<dynamic>> editeMobileBankCard(
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/core/v1/bankcard/mobile_money/modify',
+        data: params,
+      );
+      return response;
+    } catch (e) {
+      print("editeMobileBankCard error: $e");
+      rethrow;
+    }
   }
 
   //📝TODO
@@ -354,22 +373,28 @@ class AccountApi {
     //   rethrow;
     // }
   }
-
   //📝TODO
-  // Future<List<BankcardChannelListRes>> getBankChannelList() async {
-  // try {
-  //   final res =
-  //       await HttpUtil.post('/core/v1/bank_channel/public/list_front');
-  //   List<BankcardChannelListRes> list = (res as List<dynamic>)
-  //       .map((item) =>
-  //           BankcardChannelListRes.fromJson(CommonUtils.removeNullKeys(item)))
-  //       .toList();
-  //   return list;
-  // } catch (e) {
-  //   e.printError();
-  //   rethrow;
-  // }
-  // }
+  static Future<List<BankcardChannelListRes>> getBankChannelList() async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/bank_channel/public/list_front',
+        data: {},
+      );
+      final data = res.data['data'];
+      // Check if the response is null or not a list
+      if (data is! List) {
+        print("API returned null or invalid data: $res");
+        return []; // Return an empty list in case of error
+      }
+      List<BankcardChannelListRes> list = data
+          .map((item) => BankcardChannelListRes.fromJson(item))
+          .toList();
+      return list;
+    } catch (e) {
+      print("getBankChannelList Error: $e");
+      rethrow;
+    }
+  }
 
   // 📝TODO
   /// Check bank card list
@@ -386,16 +411,21 @@ class AccountApi {
     }
   }
 
-  //📝TODO
-  // static Future<BankcardListRes> getBankCardDetail(String id) async {
-  //   // try {
-  //   //   final res = await HttpUtil.post('/core/v1/bankcard/detail_front/$id');
-  //   //   return BankcardListRes.fromJson(CommonUtils.removeNullKeys(res));
-  //   // } catch (e) {
-  //   //   e.printError();
-  //   //   rethrow;
-  //   // }
-  // }
+  // Check bank card details
+  static Future<BankcardListRes> getBankCardDetail(String id) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/bankcard/detail_front/$id',
+      );
+      // final cleanData = _removeNullKeys(Map<String, dynamic>.from(res.data));
+      final Map<String, dynamic> body = Map<String, dynamic>.from(res.data);
+      final Map<String, dynamic> data = Map<String, dynamic>.from(body['data']);
+      return BankcardListRes.fromJson(data);
+    } catch (e) {
+      print("getBankCardDetail error: $e");
+      rethrow;
+    }
+  }
 
   static Future<List<CoinListRes>> getCoinList() async {
     try {

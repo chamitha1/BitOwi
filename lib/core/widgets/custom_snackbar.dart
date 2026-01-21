@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CustomSnackbar {
-  static void showSuccess({
-    required String title,
-    required String message,
-  }) {
+  static void showSuccess({required String title, required String message}) {
     Get.snackbar(
       title,
       message,
@@ -37,10 +34,7 @@ class CustomSnackbar {
     );
   }
 
-  static void showError({
-    required String title,
-    required String message,
-  }) {
+  static void showError({required String title, required String message}) {
     Get.snackbar(
       title,
       message,
@@ -69,6 +63,29 @@ class CustomSnackbar {
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
       borderRadius: 12,
+    );
+  }
+
+  static void showSimpleValidation({required String message}) {
+    Get.rawSnackbar(
+      messageText: Text(
+        message,
+        style: const TextStyle(
+          color: Color(0xFFC9710D),
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w400,
+          fontSize: 13,
+        ),
+      ),
+      backgroundColor: const Color(0xFFFFFBF6),
+      borderColor: const Color(0xFFFFE2C1),
+      borderWidth: 1,
+      borderRadius: 10,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 2),
+      isDismissible: true,
     );
   }
 }

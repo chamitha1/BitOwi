@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppInputDecorations {
   static InputDecoration textField({
-    String? hintText, // ← optional
+    String? hintText,
     Widget? suffixIcon,
     Widget? prefixIcon,
+    String? suffixText,
   }) {
     return InputDecoration(
       hintText: hintText,
@@ -24,6 +25,7 @@ class AppInputDecorations {
       focusedBorder: _focusedBorder(),
       suffixIcon: suffixIcon,
       prefixIcon: prefixIcon,
+      suffixText: suffixText,
     );
   }
 

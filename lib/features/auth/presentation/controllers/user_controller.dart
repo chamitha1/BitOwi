@@ -2,6 +2,7 @@ import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/api/c2c_api.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/api/common_api.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
 import 'package:BitOwi/models/user_model.dart';
@@ -15,6 +16,7 @@ class UserController extends GetxController {
   final RxInt notificationCount = 0.obs;
 
   final RxString userAvatar = ''.obs;
+  final RxString userRealName = 'User'.obs;
 
   @override
   void onInit() {
@@ -49,6 +51,7 @@ class UserController extends GetxController {
     // Fetch latest user info from API
     try {
       final fetchedUser = await UserApi.getUserInfo();
+      debugPrint("🚀✅${fetchedUser.toJson().toString()}");
       user.value = fetchedUser;
 
       if (fetchedUser.nickname != null && fetchedUser.nickname!.isNotEmpty) {
@@ -62,6 +65,12 @@ class UserController extends GetxController {
         setUserAvatar(fetchedUser.avatar!);
       } else {
         setUserAvatar('');
+      }
+
+      if (fetchedUser.realName != null && fetchedUser.realName!.isNotEmpty) {
+        setRealName(fetchedUser.realName!);
+      } else {
+        setRealName('');
       }
 
       // Fetch Trade Info if user is loaded
@@ -97,6 +106,10 @@ class UserController extends GetxController {
     userAvatar.value = avatarUrl;
   }
 
+  Future<void> setRealName(String realName) async {
+    userRealName.value = realName;
+  }
+
   Future<void> fetchNotificationCount() async {
     try {
       print("Fetching notification count...");
@@ -108,7 +121,7 @@ class UserController extends GetxController {
         ),
         CommonApi.getSmsPageByType(
           pageNum: 1,
-          pageSize: 100, 
+          pageSize: 100,
           type: "2", // Notifications
         ),
       ]);
@@ -121,7 +134,9 @@ class UserController extends GetxController {
           if (data != null && data['list'] != null) {
             final List list = data['list'];
             // Count items where isRead is '0'
-            final count = list.where((item) => item['isRead'].toString() == '0').length;
+            final count = list
+                .where((item) => item['isRead'].toString() == '0')
+                .length;
             unreadCount += count;
           }
         }

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/image_picker_modal.dart';
 import 'package:BitOwi/utils/aws_upload_util.dart';
@@ -151,8 +150,10 @@ class KycPersonalInformationController extends GetxController {
       }
       removeIdImage();
 
-      final file = File(pickedFile.path);
-      final size = await file.length();
+      // final file = File(pickedFile.path);
+      // final size = await file.length();
+      final bytes = await pickedFile.readAsBytes();
+      final size = bytes.lengthInBytes;
       const maxSize = 5 * 1024 * 1024;
 
       if (size > maxSize) {
