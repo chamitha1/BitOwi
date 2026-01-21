@@ -58,7 +58,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
       
       if (adsDetail != null) {
         // Fetch available balance
-        final accountRes = await AccountApi.getDetailAccount(adsDetail!.tradeCoin!);
+        final accountRes = await AccountApi.getDetailAccount(adsDetail!.tradeCoin);
         if (mounted) {
           setState(() {
             availableBalance = accountRes.availableAmount ?? '0';
@@ -101,9 +101,9 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
       _isMaxChecked = value ?? false;
       if (_isMaxChecked && adsDetail != null) {
         if (tabIndex == 0) {
-          _amountController.text = adsDetail!.countMax ?? '';
+          _amountController.text = adsDetail!.countMax;
         } else {
-          _amountController.text = adsDetail!.tradeAmountMax ?? '';
+          _amountController.text = adsDetail!.tradeAmountMax;
         }
         getDetail();
       } else {
@@ -407,7 +407,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                adsDetail!.tradeCoin ?? 'USDT',
+                adsDetail!.tradeCoin,
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
@@ -425,8 +425,9 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                   color: Color(0xFF151E2F),
                 ),
               ),
-            ],
-          ),
+              ],
+            ),
+
         ],
       ),
     );
@@ -711,7 +712,16 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
   }
 
   Widget _buildMerchantInfoCard() {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        if (widget.adItem.userId != null) {
+          Get.toNamed(
+            Routes.merchantProfilePage,
+            arguments: widget.adItem.userId,
+          );
+        }
+      },
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -735,7 +745,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
               CircleAvatar(
                 radius: 20,
                 backgroundImage: adsDetail?.photo != null
-                    ? NetworkImage(adsDetail!.photo!)
+                    ? NetworkImage(adsDetail!.photo)
                     : const AssetImage('assets/images/home/avatar.png')
                         as ImageProvider,
               ),
@@ -858,7 +868,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildTradingAlertCard() {

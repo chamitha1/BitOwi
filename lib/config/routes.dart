@@ -15,6 +15,7 @@ import 'package:BitOwi/features/profile/presentation/pages/my_ads_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/payment_methods_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/post_ads_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/settings.dart';
+import 'package:BitOwi/features/profile/presentation/pages/merchant_profile_page.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
@@ -60,6 +61,7 @@ class Routes {
   static const String postAdsPage = '/postAdsPage';
   static const String myAdsPage = '/myAdsPage';
   static const String orderDetailPage = '/orderDetail';
+  static const String merchantProfilePage = '/merchantProfile';
 }
 
 class AppPages {
@@ -145,6 +147,9 @@ class AppPages {
         return OrderDetailsPage(orderId: orderId);
       },
     ),
-
+    GetPage(
+      name: Routes.merchantProfilePage,
+      page: () => const MerchantProfilePage(),
+    ),
   ];
 }

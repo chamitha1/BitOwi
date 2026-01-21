@@ -1,20 +1,129 @@
+import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
-import 'package:BitOwi/features/profile/presentation/widgets/merchant_ad_card.dart';
+import 'package:BitOwi/features/p2p/presentation/widgets/p2p_order_card.dart';
+import 'package:BitOwi/models/ads_page_res.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
-class MerchantProfilePage extends StatelessWidget {
-  final String merchantName;
-  final String avatarUrl;
-  final bool isCertified;
+class MerchantProfilePage extends StatefulWidget {
+  const MerchantProfilePage({super.key});
 
-  const MerchantProfilePage({
-    super.key,
-    this.merchantName = "Terence Welch",
-    this.avatarUrl = "assets/images/home/avatar.png",
-    this.isCertified = true,
-  });
+  @override
+  State<MerchantProfilePage> createState() => _MerchantProfilePageState();
+}
+
+class _MerchantProfilePageState extends State<MerchantProfilePage> {
+  late String userId;
+  UserStatistics? merchantInfo;
+  List<AdItem> adsList = [];
+  int pageNum = 1;
+  bool isEnd = false;
+  bool isLoading = false;
+  late EasyRefreshController _refreshController;
+
+  @override
+  void initState() {
+    super.initState();
+    userId = Get.arguments as String;
+    _refreshController = EasyRefreshController(controlFinishRefresh: true);
+    getInitData();
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
+  Future<void> getInitData() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      // Fetch merchant profile stats
+      final stats = await P2PApi.getMerchantHome(userId);
+
+      if (mounted) {
+        setState(() {
+          merchantInfo = stats;
+        });
+      }
+
+      // Fetch first page of ads
+      await getAdsList(isRefresh: true);
+    } catch (e) {
+      debugPrint("getInitData Error: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> getAdsList({bool isRefresh = false}) async {
+    if (isRefresh) {
+      pageNum = 1;
+      isEnd = false;
+    } else if (isEnd) {
+      return;
+    }
+
+    try {
+      final res = await P2PApi.getMerchantAdsList({
+        "pageNum": pageNum,
+        "pageSize": 10,
+        "userId": userId,
+      });
+
+      if (mounted) {
+        setState(() {
+          if (isRefresh) {
+            adsList = res.list ?? [];
+          } else {
+            adsList.addAll(res.list ?? []);
+          }
+          isEnd = (res.list ?? []).isEmpty || (res.list?.length ?? 0) < 10;
+          pageNum++;
+        });
+      }
+
+      _refreshController.finishRefresh();
+      _refreshController.finishLoad();
+    } catch (e) {
+      debugPrint("getAdsList Error: $e");
+      _refreshController.finishRefresh();
+      _refreshController.finishLoad();
+    }
+  }
+
+  String _calculatePositiveRate() {
+    if (merchantInfo == null ||
+        merchantInfo!.commentCount == null ||
+        merchantInfo!.commentCount == 0) {
+      return '0.0';
+    }
+    final rate =
+        (merchantInfo!.commentGoodCount ?? 0) /
+        merchantInfo!.commentCount! *
+        100;
+    return rate.toStringAsFixed(1);
+  }
+
+  String _calculateCompletionRate() {
+    if (merchantInfo == null ||
+        merchantInfo!.orderCount == null ||
+        merchantInfo!.orderCount == 0) {
+      return '0.0';
+    }
+    final rate =
+        (merchantInfo!.orderFinishCount ?? 0) / merchantInfo!.orderCount! * 100;
+    return rate.toStringAsFixed(1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +141,7 @@ class MerchantProfilePage extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          "Partners",
+          "Merchant Profile",
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -44,27 +153,34 @@ class MerchantProfilePage extends StatelessWidget {
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 24),
-            const Text(
-              "Merchant Ads",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-                color: Color(0xFF151E2F),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : EasyRefresh(
+              controller: _refreshController,
+              onRefresh: () async => await getAdsList(isRefresh: true),
+              onLoad: () async => await getAdsList(),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildProfileHeader(),
+                    const SizedBox(height: 24),
+                    const Text(
+                      "Merchant Ads",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Color(0xFF151E2F),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAdList(),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            _buildAdList(),
-          ],
-        ),
-      ),
     );
   }
 
@@ -93,7 +209,12 @@ class MerchantProfilePage extends StatelessWidget {
                   border: Border.all(color: const Color(0xFF779DEF), width: 3),
                 ),
                 child: ClipOval(
-                  child: CommonImage(avatarUrl, fit: BoxFit.cover),
+                  child: merchantInfo?.photo != null
+                      ? CommonImage(merchantInfo!.photo!, fit: BoxFit.cover)
+                      : Image.asset(
+                          'assets/images/home/avatar.png',
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -102,7 +223,7 @@ class MerchantProfilePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      merchantName,
+                      merchantInfo?.nickname ?? "Merchant",
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
@@ -111,7 +232,7 @@ class MerchantProfilePage extends StatelessWidget {
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (isCertified) ...[
+                    if (merchantInfo?.isTrust == '1') ...[
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -171,9 +292,9 @@ class MerchantProfilePage extends StatelessWidget {
                       height: 14,
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      "98%",
-                      style: TextStyle(
+                    Text(
+                      "${_calculatePositiveRate()}%",
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
@@ -187,22 +308,21 @@ class MerchantProfilePage extends StatelessWidget {
                   height: 14,
                   color: Colors.white.withOpacity(0.3),
                 ),
-                const Row(
+                Row(
                   children: [
-                    Text(
+                    const Text(
                       "Trust ",
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
-                        color: Colors
-                            .white, 
+                        color: Colors.white,
                       ),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
-                      "124",
-                      style: TextStyle(
+                      "${merchantInfo?.confidenceCount ?? 0}",
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
@@ -216,9 +336,9 @@ class MerchantProfilePage extends StatelessWidget {
                   height: 14,
                   color: Colors.white.withOpacity(0.3),
                 ),
-                const Row(
+                Row(
                   children: [
-                    Text(
+                    const Text(
                       "Trade ",
                       style: TextStyle(
                         fontFamily: 'Inter',
@@ -227,13 +347,12 @@ class MerchantProfilePage extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
-                      "450 / 99%",
-                      style: TextStyle(
+                      "${merchantInfo?.orderFinishCount ?? 0} / ${_calculateCompletionRate()}%",
+                      style: const TextStyle(
                         fontFamily: 'Inter',
-                        fontWeight:
-                            FontWeight.w600, 
+                        fontWeight: FontWeight.w600,
                         fontSize: 12,
                         color: Colors.white,
                       ),
@@ -300,25 +419,30 @@ class MerchantProfilePage extends StatelessWidget {
   }
 
   Widget _buildAdList() {
-    final items = List.generate(
-      3,
-      (index) => MerchantAdItem(
-        name: "Matthew Schuster",
-        avatarUrl: "assets/images/home/avatar.png",
-        isCertified: true,
-        goodRate: "98",
-        trustCount: 124,
-        tradeCount: 450,
-        finishRate: "99",
-        price: "₦ 15,654.32",
-        totalAmount: "0.0456 BTC",
-        limit: "₦ 5,000 - ₦ 500,000",
-        paymentMethods: ["Bank Transfer", "Airtel Money"],
-      ),
-    );
+    if (adsList.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40.0),
+          child: Text(
+            "No ads available",
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 16,
+              color: Color(0xFF717F9A),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Column(
-      children: items.map((item) => MerchantAdCard(item: item)).toList(),
+      children: adsList.map((ad) {
+        final isBuy = ad.tradeType == '0'; // 0 = buy, 1 = sell
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: P2POrderCard(adItem: ad, isBuy: isBuy),
+        );
+      }).toList(),
     );
   }
 }

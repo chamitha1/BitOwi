@@ -173,4 +173,45 @@ class P2PApi {
       rethrow;
     }
   }
+
+  /// Get merchant home/profile stats
+  /// params: {master: userId}
+  static Future<UserStatistics> getMerchantHome(String userId) async {
+    try {
+      debugPrint("getMerchantHome Request: userId=$userId");
+
+      final res = await ApiClient.dio.post(
+        '/core/v1/ads/public/home',
+        data: {"master": userId},
+      );
+
+      debugPrint("getMerchantHome Response: ${res.data}");
+
+      return UserStatistics.fromJson(res.data['data']);
+    } catch (e) {
+      debugPrint("getMerchantHome Error: $e");
+      rethrow;
+    }
+  }
+
+  /// Get merchant's ads list
+  /// params: {pageNum, pageSize, userId}
+  static Future<AdsPageRes> getMerchantAdsList(
+      Map<String, dynamic> data) async {
+    try {
+      debugPrint("getMerchantAdsList Request: $data");
+
+      final res = await ApiClient.dio.post(
+        '/core/v1/ads/public/page_other',
+        data: data,
+      );
+
+      debugPrint("getMerchantAdsList Response: ${res.data}");
+
+      return AdsPageRes.fromJson(res.data['data']);
+    } catch (e) {
+      debugPrint("getMerchantAdsList Error: $e");
+      rethrow;
+    }
+  }
 }

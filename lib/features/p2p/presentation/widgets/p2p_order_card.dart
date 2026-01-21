@@ -241,7 +241,7 @@ class P2POrderCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${double.tryParse(adItem?.leftCount ?? '0')?.toStringAsFixed(2) ?? '0.00'} ${adItem?.tradeCoin ?? ''}",
+                    "${double.tryParse(adItem?.leftCount ?? '0')?.toStringAsFixed(1) ?? '0.0'} ${adItem?.tradeCoin ?? ''}",
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
@@ -266,7 +266,7 @@ class P2POrderCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade}",
+                    "${_getCurrencySymbol(adItem?.tradeCurrency)}${double.tryParse(adItem?.minTrade ?? '0')?.toStringAsFixed(1) ?? '0.0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${double.tryParse(adItem?.maxTrade ?? '0')?.toStringAsFixed(1) ?? '0.0'}",
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,

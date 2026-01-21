@@ -75,9 +75,9 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
       _isMaxChecked = value ?? false;
       if (_isMaxChecked && adsDetail != null) {
         if (tabIndex == 0) {
-          _amountController.text = adsDetail!.countMax ?? '';
+          _amountController.text = adsDetail!.countMax;
         } else {
-          _amountController.text = adsDetail!.tradeAmountMax ?? '';
+          _amountController.text = adsDetail!.tradeAmountMax;
         }
         getDetail();
       } else {
@@ -222,7 +222,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                adsDetail!.tradeCoin ?? 'USDT',
+                adsDetail!.tradeCoin,
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
@@ -502,7 +502,16 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
   }
 
   Widget _buildMerchantInfoCard() {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        if (widget.adItem.userId != null) {
+          Get.toNamed(
+            Routes.merchantProfilePage,
+            arguments: widget.adItem.userId,
+          );
+        }
+      },
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -528,7 +537,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
               CircleAvatar(
                 radius: 20,
                 backgroundImage: adsDetail?.photo != null
-                    ? NetworkImage(adsDetail!.photo!)
+                    ? NetworkImage(adsDetail!.photo)
                     : const AssetImage('assets/images/home/avatar.png')
                         as ImageProvider,
               ),
@@ -652,7 +661,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildTradingAlertCard() {
