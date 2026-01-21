@@ -227,8 +227,12 @@ class _P2PPageState extends State<P2PPage> {
           ),
         ),
         GestureDetector(
-          onTap: () {
-            Get.toNamed(Routes.postAdsPage);
+          onTap: () async {
+            final result = await Get.toNamed(Routes.postAdsPage);
+            // refresh after coming back
+            if (result == true) {
+              _fetchAds(isRefresh: true);
+            }
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

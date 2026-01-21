@@ -100,6 +100,20 @@ class _PostAdsPageState extends State<PostAdsPage> {
   final TextEditingController commentController = TextEditingController();
 
   String openHour = 'any'; // 'any' | 'custom'
+  final List<TimeSlotModel> timeSlots = [];
+
+  int _weekToIndex(String week) {
+    const map = {
+      'Monday': 1,
+      'Tuesday': 2,
+      'Wednesday': 3,
+      'Thursday': 4,
+      'Friday': 5,
+      'Saturday': 6,
+      'Sunday': 7,
+    };
+    return map[week]!;
+  }
 
   @override
   void dispose() {
@@ -238,6 +252,127 @@ class _PostAdsPageState extends State<PostAdsPage> {
     }
   }
 
+  void onSaveDraftTap() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    final premium = premiumController.text;
+    final highestPrice = highestPriceController.text;
+    final totalCount = totalQuantityController.text;
+    final min = minLimitController.text;
+    final max = maxLimitController.text;
+    final remark = commentController.text;
+
+    final String totalMsg = typeIndex == 0
+        ? 'Enter total purchase amount'
+        : 'Enter total sales amount';
+    final String totalMsgAsNumber = typeIndex == 0
+        ? 'Purchase amount can only be entered as numbers'
+        : 'Sales amount can only be entered as numbers';
+
+    /// -------- STEP 1 (PRICE) --------
+    if (premium.isEmpty) {
+      CustomSnackbar.showSimpleValidation(message: 'Please enter premium');
+      return;
+    }
+
+    if (!premium.isNum) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Premiums can only be entered as numbers',
+      );
+      return;
+    }
+
+    if (highestPrice.isEmpty) {
+      CustomSnackbar.showSimpleValidation(
+        message: typeIndex == 0 ? 'Enter highest price' : 'Enter lowest price',
+      );
+      return;
+    }
+
+    if (!highestPrice.isNum) {
+      CustomSnackbar.showSimpleValidation(
+        message: typeIndex == 0
+            ? 'Highest price can only be entered as numbers'
+            : 'Lowest price can only be entered as numbers',
+      );
+      return;
+    }
+
+    /// -------- STEP 2 (AMOUNT + PAYMENT) --------
+    if (totalCount.isEmpty) {
+      CustomSnackbar.showSimpleValidation(message: totalMsg);
+      return;
+    }
+
+    if (!totalCount.isNum) {
+      CustomSnackbar.showSimpleValidation(message: totalMsgAsNumber);
+      return;
+    }
+
+    if (min.isEmpty) {
+      CustomSnackbar.showSimpleValidation(message: 'Enter minimum order limit');
+      return;
+    }
+
+    if (!min.isNum) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Order minimum limit can only be entered as numbers',
+      );
+      return;
+    }
+
+    if (max.isEmpty) {
+      CustomSnackbar.showSimpleValidation(message: 'Enter maximum order limit');
+      return;
+    }
+
+    if (!max.isNum) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Order maximum limit can only be entered as numbers',
+      );
+      return;
+    }
+
+    if (double.tryParse(max)! < double.tryParse(min)!) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Maximum limit must be greater than minimum limit',
+      );
+      return;
+    }
+
+    if (bankCardSelectedIndex < 0) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Please choose a payment method',
+      );
+      return;
+    }
+
+    /// -------- STEP 3 (COMMENT + TIME) --------
+    if (remark.isEmpty) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Please enter payment comment',
+      );
+      return;
+    }
+
+    if (openHour == 'custom' && timeSlots.isEmpty) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Please add at least one time slot',
+      );
+      return;
+    }
+
+    if (openHour == 'custom' && !_areAllTimeSlotsValid()) {
+      CustomSnackbar.showSimpleValidation(
+        message: 'Start time must be before end time',
+      );
+      return;
+    }
+
+    /// -------- SAVE DRAFT --------
+    doSubmit(true);
+  }
+
   void onNextStepTap() {
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -249,13 +384,13 @@ class _PostAdsPageState extends State<PostAdsPage> {
         CustomSnackbar.showSimpleValidation(message: 'Please enter premium');
       } else if (double.tryParse(premium) == null) {
         CustomSnackbar.showSimpleValidation(
-          message: 'Premium must be a number',
+          message: 'Premiums can only be entered as numbers',
         );
       } else if (highestPrice.isEmpty) {
         CustomSnackbar.showSimpleValidation(
           message: typeIndex == 0
               ? 'Enter highest price'
-              : 'Enter lowest price'.tr,
+              : 'Enter lowest price',
         );
       } else if (!highestPrice.isNum) {
         CustomSnackbar.showSimpleValidation(
@@ -272,42 +407,41 @@ class _PostAdsPageState extends State<PostAdsPage> {
     /// STEP 2
     if (currentStep == 2) {
       final totalCount = totalQuantityController.text;
-      String msg = typeIndex == 0
+      String totalMsg = typeIndex == 0
           ? 'Enter total purchase amount'
           : 'Enter total sales amount';
+      final String totalMsgAsNumber = typeIndex == 0
+          ? 'Purchase amount can only be entered as numbers'
+          : 'Sales amount can only be entered as numbers';
 
       final min = minLimitController.text;
       final max = maxLimitController.text;
 
       if (totalCount.isEmpty) {
-        CustomSnackbar.showSimpleValidation(
-          message: 'Please enter buy quantity',
-        );
+        CustomSnackbar.showSimpleValidation(message: totalMsg);
       } else if (!totalCount.isNum) {
-        CustomSnackbar.showSimpleValidation(
-          message: 'Purchase amount can only be entered as numbers',
-        );
+        CustomSnackbar.showSimpleValidation(message: totalMsgAsNumber);
       } else if (min.isEmpty) {
-        CustomSnackbar.showSimpleValidation(message: 'Enter order limit');
+        CustomSnackbar.showSimpleValidation(
+          message: 'Enter minimum order limit',
+        );
       } else if (!min.isNum) {
         CustomSnackbar.showSimpleValidation(
-          message: 'Order limit can only be entered as numbers',
+          message: 'Order minimum limit can only be entered as numbers',
         );
       } else if (max.isEmpty) {
         CustomSnackbar.showSimpleValidation(
-          message: 'Please enter maximum limit',
+          message: 'Enter maximum order limit',
         );
       } else if (!max.isNum) {
         CustomSnackbar.showSimpleValidation(
-          message: 'Maximum limit must be numeric',
+          message: 'Order maximum limit can only be entered as numbers',
         );
-      }
-      //  else if (double.parse(max) < double.parse(min)) {
-      //   CustomSnackbar.showSimpleValidation(
-      //     message: 'Maximum must be greater than minimum',
-      //   );
-      // }
-      else if (bankCardSelectedIndex < 0) {
+      } else if (double.parse(max) < double.parse(min)) {
+        CustomSnackbar.showSimpleValidation(
+          message: 'Maximum limit must be greater than minimum limit',
+        );
+      } else if (bankCardSelectedIndex < 0) {
         CustomSnackbar.showSimpleValidation(
           message: 'Please choose a payment method',
         );
@@ -325,16 +459,18 @@ class _PostAdsPageState extends State<PostAdsPage> {
         CustomSnackbar.showSimpleValidation(
           message: 'Please enter payment comment',
         );
-      }
-      // else if (timeTypeIndex == 1 && timeList.isEmpty) {
-      //  CustomSnackbar.showSimpleValidation(
-      //     message: 'Please Add time slot',
-      //   );
-      // }
-      else if (openHour.isEmpty) {
+      } else if (openHour == 'custom' && timeSlots.isEmpty) {
+        CustomSnackbar.showSimpleValidation(
+          message: 'Please add at least one time slot',
+        );
+      } else if (openHour == 'custom' && !_areAllTimeSlotsValid()) {
+        CustomSnackbar.showSimpleValidation(
+          message: 'Start time must be before end time',
+        );
+      } else if (openHour.isEmpty) {
         CustomSnackbar.showSimpleValidation(message: 'Please Add time slot');
       } else {
-        _submitAd();
+        doSubmit();
       }
     }
   }
@@ -384,7 +520,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
     setState(() => currentStep--);
   }
 
-  Future<void> _submitAd([bool saveDraft = false]) async {
+  Future<void> doSubmit([bool saveDraft = false]) async {
     try {
       setState(() {
         isLoading = true;
@@ -430,16 +566,18 @@ class _PostAdsPageState extends State<PostAdsPage> {
         // OPEN HOUR
         "displayTime": openHour == 'any'
             ? []
-            : [
-                // TODO: fill when you implement custom time slots
-                // {
-                //   "week": x,
-                //   "startTime": y,
-                //   "endTime": z,
-                // }
-              ],
+            //todo check
+            : timeSlots
+                  .map(
+                    (e) => {
+                      "week": _weekToIndex(e.week),
+                      "startTime": e.start.hour,
+                      "endTime": e.end.hour,
+                    },
+                  )
+                  .toList(),
       };
-      debugPrint("🚀👘 _submitAd params : ${params}");
+      debugPrint("🚀👘 doSubmit params : ${params}");
 
       if (id.isEmpty) {
         final resCreate = await C2CApi.createAds(params);
@@ -478,9 +616,9 @@ class _PostAdsPageState extends State<PostAdsPage> {
         }
         // EventBusUtil.fireAdsEdit();
       }
-      Get.back(closeOverlays: true);
+      Get.back(result: true, closeOverlays: true);
     } catch (e) {
-      print("_submitAd error: $e");
+      print("doSubmit error: $e");
     } finally {
       setState(() {
         isLoading = false;
@@ -492,7 +630,20 @@ class _PostAdsPageState extends State<PostAdsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(title: "Post Ads", onBack: () => Get.back()),
+      appBar: CommonAppBar(
+        title: "Post Ads",
+        onBack: () => Get.back(),
+        actions: [
+          TextButton(
+            onPressed: onSaveDraftTap,
+            child: AppText.p1Medium(
+              'Save Draft',
+              color: const Color(0xFF1D5DE5),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         top: false,
         child: Padding(
@@ -783,6 +934,11 @@ class _PostAdsPageState extends State<PostAdsPage> {
                         value: coinIndex,
                         isExpanded: true,
                         hint: Text('Select Coin'),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: const Color(0xFF2E3D5B),
+                          size: 20,
+                        ),
                         items: List.generate(
                           coinList.length,
                           (index) => DropdownMenuItem(
@@ -828,6 +984,11 @@ class _PostAdsPageState extends State<PostAdsPage> {
                         value: currencyIndex,
                         isExpanded: true,
                         hint: Text('Select Currency'),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: const Color(0xFF2E3D5B),
+                          size: 20,
+                        ),
                         items: List.generate(
                           currencyList.length,
                           (index) => DropdownMenuItem(
@@ -1167,6 +1328,23 @@ class _PostAdsPageState extends State<PostAdsPage> {
         const SizedBox(height: 12),
 
         _radioTile(value: 'custom', title: 'Customise'),
+
+        /// 👇 CONDITIONAL UI
+        if (openHour == 'custom') ...[
+          const SizedBox(height: 16),
+
+          /// Time slot list
+          ...timeSlots.asMap().entries.map(
+            (entry) => _timeSlotCard(entry.key, entry.value),
+          ),
+
+          /// Add time slot button
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [_addTimeSlotButton()],
+          ),
+        ],
       ],
     );
   }
@@ -1208,4 +1386,253 @@ class _PostAdsPageState extends State<PostAdsPage> {
       ),
     );
   }
+
+  // customise
+  Widget _addTimeSlotButton() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          timeSlots.add(
+            TimeSlotModel(
+              week: 'Monday',
+              start: const TimeOfDay(hour: 0, minute: 0),
+              end: const TimeOfDay(hour: 0, minute: 0),
+            ),
+          );
+        });
+      },
+      child: Container(
+        width: 168,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF1D5DE5)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_circle_outline, color: Color(0xFF1D5DE5), size: 20),
+            SizedBox(width: 8),
+            AppText.p2Medium('Add Time Slot', color: Color(0xFF1D5DE5)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _timeSlotCard(int index, TimeSlotModel slot) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Color(0xFFF6F9FF).withOpacity(0.45),
+        border: Border.all(color: const Color(0xFFDAE0EE)),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          /// Header row
+          Row(
+            children: [
+              DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: slot.week,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Color(0xFF2E3D5B),
+                    size: 20,
+                  ),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF000000),
+                  ),
+                  items:
+                      const [
+                            'Monday',
+                            'Tuesday',
+                            'Wednesday',
+                            'Thursday',
+                            'Friday',
+                            'Saturday',
+                            'Sunday',
+                          ]
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                  onChanged: (v) {
+                    if (v == null) return;
+                    setState(() => slot.week = v);
+                  },
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  setState(() => timeSlots.removeAt(index));
+                },
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Color(0xFFE74C3C),
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          /// Time pickers
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText.p3Regular('Start Time', color: Color(0xFF2E3D5B)),
+                    SizedBox(height: 4),
+                    _timePicker(slot.start, (t) {
+                      // ignore validation if end time is still unset
+                      if (!_isUnset(slot.end) &&
+                          !_isStartBeforeEnd(t, slot.end)) {
+                        CustomSnackbar.showSimpleValidation(
+                          message: "Start time must be before end time",
+                        );
+                        return;
+                      }
+                      setState(() => slot.start = t);
+                    }),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  SizedBox(height: 16),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      "—",
+                      style: TextStyle(color: Color(0xFFB9C6E2)),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText.p3Regular('End Time', color: Color(0xFF2E3D5B)),
+                    SizedBox(height: 4),
+                    _timePicker(slot.end, (t) {
+                      // ignore validation if start time is still unset
+                      if (!_isUnset(slot.start) &&
+                          !_isStartBeforeEnd(slot.start, t)) {
+                        CustomSnackbar.showSimpleValidation(
+                          message: "End time must be after start time",
+                        );
+                        return;
+                      }
+                      setState(() => slot.end = t);
+                    }),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isUnset(TimeOfDay t) => t.hour == 0 && t.minute == 0;
+
+  bool _isStartBeforeEnd(TimeOfDay start, TimeOfDay end) {
+    final startMinutes = start.hour * 60 + start.minute;
+    final endMinutes = end.hour * 60 + end.minute;
+    return startMinutes < endMinutes;
+  }
+
+  bool _areAllTimeSlotsValid() {
+    for (final slot in timeSlots) {
+      //   if (_isUnset(slot.start) || _isUnset(slot.end)) {
+      //   return false; // incomplete slot
+      // }
+      if (!_isStartBeforeEnd(slot.start, slot.end)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Widget _timePicker(TimeOfDay time, ValueChanged<TimeOfDay> onPicked) {
+    return GestureDetector(
+      onTap: () async {
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: time,
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                alwaysUse24HourFormat: true, // force 24h picker
+              ),
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: Theme.of(
+                    context,
+                  ).colorScheme.copyWith(primary: const Color(0xFF1D5DE5)),
+                  timePickerTheme: const TimePickerThemeData(
+                    // selected hour/minute box background
+                    hourMinuteColor: Color(0xFFE8EFFF),
+                    // selected hour/minute text
+                    hourMinuteTextColor: Color(0xFF151E2F),
+                    dialHandColor: Color(0xFF1D5DE5),
+                  ),
+                  textSelectionTheme: const TextSelectionThemeData(
+                    cursorColor: Color(0xFF1D5DE5),
+                    selectionColor: Color(0x331D5DE5), // optional, soft blue
+                    selectionHandleColor: Color(0xFF1D5DE5),
+                  ),
+                ),
+                child: child!,
+              ),
+            );
+          },
+        );
+        if (picked != null) onPicked(picked);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFFDAE0EE)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            AppText.p2Regular(
+              _format24Hour(time),
+              color: const Color(0xFF454F63),
+            ),
+            Container(width: 8, color: const Color(0xFFB9C6E2)),
+            const Icon(Icons.access_time, size: 18, color: Color(0xFF2E3D5B)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _format24Hour(TimeOfDay time) {
+  final hour = time.hour.toString().padLeft(2, '0');
+  final minute = time.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+class TimeSlotModel {
+  String week;
+  TimeOfDay start;
+  TimeOfDay end;
+
+  TimeSlotModel({required this.week, required this.start, required this.end});
 }

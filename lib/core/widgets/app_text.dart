@@ -25,6 +25,10 @@ class AppText extends StatelessWidget {
     return AppText(text, style: AppTextStyles.p1SemiBold, color: color);
   }
 
+  factory AppText.p1Medium(String text, {Color? color}) {
+    return AppText(text, style: AppTextStyles.p1Medium, color: color);
+  }
+
   factory AppText.p2Bold(String text, {Color? color}) {
     return AppText(text, style: AppTextStyles.p2Bold, color: color);
   }
@@ -35,6 +39,10 @@ class AppText extends StatelessWidget {
 
   factory AppText.p2Medium(String text, {Color? color}) {
     return AppText(text, style: AppTextStyles.p2Medium, color: color);
+  }
+
+  factory AppText.p2Regular(String text, {Color? color}) {
+    return AppText(text, style: AppTextStyles.p2Regular, color: color);
   }
 
   factory AppText.p3Regular(String text, {Color? color}) {

@@ -5,12 +5,14 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBack;
   final bool centerTitle;
+  final List<Widget>? actions;
 
   const CommonAppBar({
     super.key,
     required this.title,
     this.onBack,
     this.centerTitle = false,
+    this.actions,
   });
 
   @override
@@ -43,6 +45,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: Color(0xFF151E2F),
         ),
       ),
+      actions: actions,
     );
   }
 

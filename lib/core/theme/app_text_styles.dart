@@ -11,6 +11,13 @@ class AppTextStyles {
     color: Color(0xFF151E2F),
   );
 
+  static const TextStyle p1Medium = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: Color(0xFF151E2F),
+  );
+
   // Paragraph / P2
   static const TextStyle p2Bold = TextStyle(
     fontFamily: _fontFamily,
@@ -30,6 +37,13 @@ class AppTextStyles {
     fontFamily: _fontFamily,
     fontSize: 16,
     fontWeight: FontWeight.w500,
+    color: Color(0xFF151E2F),
+  );
+
+  static const TextStyle pRegular = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
     color: Color(0xFF151E2F),
   );
 
