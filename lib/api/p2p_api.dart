@@ -1,6 +1,7 @@
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:BitOwi/models/trade_order_page_res.dart';
+import 'package:BitOwi/models/trade_order_detail_res.dart';
 import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:flutter/foundation.dart';
 
@@ -22,9 +23,10 @@ class P2PApi {
     }
   }
 
-  /// params: {pageNum, pageSize, ostatus (optional)}
+  /// params: {pageNum, pageSize, ostatus
   static Future<TradeOrderPageRes> getTradeOrderPageList(
-      Map<String, dynamic> data) async {
+    Map<String, dynamic> data,
+  ) async {
     try {
       final res = await ApiClient.dio.post(
         '/core/v1/trade_order/my_page_front',
@@ -40,22 +42,88 @@ class P2PApi {
     }
   }
 
-  /// Get Ad Detail with optional calculation
-  /// params: {id, tradeAmount (optional), count (optional)}
+  /// Get Trade Order Detail
+  static Future<TradeOrderDetailRes> getTradeOrderDetail(String id) async {
+    try {
+      final res = await ApiClient.dio.post(
+        '/core/v1/trade_order/detail_front/$id',
+      );
+      print('getTradeOrderDetail Raw Response: ${res.data}');
+      final responseData = res.data['data'];
+      return TradeOrderDetailRes.fromJson(responseData);
+    } catch (e) {
+      print('getTradeOrderDetail Error: $e');
+      rethrow;
+    }
+  }
+
+  /// Cancel Order
+  static Future<void> cancelOrder(String id) async {
+    try {
+      await ApiClient.dio.post(
+        '/core/v1/trade_order/user_cancel',
+        data: {"id": id},
+      );
+    } catch (e) {
+      print('cancelOrder Error: $e');
+      rethrow;
+    }
+  }
+
+  /// Mark Order as Paid
+  static Future<void> markOrderPay(String id) async {
+    try {
+      await ApiClient.dio.post(
+        '/core/v1/trade_order/mark_pay',
+        data: {"id": id},
+      );
+    } catch (e) {
+      print('markOrderPay Error: $e');
+      rethrow;
+    }
+  }
+
+  /// Apply for Arbitration
+  static Future<void> applyArbitration(String id) async {
+    try {
+      await ApiClient.dio.post(
+        '/core/v1/trade_order/apply_arbitrate',
+        data: {"id": id},
+      );
+    } catch (e) {
+      print('applyArbitration Error: $e');
+      rethrow;
+    }
+  }
+
+  /// Release Order
+  static Future<void> releaseOrder(String id, String tradePwd) async {
+    try {
+      await ApiClient.dio.post(
+        '/core/v1/trade_order/release',
+        data: {"id": id, "tradePwd": tradePwd},
+      );
+    } catch (e) {
+      print('releaseOrder Error: $e');
+      rethrow;
+    }
+  }
+
+  /// params: {id, tradeAmount, count}
   static Future<AdsDetailRes> getAdsInfo(
     String id, {
     String? tradeAmount,
     String? count,
   }) async {
     try {
-      final res = await ApiClient.dio.post('/core/v1/ads/detail_front', data: {
-        "id": id,
-        "tradeAmount": tradeAmount,
-        "count": count,
-      });
+      final res = await ApiClient.dio.post(
+        '/core/v1/ads/detail_front',
+        data: {"id": id, "tradeAmount": tradeAmount, "count": count},
+      );
 
       debugPrint(
-          "getAdsInfo Request: id=$id, tradeAmount=$tradeAmount, count=$count");
+        "getAdsInfo Request: id=$id, tradeAmount=$tradeAmount, count=$count",
+      );
       debugPrint("getAdsInfo Response: ${res.data}");
 
       final responseData = res.data['data'];
@@ -72,8 +140,10 @@ class P2PApi {
     try {
       debugPrint("buyOrder Request: $data");
 
-      final res =
-          await ApiClient.dio.post('/core/v1/trade_order/buy', data: data);
+      final res = await ApiClient.dio.post(
+        '/core/v1/trade_order/buy',
+        data: data,
+      );
 
       debugPrint("buyOrder Response: ${res.data}");
 
@@ -90,8 +160,10 @@ class P2PApi {
     try {
       debugPrint("sellOrder Request: $data");
 
-      final res =
-          await ApiClient.dio.post('/core/v1/trade_order/sell', data: data);
+      final res = await ApiClient.dio.post(
+        '/core/v1/trade_order/sell',
+        data: data,
+      );
 
       debugPrint("sellOrder Response: ${res.data}");
 

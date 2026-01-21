@@ -5,6 +5,7 @@ import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/utils/debounce_utils.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/order_confirmation_dialog.dart';
+import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:get/get.dart';
 
@@ -26,6 +27,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
   AdsDetailRes? adsDetail;
   String amount = '';
   late Function debounceGetDetail;
+  String? selectedPaymentMethod;
 
   @override
   void initState() {
@@ -38,6 +40,10 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
         debounceGetDetail();
       }
     });
+    // Set default payment method from ad
+    if (widget.adItem.bankName != null) {
+      selectedPaymentMethod = widget.adItem.bankName;
+    }
     getDetail();
   }
 
@@ -60,7 +66,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
         });
       }
     } catch (e) {
-      // Error handled by API client
+      //
     }
   }
 
@@ -86,6 +92,24 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
     return '';
   }
 
+  String _calculatePositiveRate() {
+    final stats = widget.adItem.userStatistics;
+    if (stats == null || stats.commentCount == null || stats.commentCount == 0) {
+      return '0.0';
+    }
+    final rate = (stats.commentGoodCount ?? 0) / stats.commentCount! * 100;
+    return rate.toStringAsFixed(1);
+  }
+
+  String _calculateCompletionRate() {
+    final stats = widget.adItem.userStatistics;
+    if (stats == null || stats.orderCount == null || stats.orderCount == 0) {
+      return '0.0';
+    }
+    final rate = (stats.orderFinishCount ?? 0) / stats.orderCount! * 100;
+    return rate.toStringAsFixed(1);
+  }
+
   Future<void> _onBuyTap() async {
     if (adsDetail == null || amount.isEmpty) return;
 
@@ -108,10 +132,11 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
           });
 
           if (mounted) {
-            Get.offNamed(Routes.orderDetailPage, arguments: orderId);
+            // Navigate to OrderDetailsPage with the orderId
+            Get.off(() => OrderDetailsPage(orderId: orderId));
           }
         } catch (e) {
-          // Error handled by API interceptor
+//
         }
       },
     );
@@ -451,6 +476,9 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
   }
 
   Widget _buildPaymentMethodDropdown() {
+    final paymentMethod = widget.adItem.bankName ?? 'Bank Transfer';
+    final cardNumber = widget.adItem.bankcardNumber;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -458,26 +486,17 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFDAE0EE)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            "Bank Card - ****5674",
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF151E2F),
-            ),
-          ),
-          SvgPicture.asset(
-            'assets/icons/p2p/down-arrow.svg',
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF151E2F),
-              BlendMode.srcIn,
-            ),
-          ),
-        ],
+      child: Text(
+        cardNumber != null && cardNumber.length >= 4
+            ? "$paymentMethod - ****${cardNumber.substring(cardNumber.length - 4)}"
+            : paymentMethod,
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: Color(0xFF151E2F),
+        ),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -524,45 +543,46 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                 ),
               ),
               const Spacer(),
-              // Verified Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xffEAF9F0),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color(0xFFABEAC6),
-                    width: 1.0,
+              // Verified Badge - conditionally shown
+              if (widget.adItem.userStatistics?.isTrust == '1')
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffEAF9F0),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFABEAC6),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/forgot_password/check_circle.svg',
+                        width: 14,
+                        height: 14,
+                        colorFilter: const ColorFilter.mode(
+                          Color(0xFF40A372),
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        "Verified",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF40A372),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/forgot_password/check_circle.svg',
-                      width: 14,
-                      height: 14,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF40A372),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text(
-                      "Verified",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF40A372),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 8),
-          // Stats Row (keeping as static for now)
+          // Stats Row - using userStatistics data
           Row(
             children: [
               SvgPicture.asset(
@@ -575,23 +595,23 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Text(
-                "99.0%",
-                style: TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
+              Text(
+                "${_calculatePositiveRate()}%",
+                style: const TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
               ),
               _buildDivider(),
-              const Text(
-                "Trust  453,657",
-                style: TextStyle(
+              Text(
+                "Trust  ${widget.adItem.userStatistics?.confidenceCount ?? 0}",
+                style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xFF717F9A),
                   fontWeight: FontWeight.w500,
                 ),
               ),
               _buildDivider(),
-              const Text(
-                "Trade  453,657 / 99.9%",
-                style: TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
+              Text(
+                "Trade  ${widget.adItem.userStatistics?.orderFinishCount ?? 0} / ${_calculateCompletionRate()}%",
+                style: const TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
               ),
             ],
           ),

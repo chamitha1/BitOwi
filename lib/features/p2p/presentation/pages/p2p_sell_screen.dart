@@ -29,6 +29,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
   String amount = '';
   late Function debounceGetDetail;
   BankcardListRes? selectedBankcard;
+  List<BankcardListRes> bankcardList = [];
   String availableBalance = '';
 
   @override
@@ -68,12 +69,13 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
         final bankCards = await AccountApi.getBankCardList();
         if (bankCards.isNotEmpty && mounted) {
           setState(() {
+            bankcardList = bankCards;
             selectedBankcard = bankCards.first;
           });
         }
       }
     } catch (e) {
-      // Error handled by API client
+      // 
     }
   }
 
@@ -90,7 +92,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
         });
       }
     } catch (e) {
-      // Error handled by API client
+      // 
     }
   }
 
@@ -114,6 +116,181 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
     if (currency == 'NGN') return '₦';
     if (currency == 'USD') return '\$';
     return '';
+  }
+
+  String _calculatePositiveRate() {
+    final stats = widget.adItem.userStatistics;
+    if (stats == null || stats.commentCount == null || stats.commentCount == 0) {
+      return '0.0';
+    }
+    final rate = (stats.commentGoodCount ?? 0) / stats.commentCount! * 100;
+    return rate.toStringAsFixed(1);
+  }
+
+  String _calculateCompletionRate() {
+    final stats = widget.adItem.userStatistics;
+    if (stats == null || stats.orderCount == null || stats.orderCount == 0) {
+      return '0.0';
+    }
+    final rate = (stats.orderFinishCount ?? 0) / stats.orderCount! * 100;
+    return rate.toStringAsFixed(1);
+  }
+
+  Future<void> _showPaymentMethodBottomSheet() async {
+    if (bankcardList.isEmpty) {
+      // Show message if no payment methods
+      Get.snackbar(
+        'No Payment Methods',
+        'Please add a payment method first',
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.only(top: 12),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFB9C6E2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Select Payment Method",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.close,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Payment methods list
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  itemCount: bankcardList.length,
+                  itemBuilder: (context, index) {
+                    final card = bankcardList[index];
+                    final isSelected = selectedBankcard?.id == card.id;
+                    
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedBankcard = card;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF1D5DE5)
+                                : const Color(0xFFECEFF5),
+                            width: 1.2,
+                          ),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          children: [
+                            // Bank icon or image
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFFBF6),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.account_balance,
+                                color: Color(0xFFFFAD4F),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            // Bank details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    card.bankName ?? 'Bank Card',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF151E2F),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    card.bankcardNumber != null
+                                        ? '****${card.bankcardNumber!.substring(card.bankcardNumber!.length - 4)}'
+                                        : card.bindMobile ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF717F9A),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Selection indicator
+                            Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_off_outlined,
+                              color: isSelected
+                                  ? const Color(0xFF1D5DE5)
+                                  : const Color(0xFFDAE0EE),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _onSellTap() async {
@@ -144,7 +321,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
             Get.offNamed(Routes.orderDetailPage, arguments: orderId);
           }
         } catch (e) {
-          // Error handled by API interceptor
+          // 
         }
       },
     );
@@ -426,7 +603,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
 
   Widget _buildCalculationRow() {
     if (tabIndex == 0) {
-      // By Quantity - show Receivable amount
+      // By Quantity  show Receivable amount
       return Container(
         padding: const EdgeInsets.only(top: 16),
         decoration: const BoxDecoration(
@@ -457,7 +634,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
         ),
       );
     } else {
-      // By Amount - show Sell quantity
+      // By Amount  show Sell quantity
       return Container(
         padding: const EdgeInsets.only(top: 16),
         decoration: const BoxDecoration(
@@ -491,33 +668,44 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
   }
 
   Widget _buildPaymentMethodDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDAE0EE)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            "Bank Card - ****5674",
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF151E2F),
+    return GestureDetector(
+      onTap: _showPaymentMethodBottomSheet,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFDAE0EE)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                selectedBankcard != null
+                    ? "${selectedBankcard!.bankName ?? 'Bank Card'} - ****${selectedBankcard!.bankcardNumber?.substring(selectedBankcard!.bankcardNumber!.length - 4) ?? '****'}"
+                    : "Select Payment Method",
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: selectedBankcard != null
+                      ? const Color(0xFF151E2F)
+                      : const Color(0xFF717F9A),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          SvgPicture.asset(
-            'assets/icons/p2p/down-arrow.svg',
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF151E2F),
-              BlendMode.srcIn,
+            const SizedBox(width: 8),
+            SvgPicture.asset(
+              'assets/icons/p2p/down-arrow.svg',
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF151E2F),
+                BlendMode.srcIn,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -544,14 +732,17 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 20,
-                backgroundImage: AssetImage('assets/images/home/avatar.png'),
+                backgroundImage: adsDetail?.photo != null
+                    ? NetworkImage(adsDetail!.photo!)
+                    : const AssetImage('assets/images/home/avatar.png')
+                        as ImageProvider,
               ),
               const SizedBox(width: 12),
-              const Text(
-                "Melanie Moen",
-                style: TextStyle(
+              Text(
+                adsDetail?.nickname ?? "Merchant",
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -559,44 +750,46 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                 ),
               ),
               const Spacer(),
-              // Verified Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xffEAF9F0),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color(0xFFABEAC6),
-                    width: 1.0,
+              // Verified Badge conditionally shown
+              if (widget.adItem.userStatistics?.isTrust == '1')
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffEAF9F0),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFABEAC6),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/forgot_password/check_circle.svg',
+                        width: 14,
+                        height: 14,
+                        colorFilter: const ColorFilter.mode(
+                          Color(0xFF40A372),
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        "Verified",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF40A372),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/forgot_password/check_circle.svg',
-                      width: 14,
-                      height: 14,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF40A372),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text(
-                      "Verified",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF40A372),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 8),
+          // Stats Row using userStatistics data
           Row(
             children: [
               SvgPicture.asset(
@@ -609,23 +802,23 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Text(
-                "99.0%",
-                style: TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
+              Text(
+                "${_calculatePositiveRate()}%",
+                style: const TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
               ),
               _buildDivider(),
-              const Text(
-                "Trust  453,657",
-                style: TextStyle(
+              Text(
+                "Trust  ${widget.adItem.userStatistics?.confidenceCount ?? 0}",
+                style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xFF717F9A),
                   fontWeight: FontWeight.w500,
                 ),
               ),
               _buildDivider(),
-              const Text(
-                "Trade  453,657 / 99.9%",
-                style: TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
+              Text(
+                "Trade  ${widget.adItem.userStatistics?.orderFinishCount ?? 0} / ${_calculateCompletionRate()}%",
+                style: const TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
               ),
             ],
           ),
@@ -637,10 +830,10 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
               border: Border.all(color: const Color(0xFFDAE0EE)),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Ads Message",
                   style: TextStyle(
                     fontFamily: 'Inter',
@@ -651,8 +844,8 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Selling USDT with quick confirmation.\nSecure Escrow No Delays Verified Merchant",
-                  style: TextStyle(
+                  adsDetail?.leaveMessage ?? "No message",
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,

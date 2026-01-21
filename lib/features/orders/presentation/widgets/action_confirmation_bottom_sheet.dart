@@ -7,10 +7,7 @@ enum ActionType { cancelOrder, arbitration }
 class ActionConfirmationBottomSheet extends StatefulWidget {
   final ActionType actionType;
 
-  const ActionConfirmationBottomSheet({
-    super.key,
-    required this.actionType,
-  });
+  const ActionConfirmationBottomSheet({super.key, required this.actionType});
 
   @override
   State<ActionConfirmationBottomSheet> createState() =>
@@ -252,7 +249,9 @@ class _ActionConfirmationBottomSheetState
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1D5DE5),
-                    disabledBackgroundColor: const Color(0xFF1D5DE5).withOpacity(0.5),
+                    disabledBackgroundColor: const Color(
+                      0xFF1D5DE5,
+                    ).withOpacity(0.5),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

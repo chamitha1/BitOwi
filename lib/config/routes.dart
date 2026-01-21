@@ -140,7 +140,10 @@ class AppPages {
     GetPage(name: Routes.myAdsPage, page: () => MyAdsPage()),
     GetPage(
       name: Routes.orderDetailPage,
-      page: () => const OrderDetailsPage(),
+      page: () {
+        final orderId = Get.parameters['orderId'] ?? '';
+        return OrderDetailsPage(orderId: orderId);
+      },
     ),
 
   ];

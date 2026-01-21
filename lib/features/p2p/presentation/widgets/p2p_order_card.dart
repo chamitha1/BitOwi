@@ -241,7 +241,7 @@ class P2POrderCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${adItem?.leftCount} ${adItem?.tradeCoin ?? ''}",
+                    "${double.tryParse(adItem?.leftCount ?? '0')?.toStringAsFixed(2) ?? '0.00'} ${adItem?.tradeCoin ?? ''}",
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,

@@ -2,6 +2,22 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'trade_order_page_res.g.dart';
 
+int? _dynamicToInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is double) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
+}
+
+double? _dynamicToDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
+}
+
 @JsonSerializable()
 class TradeOrderPageRes {
   final int? pageNum;
@@ -30,24 +46,48 @@ class TradeOrderPageRes {
 
 @JsonSerializable()
 class TradeOrderItem {
+  @JsonKey(fromJson: _dynamicToInt)
   final int? buyUser;
+  
   final String? buyerNickname;
   final String? buyerPhoto;
+  
+  @JsonKey(fromJson: _dynamicToInt)
   final int? sellUser;
+  
   final String? sellerNickname;
   final String? sellerPhoto;
   final List<dynamic>? statusList;
-  final String? id;
+  
+  @JsonKey(fromJson: _dynamicToInt)
+  final int? id;
+  
   final String? type;
   final String? tradeCurrency;
   final String? tradeCoin;
-  final String? tradeAmount;
-  final String? count;
-  final String? number;
+  
+  @JsonKey(fromJson: _dynamicToDouble)
+  final double? tradeAmount;
+  
+  @JsonKey(fromJson: _dynamicToDouble)
+  final double? count;
+  
+  @JsonKey(fromJson: _dynamicToInt)
+  final int? number;
+  
+  @JsonKey(fromJson: _dynamicToInt)
   final int? userId;
+  
   final String? realName;
-  final String? status;
-  final String? createDatetime;
+  
+  @JsonKey(fromJson: _dynamicToInt)
+  final int? status;
+  
+  @JsonKey(fromJson: _dynamicToInt)
+  final int? createDatetime;
+  
+  @JsonKey(fromJson: _dynamicToInt)
+  final int? adsId;
 
   TradeOrderItem({
     this.buyUser,
@@ -68,6 +108,7 @@ class TradeOrderItem {
     this.realName,
     this.status,
     this.createDatetime,
+    this.adsId,
   });
 
   factory TradeOrderItem.fromJson(Map<String, dynamic> json) =>

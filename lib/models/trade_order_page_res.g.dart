@@ -32,24 +32,25 @@ Map<String, dynamic> _$TradeOrderPageResToJson(TradeOrderPageRes instance) =>
 
 TradeOrderItem _$TradeOrderItemFromJson(Map<String, dynamic> json) =>
     TradeOrderItem(
-      buyUser: (json['buyUser'] as num?)?.toInt(),
+      buyUser: _dynamicToInt(json['buyUser']),
       buyerNickname: json['buyerNickname'] as String?,
       buyerPhoto: json['buyerPhoto'] as String?,
-      sellUser: (json['sellUser'] as num?)?.toInt(),
+      sellUser: _dynamicToInt(json['sellUser']),
       sellerNickname: json['sellerNickname'] as String?,
       sellerPhoto: json['sellerPhoto'] as String?,
       statusList: json['statusList'] as List<dynamic>?,
-      id: json['id'] as String?,
+      id: _dynamicToInt(json['id']),
       type: json['type'] as String?,
       tradeCurrency: json['tradeCurrency'] as String?,
       tradeCoin: json['tradeCoin'] as String?,
-      tradeAmount: json['tradeAmount'] as String?,
-      count: json['count'] as String?,
-      number: json['number'] as String?,
-      userId: (json['userId'] as num?)?.toInt(),
+      tradeAmount: _dynamicToDouble(json['tradeAmount']),
+      count: _dynamicToDouble(json['count']),
+      number: _dynamicToInt(json['number']),
+      userId: _dynamicToInt(json['userId']),
       realName: json['realName'] as String?,
-      status: json['status'] as String?,
-      createDatetime: json['createDatetime'] as String?,
+      status: _dynamicToInt(json['status']),
+      createDatetime: _dynamicToInt(json['createDatetime']),
+      adsId: _dynamicToInt(json['adsId']),
     );
 
 Map<String, dynamic> _$TradeOrderItemToJson(TradeOrderItem instance) =>
@@ -72,4 +73,5 @@ Map<String, dynamic> _$TradeOrderItemToJson(TradeOrderItem instance) =>
       'realName': instance.realName,
       'status': instance.status,
       'createDatetime': instance.createDatetime,
+      'adsId': instance.adsId,
     };

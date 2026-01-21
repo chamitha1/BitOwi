@@ -61,112 +61,115 @@ class OrderCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Order No",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF717F9A),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      orderNo.length > 8
+                          ? '${orderNo.substring(0, 8)}...'
+                          : orderNo,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF151E2F),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _buildStatusBadge(),
+                    // Only show chat icon for pending order and arbitration
+                    if (status == OrderStatus.pending ||
+                        status == OrderStatus.arbitration) ...[
+                      const SizedBox(width: 12),
+                      _buildChatIcon(),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: Color(0xFFECEFF5)),
+            const SizedBox(height: 12),
+
+            // Info
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF101828),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildDataColumn("Time", date, CrossAxisAlignment.start),
+                _buildDataColumn(
+                  "Quantity(ETH)",
+                  quantity,
+                  CrossAxisAlignment.center,
+                ),
+                _buildDataColumn("Total(NGN)", total, CrossAxisAlignment.end),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            //User Info
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFECEFF5).withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
                 children: [
-                  const Text(
-                    "Order No",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF717F9A),
-                      fontFamily: 'Inter',
+                  ClipOval(
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      child: CommonImage(userAvatar, fit: BoxFit.cover),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(width: 8),
                   Text(
-                    orderNo,
+                    userName,
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF151E2F),
                       fontFamily: 'Inter',
                     ),
                   ),
+                  const Spacer(),
+                  if (isCertified) _buildCertifiedBadge(),
                 ],
               ),
-              Row(
-                children: [
-                  _buildStatusBadge(),
-                  if (status != OrderStatus.completed &&
-                      status != OrderStatus.cancelled) ...[
-                    const SizedBox(width: 12),
-                    _buildChatIcon(),
-                  ],
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: Color(0xFFECEFF5)),
-          const SizedBox(height: 12),
-
-          // Info
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF101828),
-                  fontFamily: 'Inter',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildDataColumn("Time", date, CrossAxisAlignment.start),
-              _buildDataColumn(
-                "Quantity(ETH)",
-                quantity,
-                CrossAxisAlignment.center,
-              ), 
-              _buildDataColumn("Total(NGN)", total, CrossAxisAlignment.end),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          //User Info
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFECEFF5).withOpacity(0.3),
-              borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
-              children: [
-                ClipOval(
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    child: CommonImage(userAvatar, fit: BoxFit.cover),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  userName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF151E2F),
-                    fontFamily: 'Inter',
-                  ),
-                ),
-                const Spacer(),
-                if (isCertified) _buildCertifiedBadge(),
-              ],
-            ),
-          ),
           ],
         ),
       ),

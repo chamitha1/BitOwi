@@ -2,15 +2,233 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:BitOwi/api/p2p_api.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/orders/presentation/widgets/order_card.dart';
+import 'package:BitOwi/features/orders/presentation/widgets/action_confirmation_bottom_sheet.dart';
+import 'package:BitOwi/features/orders/presentation/widgets/notify_payment_dialog.dart';
+import 'package:BitOwi/features/orders/utils/order_helper.dart';
+import 'package:BitOwi/models/trade_order_detail_res.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 
-class OrderDetailsPage extends StatelessWidget {
-  final OrderStatus status;
+class OrderDetailsPage extends StatefulWidget {
+  final String orderId;
 
-  const OrderDetailsPage({super.key, this.status = OrderStatus.pendingPayment});
+  const OrderDetailsPage({super.key, required this.orderId});
+
+  @override
+  State<OrderDetailsPage> createState() => _OrderDetailsPageState();
+}
+
+class _OrderDetailsPageState extends State<OrderDetailsPage> {
+  TradeOrderDetailRes? orderDetail;
+  bool isLoading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrderDetail();
+  }
+
+  Future<void> _fetchOrderDetail() async {
+    try {
+      print('🔄 Fetching order detail for ID: ${widget.orderId}');
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+      
+      final detail = await P2PApi.getTradeOrderDetail(widget.orderId);
+      print('✅ Order detail fetched: ${detail.id}, Amount: ${detail.tradeAmount}, Currency: ${detail.tradeCurrency}');
+      print('📅 invalidDatetime: ${detail.invalidDatetime}');
+      
+      setState(() {
+        orderDetail = detail;
+        isLoading = false;
+      });
+      print('✅ State updated, UI should rebuild now');
+    } catch (e) {
+      print('❌ Error fetching order detail: $e');
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  bool get isSeller {
+    if (orderDetail == null) return false;
+    final userId = Get.find<UserController>().user.value?.id.toString();
+    return userId == orderDetail!.sellUser;
+  }
+
+  OrderStatus get status {
+    if (orderDetail == null) return OrderStatus.pending;
+    return OrderHelper.mapApiStatusToOrderStatus(orderDetail!.status);
+  }
+
+  // ==================== ACTION HANDLERS ====================
+
+  void _showCancelOrderBottomSheet() {
+    Get.bottomSheet(
+      ActionConfirmationBottomSheet(
+        actionType: ActionType.cancelOrder,
+      ),
+      isScrollControlled: true,
+    ).then((confirmed) {
+      if (confirmed == true) {
+        _handleCancelOrder();
+      }
+    });
+  }
+
+
+  Future<void> _handleCancelOrder() async {
+    try {
+      print('🔄 Cancelling order: ${widget.orderId}');
+      _showLoadingDialog();
+      
+      await P2PApi.cancelOrder(widget.orderId);
+      
+      _hideLoadingDialog();
+      _showSuccessSnackbar('Order cancelled successfully');
+      
+
+      await _fetchOrderDetail();
+    } catch (e) {
+      print('❌ Error cancelling order: $e');
+      _hideLoadingDialog();
+      _showErrorSnackbar(e.toString());
+    }
+  }
+
+  void _showNotifyPaymentDialog() {
+    Get.dialog(
+      NotifyPaymentDialog(
+        onConfirm: () {
+          Get.back(); // Close dialog
+          _handleNotifyPayment();
+        },
+      ),
+    );
+  }
+
+  ///Mark as Paid API Call
+  Future<void> _handleNotifyPayment() async {
+    try {
+      print('🔄 Marking order as paid: ${widget.orderId}');
+      _showLoadingDialog();
+      
+      await P2PApi.markOrderPay(widget.orderId);
+      
+      _hideLoadingDialog();
+      _showSuccessSnackbar('Payment notification sent');
+   
+      await _fetchOrderDetail();
+    } catch (e) {
+      print('❌ Error notifying payment: $e');
+      _hideLoadingDialog();
+      _showErrorSnackbar(e.toString());
+    }
+  }
+
+  void _showArbitrationBottomSheet() {
+    Get.bottomSheet(
+      ActionConfirmationBottomSheet(
+        actionType: ActionType.arbitration,
+      ),
+      isScrollControlled: true,
+    ).then((confirmed) {
+      if (confirmed == true) {
+        _handleArbitrationRequest();
+      }
+    });
+  }
+
+  ///Arbitration API Call
+  Future<void> _handleArbitrationRequest() async {
+    try {
+      print('🔄 Requesting arbitration for order: ${widget.orderId}');
+      _showLoadingDialog();
+      
+      await P2PApi.applyArbitration(widget.orderId);
+      
+      _hideLoadingDialog();
+      _showSuccessSnackbar('Arbitration request submitted');
+      
+
+      await _fetchOrderDetail();
+    } catch (e) {
+      print('❌ Error requesting arbitration: $e');
+      _hideLoadingDialog();
+      _showErrorSnackbar(e.toString());
+    }
+  }
+
+  // ==================== HELPER METHODS ====================
+
+  void _showLoadingDialog() {
+    Get.dialog(
+      const Center(
+        child: CircularProgressIndicator(
+          color: Color(0xFF1D5DE5),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  void _hideLoadingDialog() {
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
+  }
+
+  void _showSuccessSnackbar(String message) {
+    CustomSnackbar.showSuccess(
+      title: 'Success',
+      message: message,
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    CustomSnackbar.showError(
+      title: 'Error',
+      message: message,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: _buildAppBar(),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (error != null || orderDetail == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: _buildAppBar(),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: ${error ?? "Failed to load order"}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchOrderDetail,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF6F9FF),
       appBar: _buildAppBar(),
@@ -159,6 +377,8 @@ class OrderDetailsPage extends StatelessWidget {
     String title;
     String? subtitle;
 
+    print('🔍 Building status header - status: $status, orderDetail.status: ${orderDetail?.status}, invalidDatetime: ${orderDetail?.invalidDatetime}');
+
     switch (status) {
       case OrderStatus.pending:
         iconPath = 'assets/icons/orders/clock.svg';
@@ -170,8 +390,22 @@ class OrderDetailsPage extends StatelessWidget {
         iconPath = 'assets/icons/orders/clock.svg';
         bgColor = const Color(0xFFFFFBF6);
         title = 'Payment Pending';
+        // Format invalidDatetime 
+        String expiryTime = '00:00:00';
+        if (orderDetail?.invalidDatetime != null) {
+          try {
+            final dt = DateTime.fromMillisecondsSinceEpoch(orderDetail!.invalidDatetime!);
+            expiryTime = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+            print('✅ Formatted expiry time: $expiryTime from timestamp: ${orderDetail!.invalidDatetime}');
+          } catch (e) {
+            print('❌ Error formatting invalidDatetime: $e');
+          }
+        } else {
+          print('⚠️ invalidDatetime is null');
+        }
         subtitle =
-            'Order will be held until 12:00:00 and will be cancelled after deadline';
+            'Order will be held until $expiryTime and will be cancelled after deadline';
+        print('📝 Final subtitle: $subtitle');
         break;
       case OrderStatus.pendingReleased:
         iconPath = 'assets/icons/orders/lock.svg';
@@ -231,28 +465,42 @@ class OrderDetailsPage extends StatelessWidget {
           const SizedBox(height: 8),
           // Subtitle
           if (status == OrderStatus.pendingPayment)
-            RichText(
-              textAlign: TextAlign.center,
-              text: const TextSpan(
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF425665),
-                  fontFamily: 'Inter',
-                ),
-                children: [
-                  TextSpan(text: 'Order will be held until '),
-                  TextSpan(
-                    text: '12:00:00',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF151E2F),
+            Builder(
+              builder: (context) {
+                // Extract time from subtitle
+                String displayTime = '00:00:00';
+                if (orderDetail?.invalidDatetime != null) {
+                  try {
+                    final dt = DateTime.fromMillisecondsSinceEpoch(orderDetail!.invalidDatetime!);
+                    displayTime = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+                  } catch (e) {
+                    print('Error in RichText formatting: $e');
+                  }
+                }
+                return RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF425665),
+                      fontFamily: 'Inter',
                     ),
+                    children: [
+                      const TextSpan(text: 'Order will be held until '),
+                      TextSpan(
+                        text: displayTime,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF151E2F),
+                        ),
+                      ),
+                      const TextSpan(text: ' and will be cancelled after deadline'),
+                    ],
                   ),
-                  TextSpan(text: ' and will be cancelled after deadline'),
-                ],
-              ),
+                );
+              },
             )
           else
             Text(
@@ -271,22 +519,25 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildMainAmount() {
+    final amount = orderDetail?.tradeAmount?.toString() ?? '0';
+    final currency = orderDetail?.tradeCurrency ?? 'USD';
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         RichText(
-          text: const TextSpan(
-            style: TextStyle(
+          text: TextSpan(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: Color(0xFF151E2F),
               fontFamily: 'Inter',
             ),
             children: [
-              TextSpan(text: '84,489.04 '),
+              TextSpan(text: '$amount '),
               TextSpan(
-                text: 'NGN',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                text: currency,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -294,7 +545,7 @@ class OrderDetailsPage extends StatelessWidget {
         const SizedBox(width: 12),
         GestureDetector(
           onTap: () {
-            Clipboard.setData(ClipboardData(text: "123456"));
+            Clipboard.setData(ClipboardData(text: amount));
             Get.snackbar(
               'Copied',
               'Amount copied to clipboard',
@@ -327,20 +578,26 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildStatsGrid() {
+    final time = orderDetail?.createDatetime != null
+        ? OrderHelper.formatDateTime(orderDetail!.createDatetime)
+        : 'N/A';
+    final quantity = '${orderDetail?.count ?? '0'} ${orderDetail?.tradeCoin ?? ''}';
+    final total = '${orderDetail?.tradeAmount ?? '0'} ${orderDetail?.tradeCurrency ?? ''}';
+    
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildStatColumn('Time', '03/26, 11.45', CrossAxisAlignment.start),
+            _buildStatColumn('Time', time, CrossAxisAlignment.start),
             _buildStatColumn(
-              'Quantity(ETH)',
-              '1.00000293',
+              'Quantity(${orderDetail?.tradeCoin ?? 'COIN'})',
+              orderDetail?.count?.toString() ?? '0',
               CrossAxisAlignment.center,
             ),
             _buildStatColumn(
-              'Total(NGN)',
-              '3,578,584.95',
+              'Total(${orderDetail?.tradeCurrency ?? 'USD'})',
+              orderDetail?.tradeAmount?.toString() ?? '0',
               CrossAxisAlignment.end,
             ),
           ],
@@ -383,47 +640,61 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildDetailsList() {
+    final counterpartyName = isSeller
+        ? (orderDetail?.buyerNickname ?? 'Unknown')
+        : (orderDetail?.sellerNickname ?? 'Unknown');
+    final counterpartyPhoto = isSeller
+        ? (orderDetail?.buyerPhoto)
+        : (orderDetail?.sellerPhoto);
+    final counterpartyLabel = isSeller ? 'Buyer' : 'Seller';
+    
     return Column(
       children: [
         _buildDetailRow(
-          'Seller',
-          'Brandy Schimmel',
+          counterpartyLabel,
+          counterpartyName,
           hasAvatar: true,
-          avatarPath: 'assets/icons/orders/Avatar.png',
+          avatarPath: counterpartyPhoto,
         ),
         const SizedBox(height: 12),
-        _buildDetailRow('Order No', '19714381', hasCopy: true),
+        _buildDetailRow('Order No', orderDetail?.id ?? 'N/A', hasCopy: true),
         const SizedBox(height: 12),
-        _buildDetailRow('Order Time', '03/26, 10.30'),
+        _buildDetailRow(
+          'Order Time',
+          orderDetail?.createDatetime != null
+              ? OrderHelper.formatDateTime(orderDetail!.createDatetime)
+              : 'N/A',
+        ),
         const SizedBox(height: 12),
         _buildDetailRow(
           'Payment Methods',
-          'Bank Cards',
+          'Bank Transfer',
           valueColor: const Color(0xFF1E2C37),
         ),
         const SizedBox(height: 12),
         _buildDetailRow(
           'Bank',
-          'China Everbright Bank',
+          orderDetail?.bankName ?? 'N/A',
           valueColor: const Color(0xFF1E2C37),
         ),
         const SizedBox(height: 12),
         _buildDetailRow(
-          'Bank Branches',
-          'Macau',
+          'Account Name',
+          orderDetail?.realName ?? 'N/A',
           valueColor: const Color(0xFF1E2C37),
         ),
         const SizedBox(height: 12),
-        _buildDetailRow('Bank Number', '7434 5784 3784 4983', hasCopy: true),
-        const SizedBox(height: 12),
         _buildDetailRow(
-          'Buyer',
-          'Janie Price DDS',
-          hasAvatar: true,
-          avatarPath: 'assets/icons/orders/Avatar1.png',
+          'Bank Number',
+          orderDetail?.bankcardNumber ?? 'N/A',
+          hasCopy: true,
         ),
         const SizedBox(height: 12),
-        _buildDetailRow('Ads Messages', 'Selling USDT with quick'),
+        if (orderDetail?.leaveMessage?.isNotEmpty ?? false)
+          _buildDetailRow(
+            'Ads Messages',
+            orderDetail!.leaveMessage!,
+          ),
       ],
     );
   }
@@ -459,12 +730,27 @@ class OrderDetailsPage extends StatelessWidget {
             children: [
               if (hasAvatar && avatarPath != null) ...[
                 ClipOval(
-                  child: Image.asset(
-                    avatarPath,
-                    width: 24,
-                    height: 24,
-                    fit: BoxFit.cover,
-                  ),
+                  child: avatarPath.startsWith('http')
+                      ? Image.network(
+                          avatarPath,
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 24,
+                              height: 24,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.person, size: 16),
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          avatarPath,
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 const SizedBox(width: 8),
               ],
@@ -514,12 +800,11 @@ class OrderDetailsPage extends StatelessWidget {
     switch (status) {
       case OrderStatus.pending:
       case OrderStatus.pendingPayment:
-        // Cancel and Notify Payment
         return Row(
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: _showCancelOrderBottomSheet,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
@@ -541,7 +826,7 @@ class OrderDetailsPage extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: _showNotifyPaymentDialog,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1D5DE5),
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -565,28 +850,30 @@ class OrderDetailsPage extends StatelessWidget {
 
       case OrderStatus.pendingReleased:
         //outlined button
-        return OutlinedButton(
-          onPressed: () {},
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        return SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: _showArbitrationBottomSheet,
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-          ),
-          child: const Text(
-            'Request for Arbitration',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1D5DE5),
-              fontFamily: 'Inter',
+            child: const Text(
+              'Request for Arbitration',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1D5DE5),
+                fontFamily: 'Inter',
+              ),
             ),
           ),
         );
 
       case OrderStatus.cryptoReleased:
-        // filled button
         return ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(

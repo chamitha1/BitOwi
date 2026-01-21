@@ -63,6 +63,7 @@
     lazy_load_indexed_stack: ^1.2.1
 
     cached_network_image: ^3.4.1
+    tencent_cloud_chat_sdk: ^8.8.7373+1
     
   dev_dependencies:
     flutter_test:
