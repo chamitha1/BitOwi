@@ -7,10 +7,12 @@ class SoftCircularLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: CircularProgressIndicator(strokeWidth: 2.5, color: color),
+    return Center(
+      child: SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2.5, color: color),
+      ),
     );
   }
 }

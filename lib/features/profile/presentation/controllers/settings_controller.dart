@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
@@ -45,8 +43,11 @@ class SettingsController extends GetxController {
 
       if (pickedFile == null) return;
 
-      final file = File(pickedFile.path);
-      final size = await file.length();
+      // final file = File(pickedFile.path);
+      // final size = await file.length();
+      final bytes = await pickedFile.readAsBytes();
+      final size = bytes.lengthInBytes;
+
       const maxSize = 5 * 1024 * 1024;
 
       if (size > maxSize) {
@@ -59,6 +60,10 @@ class SettingsController extends GetxController {
 
       final url = await AwsUploadUtil().upload(file: pickedFile);
       await setPhoto(url);
+      CustomSnackbar.showSuccess(
+        title: "Success",
+        message: "Profile image changed successfully",
+      );
     } on UploadTooLargeException {
       CustomSnackbar.showError(
         title: "Upload Failed",
@@ -202,5 +207,4 @@ class SettingsController extends GetxController {
   }
 
   /// ====================== ADD BANK CARD ======================
-  
 }

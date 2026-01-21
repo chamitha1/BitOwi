@@ -1,12 +1,19 @@
 import 'package:BitOwi/api/c2c_api.dart';
+import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/core/widgets/common_empty_state.dart';
+import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/core/widgets/confirm_dialog.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/models/ads_my_page_res.dart';
-import 'package:BitOwi/models/ads_page_res.dart';
+import 'package:BitOwi/utils/common_utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class MyAdsPage extends StatefulWidget {
@@ -112,11 +119,12 @@ class _MyAdsPageState extends State<MyAdsPage> {
       appBar: CommonAppBar(title: "My Ads", onBack: () => Get.back()),
       body: Column(
         children: [
+          SizedBox(height: 10),
           // Tab Bar
           Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildTab("Draft", 0),
                 const SizedBox(width: 12),
@@ -136,24 +144,17 @@ class _MyAdsPageState extends State<MyAdsPage> {
               child: isLoading
                   ? SoftCircularLoader()
                   : isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.inbox_outlined,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "No ads found",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
+                  ? CommonEmptyState(
+                      title: 'No Ads Avalibale',
+                      description: 'Post an ad to start trading with others.',
+                      action: SizedBox(
+                        width: 287,
+                        child: PrimaryButton(
+                          text: 'Post Ads',
+                          onPressed: () {
+                            Get.toNamed(Routes.postAdsPage);
+                          },
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -186,21 +187,17 @@ class _MyAdsPageState extends State<MyAdsPage> {
           }
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF2F6CFF)
-                : const Color(0xFFF6F7FB),
-            borderRadius: BorderRadius.circular(8),
+                ? const Color(0xFF1D5DE5)
+                : const Color(0xFFECEFF5),
+            borderRadius: BorderRadius.circular(12),
           ),
           alignment: Alignment.center,
-          child: Text(
+          child: AppText.p2Bold(
             title,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF8F9BB3),
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            ),
+            color: isSelected ? Colors.white : const Color(0xFF8F9BB3),
           ),
         ),
       ),
@@ -208,221 +205,269 @@ class _MyAdsPageState extends State<MyAdsPage> {
   }
 
   Widget _buildAdCard({required AdsMyPageRes ad}) {
+    final userController = Get.find<UserController>();
+
     // Calculate completion rate from userStatistics
     final stats = ad.userStatistics;
-    final completionRate = stats.orderCount > 0
+    final finishRate = stats.orderCount > 0
         ? ((stats.orderFinishCount / stats.orderCount) * 100).toStringAsFixed(1)
         : "0.0";
 
-    // Format currency symbol based on tradeCurrency
-    final currencySymbol = ad.tradeCurrency == "NGN" ? "₦" : "\$";
-
     // Payment type display
-    final payTypeDisplay = ad.payType == "0"
-        ? (ad.bankName ?? "Bank Transfer")
-        : "Other Payment";
+    final payTypeDisplay = ad.bankPic != null
+        ? ad.bankName ?? 'Bank Transfer'
+        : 'Bank Transfer';
+
+    // Buy or Sell
+    final isBuy = ad.tradeType == "0";
+
+    // Bank or Mobile card
+    final hasBank = ad.bankPic != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           //* User Info Row
-          Row(
-            children: [
-              // Avatar
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: ad.photo.isNotEmpty
-                    ? NetworkImage(ad.photo)
-                    : null,
-                backgroundColor: const Color(0xFF2F6CFF),
-                child: ad.photo.isEmpty
-                    ? Text(
-                        ad.nickname.isNotEmpty
-                            ? ad.nickname[0].toUpperCase()
-                            : "?",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 12),
-              // Name and Badge
-              Expanded(
-                child: Row(
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Color(0xFFECEFF5).withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Flexible(
-                      child: Text(
-                        ad.nickname,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    // Avatar
+                    GestureDetector(
+                      onTap: () {
+                        // Get.toNamed(
+                        //   Routes.paymentMethodsPage,
+                        //   parameters: {"userId": info.userId},
+                        // );
+                        debugPrint("🚀 Navigate to userCenter merchant ads");
+                      },
+
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            height: 32,
+                            width: 32,
+                            child: ClipOval(
+                              child: ad.photo.isNotEmpty
+                                  ? CommonImage(ad.photo, fit: BoxFit.cover)
+                                  : Container(
+                                      color: const Color(0xFFE8EFFF),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        _getInitials(ad.nickname),
+                                        style: const TextStyle(
+                                          color: Color(0xFF1D5DE5),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          // Nickname
+                          AppText.p2SemiBold(ad.nickname),
+                        ],
                       ),
                     ),
-                    // Show Certified badge if user has good stats
-                    if (stats.orderFinishCount > 50 &&
-                        completionRate != "0.0" &&
-                        double.parse(completionRate) >= 95) ...[
-                      const SizedBox(width: 8),
+                    Spacer(),
+                    // Certified
+                    if (userController.user.value?.merchantStatus == '1')
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F0FF),
-                          borderRadius: BorderRadius.circular(4),
+                          color: const Color(0xFFE8EFFF),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(
-                              Icons.verified,
-                              size: 12,
-                              color: Color(0xFF2F6CFF),
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              "Certified",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF2F6CFF),
-                                fontWeight: FontWeight.w500,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/profile_page/shield.svg',
+                              width: 14,
+                              height: 14,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF1D5DE5),
+                                BlendMode.srcIn,
                               ),
+                            ),
+                            const SizedBox(width: 4),
+
+                            AppText.p4Medium(
+                              'Certified',
+                              color: Color(0xFF1D5DE5),
                             ),
                           ],
                         ),
                       ),
-                    ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                //* Stats Row
+                Row(
+                  children: [
+                    // completion rate
+                    SvgPicture.asset(
+                      'assets/icons/profile_page/like.svg',
+                      width: 16,
+                      height: 16,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.orange,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    AppText.p4Regular("$finishRate%", color: Color(0xFF717F9A)),
+                    Container(
+                      height: 17,
+                      width: 1,
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                      color: Color(0xFFB9C6E2),
+                    ),
+                    // Trust
+                    AppText.p4Regular("Trust", color: Color(0xFF717F9A)),
+                    AppText.p4SemiBold(
+                      '  ${ad.userStatistics.confidenceCount}',
+                      color: Color(0xFF717F9A),
+                    ),
+                    Container(
+                      height: 17,
+                      width: 1,
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                      color: Color(0xFFB9C6E2),
+                    ),
+                    // Trade
+                    AppText.p4Regular("Trade", color: Color(0xFF717F9A)),
+                    AppText.p4SemiBold(
+                      '  ${ad.userStatistics.orderCount} /  $finishRate%',
+                      color: Color(0xFF717F9A),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          //* True Price
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text:
+                          "${CommonUtils.getUnit(ad.tradeCurrency)} ${ad.truePrice} ",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF151E2F),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: "Per USDT",
+                      style: TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isBuy
+                      ? const Color(0xFFEAF9F0)
+                      : const Color(0xFFFDF4F5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      isBuy
+                          ? 'assets/icons/profile_page/arrow_down_left.svg'
+                          : 'assets/icons/profile_page/arrow_up_right.svg',
+                      width: 16,
+                      height: 16,
+                    ),
+                    const SizedBox(width: 5),
+                    AppText.p4Medium(
+                      isBuy ? 'Buy Ad' : 'Sell Ad',
+                      color: isBuy
+                          ? const Color(0xFF40A372)
+                          : const Color(0xFFE74C3C),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          //* Stats Row
-          Row(
-            children: [
-              const Icon(Icons.thumb_up, size: 14, color: Color(0xFFFF9500)),
-              const SizedBox(width: 4),
-              Text(
-                "$completionRate%",
-                style: const TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                "Trust",
-                style: TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                stats.confidenceCount.toString(),
-                style: const TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                "Trade",
-                style: TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "${stats.totalTradeCount} / $completionRate%",
-                style: const TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          //* Price
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: "$currencySymbol ${ad.truePrice} ",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-                ),
-                const TextSpan(
-                  text: "Per USDT",
-                  style: TextStyle(fontSize: 13, color: Color(0xFF8F9BB3)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
           //* Total and Limit
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Total",
-                    style: TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "${ad.leftCount} ${ad.tradeCoin}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText.p3Regular("Total", color: Color(0xFF929EB8)),
+                    const SizedBox(height: 2),
+                    AppText.p3Medium("${ad.leftCount} ${ad.tradeCoin}"),
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Limit",
-                    style: TextStyle(fontSize: 12, color: Color(0xFF8F9BB3)),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "$currencySymbol${ad.minTrade}-$currencySymbol${ad.maxTrade}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText.p3Regular("Limit", color: Color(0xFF929EB8)),
+                    const SizedBox(height: 2),
+                    AppText.p3Medium(
+                      "${CommonUtils.getUnit(ad.tradeCurrency)}${ad.minTrade}–${CommonUtils.getUnit(ad.tradeCurrency)}${ad.maxTrade}",
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+
           //* Payment Type
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF4E5),
-              borderRadius: BorderRadius.circular(6),
+              color: hasBank
+                  ? const Color(0xFFFDF4F5)
+                  : const Color(0xFFFFFBF6),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
+            child: AppText.p4Medium(
               payTypeDisplay,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFFFF9500),
-                fontWeight: FontWeight.w500,
-              ),
+              color: hasBank
+                  ? const Color(0xFFE74C3C)
+                  : const Color(0xFFFF9B29),
             ),
           ),
-          const SizedBox(height: 8),
-          const Divider(color: Color(0xFFECEFF5)),
           const SizedBox(height: 4),
-
+          if (selectedTab != 2) Divider(color: Color(0xFFECEFF5), height: 20),
           //* Action Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -432,16 +477,21 @@ class _MyAdsPageState extends State<MyAdsPage> {
                 OutlinedButton.icon(
                   onPressed: () {
                     // TODO: Navigate to edit ad page
-                    print("Edit ad: ${ad.id}");
+                    print(" Navigate to edit ad page / Edit ad: ${ad.id}");
+                    onEditTap();
                   },
-                  icon: const Icon(Icons.edit_outlined, size: 16),
-                  label: const Text("Edit"),
+                  icon: SvgPicture.asset(
+                    'assets/icons/profile_page/edit.svg',
+                    width: 16,
+                    height: 16,
+                  ),
+                  label: AppText.p3Medium('Edit', color: Color(0xFF1D5DE5)),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF2F6CFF),
-                    side: const BorderSide(color: Color(0xFFE4E9F2)),
+                    foregroundColor: const Color(0xFF1D5DE5),
+                    side: const BorderSide(color: Color(0xFF1D5DE5)),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 10,
+                      vertical: 8,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -453,14 +503,18 @@ class _MyAdsPageState extends State<MyAdsPage> {
                   onPressed: () {
                     onPostTap(ad);
                   },
-                  icon: const Icon(Icons.send, size: 16),
-                  label: const Text("Post"),
+                  icon: SvgPicture.asset(
+                    'assets/icons/profile_page/post.svg',
+                    width: 16,
+                    height: 16,
+                  ),
+                  label: AppText.p3Medium('Post', color: Colors.white),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F6CFF),
+                    backgroundColor: const Color(0xFF1D5DE5),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 10,
+                      vertical: 8,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -468,39 +522,23 @@ class _MyAdsPageState extends State<MyAdsPage> {
                   ),
                 ),
               ] else if (selectedTab == 1) ...[
-                // Posted: Edit and Off buttons
-                OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO: Navigate to edit ad page
-                    print("Edit ad: ${ad.id}");
-                  },
-                  icon: const Icon(Icons.edit_outlined, size: 16),
-                  label: const Text("Edit"),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF2F6CFF),
-                    side: const BorderSide(color: Color(0xFFE4E9F2)),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
+                // Posted: Off buttons
                 ElevatedButton.icon(
                   onPressed: () {
                     offDownTap(ad);
                   },
-                  icon: const Icon(Icons.power_settings_new, size: 16),
-                  label: const Text("Off"),
+                  icon: SvgPicture.asset(
+                    'assets/icons/profile_page/toggle_off_circle.svg',
+                    width: 16,
+                    height: 16,
+                  ),
+                  label: AppText.p3Medium('Off', color: Colors.white),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F6CFF),
+                    backgroundColor: const Color(0xFF1D5DE5),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 10,
+                      vertical: 8,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -516,30 +554,13 @@ class _MyAdsPageState extends State<MyAdsPage> {
     );
   }
 
-  //   onDownTap(BuildContext context) {
-  //     // todo: only for web this feature
-  //   // if (!PlatformUtils().isMobile) {
-  //   //   DownloadModal.showModal(context);
-  //   //   return;
-  //   // }
-  //   ConfirmModal.showModal(
-  //     context: context,
-  //     title: '确认下架广告?'.tr,
-  //     onConfirm: () async {
-  //       try {
-  //         ToastUtil.showLoading();
-  //         await C2CApi.upDownAds(info.id, "0");
-  //         ToastUtil.dismiss();
-  //         ToastUtil.showToast('下架成功'.tr);
-  //         if (afterDown != null) {
-  //           afterDown!();
-  //         }
-  //       } catch (e) {
-  //         ToastUtil.dismiss();
-  //       }
-  //     },
-  //   );
-  // }
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length == 1) {
+      return parts.first[0].toUpperCase();
+    }
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
 
   // Post ad (Draft → Posted)
   void onPostTap(AdsMyPageRes ad) {
@@ -552,9 +573,10 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
     showCommonConfirmDialog(
       context,
-      title: "Confirm to post ad?",
-      message: "Are you sure you want to post this ad?",
-      primaryText: "Post",
+      title: "Post This Ad?",
+      message:
+          "Once posted, this ad will be visible to other users and open for trading.",
+      primaryText: "Confirm",
       secondaryText: "Cancel",
       onPrimary: () async {
         if (isLoading) return;
@@ -606,8 +628,9 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
     showCommonConfirmDialog(
       context,
-      title: "Confirm to off ads?",
-      message: "Are you sure you want to turn off this ad?",
+      title: "Confirmation to Off",
+      message:
+          "This ad will be moved to Archived and will no longer be visible to other users. Once archived, this action cannot be undone",
       primaryText: "Confirm",
       secondaryText: "Cancel",
       onPrimary: () async {
@@ -648,5 +671,6 @@ class _MyAdsPageState extends State<MyAdsPage> {
   // Edit ad
   void onEditTap() {
     // Get.toNamed(Routes.publishAd, parameters: {'id': info.id});
+    Get.toNamed(Routes.postAdsPage);
   }
 }

@@ -22,7 +22,10 @@ class ImagePickerModal extends StatelessWidget {
       if (isVideo) {
         return picker.pickVideo(source: source);
       }
-      return picker.pickImage(source: source, imageQuality: 75);
+      return picker.pickImage(
+        source: source,
+        //  imageQuality: 75
+      );
     }
     return null;
   }
