@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 
-import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/p2p_api.dart';
-import 'package:BitOwi/models/dict.dart';
+import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:get/get.dart';
 
@@ -24,8 +24,8 @@ class _P2PPageState extends State<P2PPage> {
   bool isBuySelected = true;
 
   // Filters
-  List<Dict> _currencyList = [];
-  Dict? _selectedCurrency;
+  List<CoinListRes> _coinList = [];
+  CoinListRes? _selectedCoin;
   String? _minPrice;
 
   late final TextEditingController _searchController;
@@ -40,10 +40,10 @@ class _P2PPageState extends State<P2PPage> {
     controlFinishLoad: true,
   );
 
-  Dict? _defaultCurrency(List<Dict> list) {
+  CoinListRes? _defaultCoin(List<CoinListRes> list) {
     if (list.isEmpty) return null;
     return list.firstWhere(
-      (e) => e.key == 'NGN',
+      (e) => e.symbol == 'USDT',
       orElse: () => list.first,
     );
   }
@@ -53,7 +53,7 @@ class _P2PPageState extends State<P2PPage> {
     super.initState();
     _searchController = TextEditingController();
 
-    _fetchCurrencies();
+    _fetchCoins();
   }
 
   @override
@@ -63,22 +63,26 @@ class _P2PPageState extends State<P2PPage> {
     super.dispose();
   }
 
-  Future<void> _fetchCurrencies() async {
+  Future<void> _fetchCoins() async {
     try {
-      final list = await CommonApi.getDictList(parentKey: 'ads_trade_currency');
+      final list = await AccountApi.getCoinList();
+      debugPrint("🪙 Fetched P2P Coins: ${list.length}");
+      for (var c in list) {
+        debugPrint("🪙 Coin: ${c.symbol} - ${c.name}");
+      }
 
       if (!mounted) return;
 
       setState(() {
-        _currencyList = list;
-        _selectedCurrency = _defaultCurrency(list);
+        _coinList = list;
+        _selectedCoin = _defaultCoin(list);
+        debugPrint("🪙 Selected Coin: ${_selectedCoin?.symbol}");
       });
 
       await _fetchAds(isRefresh: true);
     } catch (e) {
-      debugPrint("Error fetching currencies: $e");
+      debugPrint("Error fetching coins: $e");
 
-      // If currencies fail, still try loading ads (backend may allow default)
       await _fetchAds(isRefresh: true);
     }
   }
@@ -96,7 +100,7 @@ class _P2PPageState extends State<P2PPage> {
       final Map<String, dynamic> params = {
         "pageNum": _pageNum,
         "pageSize": 10,
-        "tradeCoin": "USDT",
+        "tradeCoin": _selectedCoin?.symbol ?? "USDT",
         "tradeType": isBuySelected ? "1" : "0",
       };
 
@@ -105,11 +109,6 @@ class _P2PPageState extends State<P2PPage> {
       if (nickName.isNotEmpty) {
         params["nickName"] = nickName;
       } else {
-        final currencyKey = _selectedCurrency?.key;
-        if (currencyKey != null && currencyKey.isNotEmpty) {
-          params["tradeCurrency"] = currencyKey;
-        }
-
         if (_minPrice != null && _minPrice!.trim().isNotEmpty) {
           params["minPrice"] = _minPrice!.trim();
         }
@@ -336,8 +335,8 @@ class _P2PPageState extends State<P2PPage> {
     );
   }
 
-  Widget _buildCurrencyDropdown() {
-    final bool hasCurrencies = _currencyList.isNotEmpty;
+  Widget _buildCoinDropdown() {
+    final bool hasCoins = _coinList.isNotEmpty;
 
     return Container(
       height: 48,
@@ -348,8 +347,8 @@ class _P2PPageState extends State<P2PPage> {
         border: Border.all(color: const Color(0xFFDAE0EE)),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<Dict>(
-          value: hasCurrencies ? _selectedCurrency : null,
+        child: DropdownButton<CoinListRes>(
+          value: hasCoins ? _selectedCoin : null,
           isDense: true,
           icon: const Icon(
             Icons.keyboard_arrow_down_rounded,
@@ -362,11 +361,11 @@ class _P2PPageState extends State<P2PPage> {
             fontSize: 16,
             color: Color(0xFF151E2F),
           ),
-          items: _currencyList.map((Dict currency) {
-            return DropdownMenuItem<Dict>(
-              value: currency,
+          items: _coinList.map((CoinListRes coin) {
+            return DropdownMenuItem<CoinListRes>(
+              value: coin,
               child: Text(
-                currency.key,
+                coin.symbol ?? 'USDT',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,
@@ -376,10 +375,10 @@ class _P2PPageState extends State<P2PPage> {
               ),
             );
           }).toList(),
-          onChanged: hasCurrencies
-              ? (Dict? newValue) {
+          onChanged: hasCoins
+              ? (CoinListRes? newValue) {
                   if (newValue == null) return;
-                  setState(() => _selectedCurrency = newValue);
+                  setState(() => _selectedCoin = newValue);
                   _fetchAds(isRefresh: true);
                 }
               : null,
@@ -389,8 +388,6 @@ class _P2PPageState extends State<P2PPage> {
   }
 
   Widget _buildFilterRow() {
-    final bool hasCurrencies = _currencyList.isNotEmpty;
-
     return Row(
       children: [
         // Currency Dropdown
@@ -441,7 +438,7 @@ class _P2PPageState extends State<P2PPage> {
         //     ),
         //   ),
         // ),
-        _buildCurrencyDropdown(),
+        _buildCoinDropdown(),
         const SizedBox(width: 12),
 
         // Search Bar
@@ -504,7 +501,7 @@ class _P2PPageState extends State<P2PPage> {
               isScrollControlled: true,
               builder: (_) => FilterBottomSheet(
                 initialAmount: _minPrice,
-                initialCurrency: _selectedCurrency?.key,
+                initialCurrency: null, // Not using currency filter anymore
               ),
             );
 
@@ -513,7 +510,6 @@ class _P2PPageState extends State<P2PPage> {
             if (result['type'] == 'reset') {
               setState(() {
                 _minPrice = null;
-                _selectedCurrency = _defaultCurrency(_currencyList);
               });
               _fetchAds(isRefresh: true);
               return;
@@ -521,19 +517,9 @@ class _P2PPageState extends State<P2PPage> {
 
             if (result['type'] == 'filter') {
               final amount = (result['amount'] ?? '').toString();
-              final currencyKey = (result['currency'] ?? '').toString();
 
               setState(() {
                 _minPrice = amount.trim().isEmpty ? null : amount.trim();
-
-                if (currencyKey.trim().isNotEmpty) {
-                  final match = _currencyList.where((e) => e.key == currencyKey);
-                  _selectedCurrency = match.isNotEmpty
-                      ? match.first
-                      : _defaultCurrency(_currencyList);
-                } else {
-                  _selectedCurrency = _defaultCurrency(_currencyList);
-                }
               });
 
               _fetchAds(isRefresh: true);

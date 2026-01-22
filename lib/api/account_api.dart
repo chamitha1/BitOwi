@@ -434,6 +434,7 @@ class AccountApi {
         data: {},
       );
       final data = res.data;
+      print("🚀 AccountApi.getCoinList Raw: $data");
       if (data is Map<String, dynamic> &&
           (data['code'] == 200 || data['code'] == '200')) {
         final list = data['data'] as List<dynamic>;
