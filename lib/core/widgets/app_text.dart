@@ -21,6 +21,7 @@ class AppText extends StatelessWidget {
 
   // ---- Named constructors (Figma friendly) ----
 
+  // Paragraph / P1
   factory AppText.p1SemiBold(String text, {Color? color}) {
     return AppText(text, style: AppTextStyles.p1SemiBold, color: color);
   }
@@ -29,6 +30,7 @@ class AppText extends StatelessWidget {
     return AppText(text, style: AppTextStyles.p1Medium, color: color);
   }
 
+  // Paragraph / P2
   factory AppText.p2Bold(String text, {Color? color}) {
     return AppText(text, style: AppTextStyles.p2Bold, color: color);
   }
@@ -45,6 +47,11 @@ class AppText extends StatelessWidget {
     return AppText(text, style: AppTextStyles.p2Regular, color: color);
   }
 
+  // Paragraph / P3
+  factory AppText.p3SemiBold(String text, {Color? color}) {
+    return AppText(text, style: AppTextStyles.p3SemiBold, color: color);
+  }
+
   factory AppText.p3Regular(String text, {Color? color}) {
     return AppText(text, style: AppTextStyles.p3Regular, color: color);
   }
@@ -53,6 +60,7 @@ class AppText extends StatelessWidget {
     return AppText(text, style: AppTextStyles.p3Medium, color: color);
   }
 
+  // Paragraph / P4
   factory AppText.p4SemiBold(String text, {Color? color}) {
     return AppText(text, style: AppTextStyles.p4SemiBold, color: color);
   }

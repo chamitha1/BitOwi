@@ -129,6 +129,7 @@
       - assets/images/public/
       - assets/icons/profile_page/about_us/
       - assets/icons/orders/
+      - assets/icons/post_ads/
 
 
     # An image asset can refer to one or more resolution-specific "variants", see

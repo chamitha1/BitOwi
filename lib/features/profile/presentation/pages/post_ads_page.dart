@@ -8,8 +8,10 @@ import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_bottom_sheets.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/core/widgets/info_dialog.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
+import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/models/bankcard_list_res.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
@@ -69,23 +71,6 @@ class _PostAdsPageState extends State<PostAdsPage> {
     setState(() {});
   }
 
-  void showInfo(String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Info"),
-        // content: Text(currentStep == 1 ? buyTips[key] ?? '' : sellTips[key] ?? ''), //todo
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
-
   // ! ------ step 2 ------
 
   // Step 2 controllers
@@ -132,7 +117,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
   @override
   void initState() {
     super.initState();
-    id = Get.parameters["id"] ?? ''; // todo for edit
+    id = Get.parameters["id"] ?? '';
     getInitData();
     debounceGetPrice = CommonUtils.debounce(getPrice, 300);
     // beStream = EventBusUtil.listenBankcardEdit((event) async {
@@ -144,6 +129,19 @@ class _PostAdsPageState extends State<PostAdsPage> {
     //     });
     //   } catch (e) {}
     // });
+  }
+
+  String _apiWeekToName(int week) {
+    const map = {
+      1: 'Monday',
+      2: 'Tuesday',
+      3: 'Wednesday',
+      4: 'Thursday',
+      5: 'Friday',
+      6: 'Saturday',
+      7: 'Sunday',
+    };
+    return map[week] ?? 'Monday';
   }
 
   //! ----- helper methods -----
@@ -172,50 +170,85 @@ class _PostAdsPageState extends State<PostAdsPage> {
       bankCardList = result[2];
       buyTips = result[3].data;
       sellTips = result[4].data;
-      // if (id.isNotEmpty) {
-      //   final adsInfo = result[5] as AdsDetailRes;
-      //   typeIndex = int.parse(adsInfo.tradeType);
-      //   coinIndex = coinList.indexWhere(
-      //     (element) => element.symbol == adsInfo.tradeCoin,
-      //   );
-      //   currencyIndex = currencyList.indexWhere(
-      //     (element) => element.key == adsInfo.tradeCurrency,
-      //   );
-      //   premiumController.text = (num.parse(adsInfo.premiumRate) * 100).toString();
-      //   onPremiumRateChange(premiumController.text);
-      //   maxPriceController.text = adsInfo.protectPrice;
-      //   priceController.text = adsInfo.truePrice;
-      //   totalQuantityController.text = adsInfo.totalCount;
-      //   if (adsInfo.totalCount.isNum) {
-      //     final truePrice = num.parse(priceController.text);
-      //     totalAmount = (truePrice * num.parse(adsInfo.totalCount))
-      //         .toStringAsFixed(2);
-      //   } else {
-      //     totalAmount = '0.00';
-      //   }
-      //   minLimitController.text = adsInfo.minTrade;
-      //   maxLimitController.text = adsInfo.maxTrade;
-      //   bankCardSelectedIndex = bankCardList.indexWhere(
-      //     (element) => element.id == adsInfo.bankcardId,
-      //   );
-      //   remarkController.text = adsInfo.leaveMessage;
-      //   if (adsInfo.displayTime?.isNotEmpty ?? false) {
-      //     timeList = adsInfo.displayTime!.map((e) {
-      //       final apiWeek = int.parse(e.week);
-      //       print({e.week});
-      //       final dartWeek = (((apiWeek - 2) % 7) + 7) % 7 + 1;
-      //       print("API week: $apiWeek → Dart week: $dartWeek");
+      if (id.isNotEmpty) {
+        final adsInfo = result[5] as AdsDetailRes;
 
-      //       return WeekTimePickModalResult(
-      //         week: WeekPickModalResult.fromWeekday(int.parse(e.week)),
-      //         // week: WeekPickModalResult.fromWeekday(((int.parse(e.week)) % 7) -1),
-      //         startTime: TimePickModalResult.fromHour(e.startTime.toInt()),
-      //         endTime: TimePickModalResult.fromHour(e.endTime.toInt()),
-      //       );
-      //     }).toList();
-      //     timeTypeIndex = 1;
-      //   }
-      // }
+        /// BUY / SELL
+        typeIndex = int.parse(adsInfo.tradeType);
+
+        /// COIN
+        coinIndex = coinList.indexWhere(
+          (element) => element.symbol == adsInfo.tradeCoin,
+        );
+
+        /// CURRENCY
+        currencyIndex = currencyList.indexWhere(
+          (element) => element.key == adsInfo.tradeCurrency,
+        );
+
+        /// PREMIUM (decimal → percentage)
+        premiumController.text = (num.parse(adsInfo.premiumRate) * 100)
+            .toString();
+        onPremiumRateChange(premiumController.text);
+
+        /// PRICE
+        highestPriceController.text = adsInfo.protectPrice;
+        priceController.text = adsInfo.truePrice;
+
+        /// TOTAL AMOUNT
+        totalQuantityController.text = adsInfo.totalCount;
+        if (adsInfo.totalCount.isNum) {
+          final truePrice = num.parse(priceController.text);
+          totalAmount = (truePrice * num.parse(adsInfo.totalCount))
+              .toStringAsFixed(2);
+        } else {
+          totalAmount = '0.00';
+        }
+
+        /// LIMITS
+        minLimitController.text = adsInfo.minTrade;
+        maxLimitController.text = adsInfo.maxTrade;
+
+        /// PAYMENT METHOD
+        bankCardSelectedIndex = bankCardList.indexWhere(
+          (element) => element.id == adsInfo.bankcardId,
+        );
+
+        /// COMMENT
+        commentController.text = adsInfo.leaveMessage;
+
+        /// OPEN HOUR
+        if (adsInfo.displayTime?.isNotEmpty ?? false) {
+          timeSlots.clear();
+          for (final e in adsInfo.displayTime!) {
+            timeSlots.add(
+              TimeSlotModel(
+                week: _apiWeekToName(int.parse(e.week)),
+                start: TimeOfDay(hour: e.startTime.toInt(), minute: 0),
+                end: TimeOfDay(hour: e.endTime.toInt(), minute: 0),
+              ),
+            );
+          }
+          openHour = 'custom';
+        }
+
+        //   if (adsInfo.displayTime?.isNotEmpty ?? false) {
+        //     timeList = adsInfo.displayTime!.map((e) {
+        //       final apiWeek = int.parse(e.week);
+        //       print({e.week});
+        //       final dartWeek = (((apiWeek - 2) % 7) + 7) % 7 + 1;
+        //       print("API week: $apiWeek → Dart week: $dartWeek");
+
+        //       return WeekTimePickModalResult(
+        //         week: WeekPickModalResult.fromWeekday(int.parse(e.week)),
+        //         // week: WeekPickModalResult.fromWeekday(((int.parse(e.week)) % 7) -1),
+        //         startTime: TimePickModalResult.fromHour(e.startTime.toInt()),
+        //         endTime: TimePickModalResult.fromHour(e.endTime.toInt()),
+        //       );
+        //     }).toList();
+        //     timeTypeIndex = 1;
+        //   }
+      }
       getPrice();
       setState(() {});
     } catch (e) {
@@ -374,7 +407,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
   }
 
   void onNextStepTap() {
-    FocusManager.instance.primaryFocus?.unfocus();
+    hideKeyboard();
 
     /// STEP 1
     if (currentStep == 1) {
@@ -527,12 +560,15 @@ class _PostAdsPageState extends State<PostAdsPage> {
       });
 
       String publishType = '';
-      if (id.isNotEmpty) {
-        //todo
-        // publishType = status == '1' ? '3' : '2';
-      } else {
-        publishType = saveDraft ? "0" : "1";
-      }
+      // if (id.isNotEmpty) {
+      //   //todo has a issue here
+      //   publishType = status == '1' ? '3' : '2';
+      // } else {
+      //   publishType = saveDraft ? "0" : "1";
+      // }
+      //todo: temp below
+      publishType = saveDraft ? "0" : "1";
+
       final params = {
         "publishType": publishType,
 
@@ -654,44 +690,13 @@ class _PostAdsPageState extends State<PostAdsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     /// STEP HEADER
-                    Container(
-                      margin: const EdgeInsets.only(top: 16),
-                      padding: const EdgeInsets.all(16),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x0F555555),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText.p4Regular(
-                            "Step $currentStep of 3",
-                            color: Color(0xFF717F9A),
-                          ),
-                          SizedBox(height: 6),
-                          AppText.p2Medium(
-                            currentStep == 1
-                                ? "Set Types & Prices"
-                                : currentStep == 2
-                                ? "Set Total Amount and Payment Method"
-                                : "Add Comment and Time",
-                            color: Color(0xFF151E2F),
-                          ),
-                        ],
-                      ),
-                    ),
+                    stepHeader(),
 
-                    /// FORM
+                    /// CONTENT
                     Expanded(
                       child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: const EdgeInsets.only(top: 16, bottom: 16),
                         child: Container(
                           padding: const EdgeInsets.all(16),
@@ -752,117 +757,37 @@ class _PostAdsPageState extends State<PostAdsPage> {
   }
 
   /// ---------- WIDGETS ----------
-
-  Widget _buildToggle({
-    required String text,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: selected ? const Color(0xFFE8EFFF) : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: selected
-                  ? const Color(0xFF1D5DE5)
-                  : const Color(0xFFDAE0EE),
-            ),
+  ///
+  Container stepHeader() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x0F555555),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                size: 18,
-                color: selected
-                    ? const Color(0xFF1D5DE5)
-                    : const Color(0xFF9CA3AF),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                text,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: selected
-                      ? const Color(0xFF2E3D5B)
-                      : const Color(0xFF717F9A),
-                ),
-              ),
-            ],
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText.p4Regular("Step $currentStep of 3", color: Color(0xFF717F9A)),
+          SizedBox(height: 6),
+          AppText.p2Medium(
+            currentStep == 1
+                ? "Set Types & Prices"
+                : currentStep == 2
+                ? "Set Total Amount and Payment Method"
+                : "Add Comment and Time",
+            color: Color(0xFF151E2F),
           ),
-        ),
-      ),
-    );
-  }
-
-  // Widget _buildDropdown({
-  //   required String label,
-  //   required String? value,
-  //   required String hint,
-  //   required List<String> items,
-  //   required Function(String) onChanged,
-  // }) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       _buildLabel(label),
-  //       Container(
-  //         height: 48,
-  //         padding: const EdgeInsets.symmetric(horizontal: 12),
-  //         decoration: BoxDecoration(
-  //           borderRadius: BorderRadius.circular(12),
-  //           border: Border.all(color: const Color(0xFFE5E7EB)),
-  //         ),
-  //         child: DropdownButtonHideUnderline(
-  //           child: DropdownButtonFormField<String>(
-  //             value: value,
-  //             hint: Text(hint),
-  //             items: items
-  //                 .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-  //                 .toList(),
-  //             onChanged: (v) => onChanged(v!),
-  //             decoration: const InputDecoration(border: InputBorder.none),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildFormField({
-    required TextEditingController controller,
-    String? hint,
-    String? suffix,
-    bool enabled = true,
-    ValueChanged<String>? onChanged,
-  }) {
-    return TextField(
-      controller: controller,
-      enabled: enabled,
-      keyboardType: TextInputType.number,
-      onChanged: onChanged,
-      decoration: AppInputDecorations.textField(
-        hintText: hint,
-        suffixText: suffix,
-      ),
-    );
-  }
-
-  Widget _squareButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: const Color(0xFFEFF6FF),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: const Color(0xFF1D5DE5)),
+        ],
       ),
     );
   }
@@ -874,18 +799,54 @@ class _PostAdsPageState extends State<PostAdsPage> {
         children: [
           AppText.p3Regular(text, color: Color(0xFF2E3D5B)),
           if (onInfo != null) ...[
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             GestureDetector(
               onTap: onInfo,
-              child: const Icon(
-                Icons.info_outline,
-                size: 16,
-                color: Color(0xFF9CA3AF),
+              child: SvgPicture.asset(
+                'assets/icons/post_ads/info_circle.svg',
+                width: 16,
+                height: 16,
               ),
             ),
           ],
         ],
       ),
+    );
+  }
+
+  void showInfoTip(String title, String key) {
+    final message = typeIndex == 0 ? buyTips[key] ?? '' : sellTips[key] ?? '';
+    showCommonInfoDialog(context, title: title, message: message);
+  }
+
+  Widget _buildFormField({
+    required TextEditingController controller,
+    String? hint,
+    String? suffix,
+    bool enabled = true,
+    ValueChanged<String>? onChanged,
+  }) {
+    return Stack(
+      alignment: Alignment.centerRight,
+      children: [
+        TextField(
+          controller: controller,
+          enabled: enabled,
+          keyboardType: TextInputType.number,
+          onChanged: onChanged,
+          decoration: AppInputDecorations.textField(
+            hintText: hint,
+            enabled: enabled,
+          ),
+        ),
+        if (suffix != null)
+          IgnorePointer(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: AppText.p2Regular(suffix, color: Color(0xFF717F9A)),
+            ),
+          ),
+      ],
     );
   }
 
@@ -933,7 +894,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
                       child: DropdownButtonFormField<int>(
                         value: coinIndex,
                         isExpanded: true,
-                        hint: Text('Select Coin'),
+                        hint: AppText.p2Regular(
+                          'Select Coin',
+                          color: const Color(0xFF717F9A),
+                        ),
                         icon: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: const Color(0xFF2E3D5B),
@@ -943,10 +907,9 @@ class _PostAdsPageState extends State<PostAdsPage> {
                           coinList.length,
                           (index) => DropdownMenuItem(
                             value: index,
-                            child: Text(
+                            child: AppText.p2Regular(
                               coinList[index].symbol ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              color: Color(0xFF151E2F),
                             ),
                           ),
                         ),
@@ -983,7 +946,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
                       child: DropdownButtonFormField<int>(
                         value: currencyIndex,
                         isExpanded: true,
-                        hint: Text('Select Currency'),
+                        hint: AppText.p2Regular(
+                          'Select Currency',
+                          color: const Color(0xFF717F9A),
+                        ),
                         icon: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: const Color(0xFF2E3D5B),
@@ -993,10 +959,9 @@ class _PostAdsPageState extends State<PostAdsPage> {
                           currencyList.length,
                           (index) => DropdownMenuItem(
                             value: index,
-                            child: Text(
+                            child: AppText.p2Regular(
                               currencyList[index].value,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              color: Color(0xFF151E2F),
                             ),
                           ),
                         ),
@@ -1024,7 +989,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
         /// PREMIUM
         _buildLabel(
           "Premium",
-          onInfo: () => showInfo("Premium affects final market price."),
+          onInfo: () => showInfoTip('Premium', 'premiumRate'),
         ),
         Row(
           children: [
@@ -1040,40 +1005,47 @@ class _PostAdsPageState extends State<PostAdsPage> {
               ),
             ),
             const SizedBox(width: 12),
-            _squareButton(Icons.remove, () {
-              final value = premiumController.text;
-              if (!value.isNum) {
-                premiumController.text = '0';
-              } else {
-                num rate = num.parse(value);
-                rate -= 1;
-                premiumController.text = rate.toString();
-                onPremiumRateChange(rate.toString());
-              }
-            }),
+            _squareButton(
+              premiumController.text.isEmpty
+                  ? 'assets/icons/post_ads/minus_square.svg'
+                  : 'assets/icons/post_ads/minus_square_selected.svg',
+
+              () {
+                final value = premiumController.text;
+                if (!value.isNum) {
+                  premiumController.text = '0';
+                } else {
+                  num rate = num.parse(value);
+                  rate -= 1;
+                  premiumController.text = rate.toString();
+                  onPremiumRateChange(rate.toString());
+                }
+              },
+            ),
             const SizedBox(width: 8),
-            _squareButton(Icons.add, () {
-              final value = premiumController.text;
-              if (!value.isNum) {
-                premiumController.text = '0';
-              } else {
-                num rate = num.parse(value);
-                rate += 1;
-                premiumController.text = rate.toString();
-                onPremiumRateChange(rate.toString());
-              }
-            }),
+            _squareButton(
+              premiumController.text.isEmpty
+                  ? 'assets/icons/post_ads/add_square.svg'
+                  : 'assets/icons/post_ads/add_square_selected.svg',
+              () {
+                final value = premiumController.text;
+                if (!value.isNum) {
+                  premiumController.text = '0';
+                } else {
+                  num rate = num.parse(value);
+                  rate += 1;
+                  premiumController.text = rate.toString();
+                  onPremiumRateChange(rate.toString());
+                }
+              },
+            ),
           ],
         ),
 
         const SizedBox(height: 20),
 
         /// PRICE
-        _buildLabel(
-          "Price",
-          onInfo: () =>
-              showInfo("Price is auto-calculated and cannot be edited."),
-        ),
+        _buildLabel("Price", onInfo: () => showInfoTip('Price', 'price')),
         _buildFormField(
           controller: priceController,
           enabled: false,
@@ -1085,7 +1057,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
         /// HIGHEST PRICE
         _buildLabel(
           typeIndex == 0 ? 'Highest price' : 'Lowest price',
-          onInfo: () => showInfo("Maximum acceptable price for this ad."),
+          onInfo: () => showInfoTip(
+            typeIndex == 0 ? 'Highest price' : 'Lowest price',
+            'protectPrice',
+          ),
         ),
         _buildFormField(
           controller: highestPriceController,
@@ -1100,6 +1075,70 @@ class _PostAdsPageState extends State<PostAdsPage> {
     );
   }
 
+  bool get _isPremiumValid {
+    final text = premiumController.text;
+    return text.isNotEmpty && text.isNum;
+  }
+
+  Widget _buildToggle({
+    required String text,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 48,
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFFE8EFFF) : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFF1D5DE5)
+                  : const Color(0xFFDAE0EE),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                size: 18,
+                color: selected
+                    ? const Color(0xFF1D5DE5)
+                    : const Color(0xFF9CA3AF),
+              ),
+              const SizedBox(width: 8),
+              AppText.p3SemiBold(
+                text,
+                color: selected
+                    ? const Color(0xFF2E3D5B)
+                    : const Color(0xFF717F9A),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _squareButton(String icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF6F9FF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.all(8),
+        child: SvgPicture.asset(icon, width: 26, height: 26),
+      ),
+    );
+  }
+
   //! ----------------- step 2 content -----------------
 
   Widget _buildStep2(int typeIndex) {
@@ -1108,28 +1147,38 @@ class _PostAdsPageState extends State<PostAdsPage> {
       children: [
         // / BUY QUANTITY
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildLabel(typeIndex == 0 ? 'Buy Quantity' : 'Sold quantity'),
-            //todo not in ui
-            // Text.rich(TextSpan(
-            //   children: [
-            //     const TextSpan(text: '≈ '),
-            //     TextSpan(
-            //       text: totalAmount,
-            //       style: const TextStyle(fontFamily: 'DINAlternate'),
-            //     ),
-            //     TextSpan(
-            //       text: currencyList.isNotEmpty
-            //           ? currencyList[currencyIndex].value
-            //           : '',
-            //     ),
-            //   ],
-            //   style: TextStyle(
-            //     fontSize: 14.sp,
-            //     color: customTheme.p2pPublishTip,
-            //     fontFamily: 'SFPro',
-            //   ),
-            // )),
+            _buildLabel(
+              typeIndex == 0 ? 'Buy quantity' : 'Sold quantity',
+              onInfo: () => showInfoTip(
+                typeIndex == 0 ? 'Buy quantity' : 'Sold quantity',
+                'totalCount',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(text: '≈ '),
+                    TextSpan(
+                      text: totalAmount,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2E3D5B),
+                      ),
+                    ),
+                    TextSpan(
+                      text: currencyList.isNotEmpty
+                          ? currencyList[currencyIndex].value
+                          : '',
+                    ),
+                  ],
+                  style: TextStyle(fontSize: 14, color: Color(0xFF2E3D5B)),
+                ),
+              ),
+            ),
           ],
         ),
         _buildFormField(
@@ -1144,7 +1193,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
         const SizedBox(height: 20),
 
         /// ORDER LIMIT
-        _buildLabel("Order Limit"),
+        _buildLabel(
+          "Order Limit",
+          onInfo: () => showInfoTip('Order Limit', 'trade'),
+        ),
         _buildFormField(
           controller: minLimitController,
           hint: "Min Quantity",
@@ -1165,7 +1217,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
         const SizedBox(height: 20),
 
         /// PAYMENT METHOD
-        _buildLabel("Payment Method"),
+        _buildLabel(
+          "Payment Method",
+          onInfo: () => showInfoTip('Payment Method', 'payType'),
+        ),
         const SizedBox(height: 4),
         ..._paymentMethodList(),
         const SizedBox(height: 12),
@@ -1206,15 +1261,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
               const SizedBox(width: 12),
 
               /// Title
-              Expanded(
-                child: Text(
-                  _cardTitle(card),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+              Expanded(child: AppText.p2Medium(_cardTitleMasked(card))),
 
               /// Radio
               Icon(
@@ -1234,14 +1281,14 @@ class _PostAdsPageState extends State<PostAdsPage> {
   Widget _paymentIcon(BankcardListRes card) {
     return card.pic == null
         ? SvgPicture.asset(
-            'assets/icons/profile_page/bankcard.svg',
+            'assets/icons/post_ads/bankcard.svg',
             width: 32,
             height: 32,
           )
         : ClipOval(child: CommonImage(card.pic ?? '', width: 32, height: 32));
   }
 
-  String _cardTitle(BankcardListRes card) {
+  String _cardTitleMasked(BankcardListRes card) {
     final masked = CommonUtils.maskBankno(
       card.bankcardNumber ?? card.bindMobile ?? '',
     );
@@ -1369,12 +1416,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
         ),
         child: Row(
           children: [
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w500),
-              ),
-            ),
+            Expanded(child: AppText.p2Medium(title)),
             Icon(
               selected ? Icons.radio_button_checked : Icons.radio_button_off,
               color: selected

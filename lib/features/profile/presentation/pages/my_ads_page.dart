@@ -144,20 +144,36 @@ class _MyAdsPageState extends State<MyAdsPage> {
               child: isLoading
                   ? SoftCircularLoader()
                   : isEmpty
-                  ? CommonEmptyState(
-                      title: 'No Ads Avalibale',
-                      description: 'Post an ad to start trading with others.',
-                      action: SizedBox(
-                        width: 287,
-                        child: PrimaryButton(
-                          text: 'Post Ads',
-                          onPressed: () {
-                            Get.toNamed(Routes.postAdsPage);
-                          },
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      children: [
+                        SizedBox(height: 50),
+                        CommonEmptyState(
+                          title: 'No Ads Available',
+                          description:
+                              'Post an ad to start trading with others.',
+                          action: SizedBox(
+                            width: 287,
+                            child: PrimaryButton(
+                              text: 'Post Ads',
+                              onPressed: () async {
+                                final result = await Get.toNamed(
+                                  Routes.postAdsPage,
+                                );
+                                // refresh after coming back
+                                if (result == true) {
+                                  // await _controller.callRefresh();
+                                  onRefresh();
+                                }
+                              },
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     )
                   : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(20),
                       itemCount: list.length,
                       itemBuilder: (context, index) {
@@ -476,9 +492,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
                 // Draft: Edit and Post buttons
                 OutlinedButton.icon(
                   onPressed: () {
-                    // TODO: Navigate to edit ad page
-                    print(" Navigate to edit ad page / Edit ad: ${ad.id}");
-                    onEditTap();
+                    onEditTap(ad);
                   },
                   icon: SvgPicture.asset(
                     'assets/icons/profile_page/edit.svg',
@@ -668,9 +682,22 @@ class _MyAdsPageState extends State<MyAdsPage> {
     );
   }
 
-  // Edit ad
-  void onEditTap() {
-    // Get.toNamed(Routes.publishAd, parameters: {'id': info.id});
-    Get.toNamed(Routes.postAdsPage);
+  void onEditTap(AdsMyPageRes ad) async {
+    //todo:
+    // if (!PlatformUtils().isMobile) {
+    //   DownloadModal.showModal(context);
+    //   return;
+    // }
+    print(" Navigate to edit ad page / Edit ad: ${ad.id}");
+    final result = await Get.toNamed(
+      Routes.postAdsPage,
+      parameters: {'id': ad.id},
+    );
+
+    // refresh after coming back
+    if (result == true) {
+      // await _controller.callRefresh();
+      onRefresh();
+    }
   }
 }

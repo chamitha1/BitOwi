@@ -40,13 +40,6 @@ class AppTextStyles {
     color: Color(0xFF151E2F),
   );
 
-  static const TextStyle pRegular = TextStyle(
-    fontFamily: _fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    color: Color(0xFF151E2F),
-  );
-
   static const TextStyle p2Regular = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 16,
@@ -55,10 +48,10 @@ class AppTextStyles {
   );
 
   // Paragraph / P3
-  static const TextStyle p3Regular = TextStyle(
+  static const TextStyle p3SemiBold = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w600,
     color: Color(0xFF151E2F),
   );
 
@@ -66,6 +59,13 @@ class AppTextStyles {
     fontFamily: _fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w500,
+    color: Color(0xFF151E2F),
+  );
+
+  static const TextStyle p3Regular = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
     color: Color(0xFF151E2F),
   );
 
