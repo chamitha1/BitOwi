@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/p2p_api.dart';
+import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/p2p_order_card.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
@@ -27,7 +28,10 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
   void initState() {
     super.initState();
     userId = Get.arguments as String;
-    _refreshController = EasyRefreshController(controlFinishRefresh: true);
+    _refreshController = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
     getInitData();
   }
 
@@ -62,6 +66,59 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
           isLoading = false;
         });
       }
+    }
+  }
+
+  // Trust Toggle
+  Future<void> onTrustTap() async {
+    if (merchantInfo == null) return;
+
+    try {
+      if (merchantInfo!.isTrust == '1') {
+        await UserApi.removeUserRelation(toUser: userId, type: '1');
+        if (mounted) {
+          setState(() {
+            merchantInfo!.isTrust = '0';
+          });
+        }
+      } else {
+        await UserApi.createUserRelation(toUser: userId, type: '1');
+        if (mounted) {
+          setState(() {
+            merchantInfo!.isTrust = '1';
+            merchantInfo!.isAddBlackList = '0';
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Trust action failed: $e");
+      //  Get.snackbar("Error", "Failed to update trust status");
+    }
+  }
+
+  //  Blacklist Toggle
+  Future<void> onBlacklistTap() async {
+    if (merchantInfo == null) return;
+
+    try {
+      if (merchantInfo!.isAddBlackList == '1') {
+        await UserApi.removeUserRelation(toUser: userId, type: '0');
+        if (mounted) {
+          setState(() {
+            merchantInfo!.isAddBlackList = '0';
+          });
+        }
+      } else {
+        await UserApi.createUserRelation(toUser: userId, type: '0');
+        if (mounted) {
+          setState(() {
+            merchantInfo!.isAddBlackList = '1';
+            merchantInfo!.isTrust = '0';
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Blacklist action failed: $e");
     }
   }
 
@@ -368,14 +425,21 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
               Expanded(
                 child: _buildActionButton(
                   iconPath: 'assets/icons/profile_page/tick-square.svg',
-                  label: "Trust",
+                  label: merchantInfo?.isTrust == '1'
+                      ? "Remove Trust"
+                      : "Trust",
+                  onTap: onTrustTap,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildActionButton(
                   iconPath: 'assets/icons/profile_page/card-send.svg',
-                  label: "Blacklist",
+                  label: merchantInfo?.isAddBlackList == '1'
+                      ? "Remove Blacklist"
+                      : "Blacklist",
+
+                  onTap: onBlacklistTap,
                 ),
               ),
             ],
@@ -385,35 +449,47 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
     );
   }
 
-  Widget _buildActionButton({required String iconPath, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1D5DE5),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x331D5DE5),
-            offset: Offset(0, 6),
-            blurRadius: 24,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(iconPath, width: 20, height: 20),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              color: Colors.white,
+  Widget _buildActionButton({
+    required String iconPath,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1D5DE5),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x331D5DE5),
+              offset: Offset(0, 6),
+              blurRadius: 24,
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(iconPath, width: 20, height: 20),
+            const SizedBox(width: 8),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

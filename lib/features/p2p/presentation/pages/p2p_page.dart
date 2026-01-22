@@ -7,6 +7,7 @@ import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
+import 'package:BitOwi/models/dict.dart';
 import 'package:get/get.dart';
 
 import '../widgets/p2p_order_card.dart';
@@ -34,6 +35,8 @@ class _P2PPageState extends State<P2PPage> {
   List<AdItem> _adsList = [];
   int _pageNum = 1;
   bool _isEnd = false;
+  
+  Dict? _selectedCurrency;
 
   final EasyRefreshController _refreshController = EasyRefreshController(
     controlFinishRefresh: true,
@@ -66,17 +69,12 @@ class _P2PPageState extends State<P2PPage> {
   Future<void> _fetchCoins() async {
     try {
       final list = await AccountApi.getCoinList();
-      debugPrint("🪙 Fetched P2P Coins: ${list.length}");
-      for (var c in list) {
-        debugPrint("🪙 Coin: ${c.symbol} - ${c.name}");
-      }
 
       if (!mounted) return;
 
       setState(() {
         _coinList = list;
         _selectedCoin = _defaultCoin(list);
-        debugPrint("🪙 Selected Coin: ${_selectedCoin?.symbol}");
       });
 
       await _fetchAds(isRefresh: true);
@@ -112,7 +110,13 @@ class _P2PPageState extends State<P2PPage> {
         if (_minPrice != null && _minPrice!.trim().isNotEmpty) {
           params["minPrice"] = _minPrice!.trim();
         }
+        // Add tradeCurrency filter if selected via bottom sheet
+        if (_selectedCurrency != null) {
+          params['tradeCurrency'] = _selectedCurrency!.key;
+        }
       }
+      
+      debugPrint("P2PPage: Fetching ads with params: $params");
 
       final res = await P2PApi.getAdsPageList(params);
 
@@ -186,8 +190,8 @@ class _P2PPageState extends State<P2PPage> {
             Expanded(
               child: EasyRefresh(
                 controller: _refreshController,
-                onRefresh: () async => _fetchAds(isRefresh: true),
-                onLoad: () async => _fetchAds(),
+                onRefresh: () => _fetchAds(isRefresh: true),
+                onLoad: () => _fetchAds(),
                 child: _adsList.isEmpty
                     ? _emptyScrollable()
                     : ListView.separated(
@@ -196,7 +200,7 @@ class _P2PPageState extends State<P2PPage> {
                           vertical: 16,
                         ),
                         itemCount: _adsList.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                        separatorBuilder: (context, index) => const SizedBox(height: 16),
                         itemBuilder: (_, index) {
                           return P2POrderCard(
                             isBuy: isBuySelected,
@@ -206,6 +210,7 @@ class _P2PPageState extends State<P2PPage> {
                       ),
               ),
             ),
+
           ],
         ),
       ),
@@ -501,7 +506,7 @@ class _P2PPageState extends State<P2PPage> {
               isScrollControlled: true,
               builder: (_) => FilterBottomSheet(
                 initialAmount: _minPrice,
-                initialCurrency: null, // Not using currency filter anymore
+                initialCurrency: _selectedCurrency?.key,
               ),
             );
 
@@ -510,6 +515,7 @@ class _P2PPageState extends State<P2PPage> {
             if (result['type'] == 'reset') {
               setState(() {
                 _minPrice = null;
+                _selectedCurrency = null; // Clear filter currency
               });
               _fetchAds(isRefresh: true);
               return;
@@ -517,9 +523,15 @@ class _P2PPageState extends State<P2PPage> {
 
             if (result['type'] == 'filter') {
               final amount = (result['amount'] ?? '').toString();
+              final currency = result['currency'] as Dict?;
+              
+              debugPrint("P2PPage: Filter result received. Amount=$amount, Currency=${currency?.key}");
 
               setState(() {
                 _minPrice = amount.trim().isEmpty ? null : amount.trim();
+                if (currency != null) {
+                   _selectedCurrency = currency;
+                }
               });
 
               _fetchAds(isRefresh: true);

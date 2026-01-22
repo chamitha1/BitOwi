@@ -20,19 +20,37 @@ class PageInfo<T> {
     final data = json['data'] != null ? json['data'] as Map<String, dynamic> : json;
     
     final rawList = data['list'] as List<dynamic>? ?? [];
-    final list = rawList.map((item) => fromJsonT(item as Map<String, dynamic>)).toList();
+    List<T> list = [];
+    try {
+      list = rawList.map((item) => fromJsonT(item as Map<String, dynamic>)).toList();
+    } catch (e) {
+      print("PageInfo list parsing error: $e");
     
-    final total = data['total'] ?? 0;
-    final pages = data['pages'] ?? 0;
-    final pageNum = data['pageNum'] ?? 1;
+      rethrow;
+    }
+    
+    final total = _parseInt(data['total']);
+    final pages = _parseInt(data['pages']);
+    final pageNum = _parseInt(data['pageNum'], defaultValue: 1);
+    final pageSize = _parseInt(data['pageSize'], defaultValue: 10);
     final isEnd = pageNum >= pages; 
 
     return PageInfo(
       list: list,
       total: total,
       pageNum: pageNum,
-      pageSize: data['pageSize'] ?? 10,
+      pageSize: pageSize,
       isEnd: isEnd,
     );
+  }
+
+  static int _parseInt(dynamic value, {int defaultValue = 0}) {
+    if (value == null) return defaultValue;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? defaultValue;
+    }
+    return defaultValue;
   }
 }

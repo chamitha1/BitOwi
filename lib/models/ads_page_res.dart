@@ -29,22 +29,22 @@ class AdsPageRes {
 @JsonSerializable()
 class AdItem {
   final String? id;
-  final String? userId; 
-  final String? nickname; 
+  final String? userId;
+  final String? nickname;
   final String? photo;
-  final String? tradeType; 
-  final String? tradeCurrency; 
-  final String? leftCount; 
-  final String? tradeCoin; 
+  final String? tradeType;
+  final String? tradeCurrency;
+  final String? leftCount;
+  final String? tradeCoin;
   final String? premiumRate;
   final String? truePrice;
-  final String? minTrade; 
-  final String? maxTrade; 
-  final String? payType; 
-  final String? bankName; 
+  final String? minTrade;
+  final String? maxTrade;
+  final String? payType;
+  final String? bankName;
   final String? bankcardNumber;
   final String? bankPic;
-  final String? status; 
+  final String? status;
   final UserStatistics? userStatistics;
 
   AdItem({
@@ -82,8 +82,8 @@ class UserStatistics {
   final int? confidenceCount;
   final String? totalTradeCount; // "0"
   final String? tradeCurrency;
-  final String? isTrust; // null or "1" probably?
-  final String? isAddBlackList;
+  String? isTrust;
+  String? isAddBlackList;
   final String? betweenTradeTimes;
   final String? nickname;
   final String? photo;

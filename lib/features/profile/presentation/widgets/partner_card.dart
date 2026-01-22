@@ -13,11 +13,13 @@ class PartnerItem {
   final int trustCount;
   final int tradeCount;
   final String finishRate;
+  final String userId;
   final String addedDate;
 
   PartnerItem({
     required this.name,
     required this.avatarUrl,
+    required this.userId,
     required this.isOnline,
     required this.isCertified,
     required this.goodRate,
@@ -37,7 +39,7 @@ class PartnerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => const MerchantProfilePage());
+        Get.to(() => const MerchantProfilePage(), arguments: item.userId);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),

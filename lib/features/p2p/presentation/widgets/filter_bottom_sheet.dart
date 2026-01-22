@@ -73,6 +73,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         _currencyList = filtered;
         _selectedCurrency = selected;
         _loadingCurrencies = false;
+        debugPrint("FilterBottomSheet: initKey=$initKey, selected=${selected?.key}, list=${filtered.map((e)=>e.key).toList()}");
       });
     } catch (e) {
       if (!mounted) return;
@@ -139,7 +140,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     Navigator.pop(context, {
       'type': 'filter',
       'amount': _amountController.text.trim(),
-      'currency': _selectedCurrency?.key ?? 'NGN',
+      'currency': _selectedCurrency, 
       'multiplier': _selectedMultiplier,
     });
   }

@@ -60,7 +60,8 @@ class _PartnersPageState extends State<PartnersPage> {
       if (!mounted) return;
       setState(() {});
       _controller.finishLoad(
-          _isEnd ? IndicatorResult.noMore : IndicatorResult.success);
+        _isEnd ? IndicatorResult.noMore : IndicatorResult.success,
+      );
     } catch (e) {
       _controller.finishLoad(IndicatorResult.fail);
     }
@@ -73,7 +74,7 @@ class _PartnersPageState extends State<PartnersPage> {
       if (isRefresh) {
         _pageNum = 1;
       }
-      
+
       // Tab 0 "My Trusted" -> type '1' (Trust)
       // Tab 1 "Trusted Me" -> type '2' (Trust me)
       // Tab 2 "Block List" -> type '0' (Block)
@@ -89,8 +90,8 @@ class _PartnersPageState extends State<PartnersPage> {
         "type": type,
       });
 
-      _isEnd = res.isEnd; 
-      
+      _isEnd = res.isEnd;
+
       if (isRefresh) {
         _list = res.list;
       } else {
@@ -170,12 +171,15 @@ class _PartnersPageState extends State<PartnersPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                             SvgPicture.asset(
-                               'assets/icons/profile_page/account_security/empty_state.svg', 
-                               width: 120,
-                               height: 120,
-                             )
-                                 .paddingOnly(bottom: 16),
+                            SvgPicture.asset(
+                              'assets/icons/profile_page/address/search.svg',
+                              width: 80,
+                              height: 80,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFFDAE0EE),
+                                BlendMode.srcIn,
+                              ),
+                            ).paddingOnly(bottom: 16),
                             const Text(
                               "No partners found",
                               style: TextStyle(
@@ -189,36 +193,51 @@ class _PartnersPageState extends State<PartnersPage> {
                       ),
                     )
                   : ListView.separated(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 20,
+                      ),
                       itemCount: _list.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 12),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final data = _list[index];
-                   
+
                         String goodRate = "0";
-                         if (data.commentCount > 0) {
-                           goodRate = ((data.commentGoodCount / data.commentCount) * 100).toStringAsFixed(0);
-                         }
-                        
-                         String finishRate = "0";
-                          if (data.orderCount > 0) {
-                             finishRate = ((data.orderFinishCount / data.orderCount) * 100).toStringAsFixed(1);
-                           }
+                        if (data.commentCount > 0) {
+                          goodRate =
+                              ((data.commentGoodCount / data.commentCount) *
+                                      100)
+                                  .toStringAsFixed(0);
+                        }
+
+                        String finishRate = "0";
+                        if (data.orderCount > 0) {
+                          finishRate =
+                              ((data.orderFinishCount / data.orderCount) * 100)
+                                  .toStringAsFixed(1);
+                        }
+
+                        final partnerId = _selectedTabIndex == 1
+                            ? data.userId.toString()
+                            : data.toUser.toString();
 
                         final item = PartnerItem(
                           name: data.nickname,
-                          avatarUrl: data.photo.isNotEmpty 
-                              ? data.photo 
-                              : "assets/images/home/avatar.png", 
+                          userId: partnerId,
+                          avatarUrl: data.photo.isNotEmpty
+                              ? data.photo
+                              : "assets/images/home/avatar.png",
                           isOnline: false, // Not in API
                           isCertified: false, // Not in API
                           goodRate: goodRate,
                           trustCount: data.confidenceCount,
                           tradeCount: data.orderCount,
                           finishRate: finishRate,
-                          addedDate: data.createDatetime.split(' ').first, 
+                          addedDate: data.createDatetime.split(' ').first,
                         );
-                        
+
                         return PartnerCard(item: item);
                       },
                     ),

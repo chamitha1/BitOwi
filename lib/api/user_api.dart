@@ -389,4 +389,38 @@ class UserApi {
       rethrow;
     }
   }
+
+  /// Create User Relation (Trust or Block)
+  /// type: 0 = Blacklist/Block, 1 = Trust
+  static Future<void> createUserRelation({
+    required String toUser,
+    required String type,
+  }) async {
+    try {
+      await ApiClient.dio.post(
+        "/core/v1/user_relation/create",
+        data: {"toUser": toUser, "type": type},
+      );
+    } catch (e) {
+      print("createUserRelation error: $e");
+      rethrow;
+    }
+  }
+
+  /// Remove User Relation (Untrust or Unblock)
+  /// type: 0 = Blacklist/Block, 1 = Trust
+  static Future<void> removeUserRelation({
+    required String toUser,
+    required String type,
+  }) async {
+    try {
+      await ApiClient.dio.post(
+        "/core/v1/user_relation/modify",
+        data: {"toUser": toUser, "type": type},
+      );
+    } catch (e) {
+      print("removeUserRelation error: $e");
+      rethrow;
+    }
+  }
 }
