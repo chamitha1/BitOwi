@@ -109,7 +109,7 @@ class _DownloadAppBottomSheetState extends State<DownloadAppBottomSheet> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 18),
               _buildDownloadButton(),
               const SizedBox(height: 10),
             ],
