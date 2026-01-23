@@ -18,14 +18,21 @@ class FilterBottomSheet extends StatefulWidget {
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
   String? _selectedMultiplier;
-  final List<String> _multipliers = const ["1X", "5X", "10X", "20X", "50X", "100X"];
+  final List<String> _multipliers = const [
+    "1X",
+    "5X",
+    "10X",
+    "20X",
+    "50X",
+    "100X",
+  ];
   List<Dict> _currencyList = [];
   Dict? _selectedCurrency;
   bool _loadingCurrencies = true;
 
   late final TextEditingController _amountController;
 
-  String _rawAmount = "";       // what user typed (base amount)
+  String _rawAmount = ""; // what user typed (base amount)
   bool _updatingAmount = false; // prevent listener loop
 
   @override
@@ -52,7 +59,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     try {
       final list = await CommonApi.getDictList(parentKey: 'ads_trade_currency');
       if (!mounted) return;
-      final filtered = list.where((e) => e.key == 'NGN' || e.key == 'USD').toList();
+      final filtered = list
+          .where((e) => e.key == 'NGN' || e.key == 'USD')
+          .toList();
 
       Dict? selected;
 
@@ -66,14 +75,19 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
       // else default NGN, else first
       selected ??= filtered.isNotEmpty
-          ? filtered.firstWhere((e) => e.key == 'NGN', orElse: () => filtered.first)
+          ? filtered.firstWhere(
+              (e) => e.key == 'NGN',
+              orElse: () => filtered.first,
+            )
           : null;
 
       setState(() {
         _currencyList = filtered;
         _selectedCurrency = selected;
         _loadingCurrencies = false;
-        debugPrint("FilterBottomSheet: initKey=$initKey, selected=${selected?.key}, list=${filtered.map((e)=>e.key).toList()}");
+        debugPrint(
+          "FilterBottomSheet: initKey=$initKey, selected=${selected?.key}, list=${filtered.map((e) => e.key).toList()}",
+        );
       });
     } catch (e) {
       if (!mounted) return;
@@ -103,8 +117,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     final mul = _multiplierValue(m);
     final updated = base * mul;
 
-    final text =
-        (updated % 1 == 0) ? updated.toInt().toString() : updated.toString();
+    final text = (updated % 1 == 0)
+        ? updated.toInt().toString()
+        : updated.toString();
 
     _updatingAmount = true;
     _amountController.text = text;
@@ -140,7 +155,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     Navigator.pop(context, {
       'type': 'filter',
       'amount': _amountController.text.trim(),
-      'currency': _selectedCurrency, 
+      'currency': _selectedCurrency,
       'multiplier': _selectedMultiplier,
     });
   }
@@ -245,8 +260,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           fontWeight: FontWeight.w400,
           color: Color(0xFF717F9A),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         isDense: true,
         filled: true,
         fillColor: Colors.white,
@@ -333,11 +350,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     ];
 
     // safety fallback
-    final safeCurrencies = currencies.isEmpty ? <String>['NGN', 'USD'] : currencies;
+    final safeCurrencies = currencies.isEmpty
+        ? <String>['NGN', 'USD']
+        : currencies;
 
     final selectedKey = _selectedCurrency?.key;
-    final activeKey =
-        (selectedKey == 'NGN' || selectedKey == 'USD') ? selectedKey : 'NGN';
+    final activeKey = (selectedKey == 'NGN' || selectedKey == 'USD')
+        ? selectedKey
+        : 'NGN';
 
     return Row(
       children: safeCurrencies.map((c) {
@@ -346,7 +366,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           child: Padding(
             padding: EdgeInsets.only(right: c != safeCurrencies.last ? 12 : 0),
             child: GestureDetector(
-              onTap: () => setState(() => _selectedCurrency = Dict(key: c, value: c)),
+              onTap: () =>
+                  setState(() => _selectedCurrency = Dict(key: c, value: c)),
               child: _buildCurrencyButtonSmall(c, isActive),
             ),
           ),

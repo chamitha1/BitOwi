@@ -91,6 +91,7 @@ class _P2PPageState extends State<P2PPage> {
         _pageNum = 1;
         _isEnd = false;
       } else if (_isEnd) {
+        await Future.delayed(Duration.zero);
         _refreshController.finishLoad(IndicatorResult.noMore);
         return;
       }
@@ -205,6 +206,7 @@ class _P2PPageState extends State<P2PPage> {
                           return P2POrderCard(
                             isBuy: isBuySelected,
                             adItem: _adsList[index],
+                            onRefresh: () => _fetchAds(isRefresh: true),
                           );
                         },
                       ),

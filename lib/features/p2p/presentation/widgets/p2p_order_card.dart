@@ -7,11 +7,22 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/features/profile/presentation/pages/merchant_profile_page.dart';
 
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/api/c2c_api.dart';
+import 'package:BitOwi/core/widgets/confirm_dialog.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+
 class P2POrderCard extends StatelessWidget {
   final bool isBuy;
   final AdItem? adItem;
+  final VoidCallback? onRefresh;
 
-  const P2POrderCard({super.key, this.isBuy = true, this.adItem});
+  const P2POrderCard({
+    super.key,
+    this.isBuy = true,
+    this.adItem,
+    this.onRefresh,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -275,42 +286,82 @@ class P2POrderCard extends StatelessWidget {
               SizedBox(
                 width: 76,
                 height: 32,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isBuy) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => P2PBuyScreen(adItem: adItem!),
+                child: Builder(builder: (context) {
+                  final currentUser = Get.find<UserController>().user.value;
+                  final isMine = currentUser?.id != null &&
+                      adItem?.userId != null &&
+                      currentUser!.id == adItem!.userId;
+
+                  if (isMine) {
+                    return ElevatedButton.icon(
+                      onPressed: () => _onOffTap(context),
+                      icon: SvgPicture.asset(
+                        'assets/icons/profile_page/toggle_off_circle.svg',
+                        width: 14,
+                        height: 14,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
                         ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => P2PSellScreen(adItem: adItem!),
+                      ),
+                      label: const Text(
+                        'Off',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Colors.white,
                         ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1D5DE5),
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1D5DE5),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                    );
+                  }
+
+                  return ElevatedButton(
+                    onPressed: () {
+                      if (isBuy) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => P2PBuyScreen(adItem: adItem!),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => P2PSellScreen(adItem: adItem!),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1D5DE5),
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    isBuy ? "Buy" : "Sell",
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: Colors.white,
+                    child: Text(
+                      isBuy ? "Buy" : "Sell",
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
           ),
@@ -413,4 +464,41 @@ class P2POrderCard extends StatelessWidget {
   }
 
 
+  void _onOffTap(BuildContext context) {
+    if (adItem?.id == null) return;
+    
+    showCommonConfirmDialog(
+      context,
+      title: "Confirmation to Off",
+      message:
+          "This ad will be moved to Archived and will no longer be visible to other users. Once archived, this action cannot be undone",
+      primaryText: "Confirm",
+      secondaryText: "Cancel",
+      onPrimary: () async {
+        try {
+          // 0 = Archive
+          await C2CApi.upDownAds(adItem!.id!, "0"); 
+          
+          CustomSnackbar.showSuccess(
+            title: "Success",
+            message: "Ad turned off successfully",
+          );
+          
+          // Trigger refresh
+          if (onRefresh != null) {
+            onRefresh!();
+          }
+        } catch (e) {
+          debugPrint("Off ad error: $e");
+          CustomSnackbar.showError(
+            title: "Error",
+            message: "Something went wrong",
+          );
+        }
+      },
+      onSecondary: () {
+        debugPrint("User cancelled off ad");
+      },
+    );
+  }
 }

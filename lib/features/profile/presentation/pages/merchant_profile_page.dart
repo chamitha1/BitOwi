@@ -516,7 +516,11 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         final isBuy = ad.tradeType == '0'; // 0 = buy, 1 = sell
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: P2POrderCard(adItem: ad, isBuy: isBuy),
+          child: P2POrderCard(
+            adItem: ad,
+            isBuy: isBuy,
+            onRefresh: () => getAdsList(isRefresh: true),
+          ),
         );
       }).toList(),
     );
