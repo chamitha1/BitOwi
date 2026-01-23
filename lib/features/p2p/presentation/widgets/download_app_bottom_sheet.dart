@@ -70,26 +70,44 @@ class _DownloadAppBottomSheetState extends State<DownloadAppBottomSheet> {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10),
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 10),
               _buildHeader(context),
-              const SizedBox(height: 24),
-              const Text(
-                "This function requires downloading「${AppConfig.appName}」app.",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF2E3D5B),
-                  height: 1.5,
+              const SizedBox(height: 7),
+              const Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "The Function requires Downloading\n",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: Color(0xFF717F9A),
+                        height: 1.5,
+                      ),
+                    ),
+                    TextSpan(
+                      text: "${AppConfig.appName} App",
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xFF151E2F),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               _buildDownloadButton(),
@@ -103,20 +121,17 @@ class _DownloadAppBottomSheetState extends State<DownloadAppBottomSheet> {
 
   Widget _buildHeader(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
-          "Download",
+          "Go Download",
           style: TextStyle(
             fontFamily: 'Inter',
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF000000),
+            color: Color(0xff151E2F),
           ),
-        ),
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.close, color: Colors.black, size: 24),
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -155,7 +170,7 @@ class _DownloadAppBottomSheetState extends State<DownloadAppBottomSheet> {
                 ),
               )
             : const Text(
-                "Go Download",
+                "Download",
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
