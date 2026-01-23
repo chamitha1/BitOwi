@@ -264,25 +264,140 @@ class P2POrderCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Info Column
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Info & Action Row
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // Total Row
-              _buildInfoRow(
-                "Total",
-                "${adItem?.leftCount ?? '0'} ${adItem?.tradeCoin ?? ''}",
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Total Row
+                    _buildInfoRow(
+                      "Total",
+                      "${adItem?.leftCount ?? '0'} ${adItem?.tradeCoin ?? ''}",
+                    ),
+                    const SizedBox(height: 8),
+                    // Limit Row
+                    _buildInfoRow(
+                      "Limit",
+                      "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade ?? '0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade ?? '0'}",
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              // Limit Row
-              _buildInfoRow(
-                "Limit",
-                "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade ?? '0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade ?? '0'}",
+              const SizedBox(width: 8),
+              // Action Button
+              SizedBox(
+                width: isMerchantProfile ? 90 : 70,
+                height: 36,
+                child: Builder(
+                  builder: (context) {
+                    final currentUser = Get.find<UserController>().user.value;
+                    final isMine =
+                        currentUser?.id != null &&
+                        adItem?.userId != null &&
+                        currentUser!.id == adItem!.userId;
+
+                    if (isMine) {
+                      return ElevatedButton.icon(
+                        onPressed: () => _onOffTap(context),
+                        icon: SvgPicture.asset(
+                          'assets/icons/profile_page/toggle_off_circle.svg',
+                          width: 14,
+                          height: 14,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: const Text(
+                          'Off',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1D5DE5),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                      );
+                    }
+
+                    return ElevatedButton(
+                      onPressed: () {
+                        if (isBuy) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  P2PBuyScreen(adItem: adItem!),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  P2PSellScreen(adItem: adItem!),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1D5DE5),
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            isBuy
+                                ? 'assets/icons/orders/arrow-down-left.svg'
+                                : 'assets/icons/orders/arrow-up-right.svg',
+                            width: 16,
+                            height: 16,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${isBuy ? "Buy" : "Sell"}${isMerchantProfile ? " Ad" : ""}",
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          const Divider(height: 1, thickness: 1, color: Color(0xFFECEFF5)),
+          const SizedBox(height: 16),
           // Payment Methods
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Builder(
                 builder: (context) {
@@ -317,116 +432,6 @@ class P2POrderCard extends StatelessWidget {
                 },
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-          const Divider(height: 1, thickness: 1, color: Color(0xFFECEFF5)),
-          const SizedBox(height: 16),
-          // Action Button
-          Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-              width: isMerchantProfile ? 90 : 70,
-              height: 36,
-              child: Builder(
-                builder: (context) {
-                  final currentUser = Get.find<UserController>().user.value;
-                  final isMine =
-                      currentUser?.id != null &&
-                      adItem?.userId != null &&
-                      currentUser!.id == adItem!.userId;
-
-                  if (isMine) {
-                    return ElevatedButton.icon(
-                      onPressed: () => _onOffTap(context),
-                      icon: SvgPicture.asset(
-                        'assets/icons/profile_page/toggle_off_circle.svg',
-                        width: 14,
-                        height: 14,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      label: const Text(
-                        'Off',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1D5DE5),
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                    );
-                  }
-
-                  return ElevatedButton(
-                    onPressed: () {
-                      if (isBuy) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => P2PBuyScreen(adItem: adItem!),
-                          ),
-                        );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                P2PSellScreen(adItem: adItem!),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1D5DE5),
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          isBuy
-                              ? 'assets/icons/orders/arrow-down-left.svg'
-                              : 'assets/icons/orders/arrow-up-right.svg',
-                          width: 16,
-                          height: 16,
-
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-
-                        const SizedBox(width: 4),
-                        Text(
-                          "${isBuy ? "Buy" : "Sell"}${isMerchantProfile ? " Ad" : ""}",
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
           ),
         ],
       ),
