@@ -31,7 +31,7 @@ class P2PEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const Text(
-            "No Traders Available",
+            "No Ads Available",
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
@@ -42,7 +42,7 @@ class P2PEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            "There are no active trading offers at the moment.\nBe the first to post an ad and start trading!",
+            "Post an ad to start trading with others.",
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w400,
