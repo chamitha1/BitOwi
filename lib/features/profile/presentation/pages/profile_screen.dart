@@ -298,7 +298,9 @@ class ProfileScreen extends StatelessWidget {
           color: Color(0xFF779DEF),
         ),
         padding: const EdgeInsets.all(3),
-        child: ClipOval(child: CommonImage(avatar, fit: BoxFit.cover)),
+        child: ClipOval(
+          child: CommonImage(avatar, fit: BoxFit.cover, height: 64, width: 64),
+        ),
       ),
     );
   }

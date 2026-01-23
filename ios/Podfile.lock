@@ -5,6 +5,7 @@ PODS:
   - gal (1.0.0):
     - Flutter
     - FlutterMacOS
+  - HydraAsync (2.0.6)
   - image_picker_ios (0.0.1):
     - Flutter
   - just_audio (0.0.1):
@@ -27,6 +28,11 @@ PODS:
   - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
+  - tencent_cloud_chat_sdk (8.0.0):
+    - Flutter
+    - HydraAsync
+    - TXIMSDK_Plus_iOS_XCFramework (~> 8.8.7373)
+  - TXIMSDK_Plus_iOS_XCFramework (8.8.7373)
   - url_launcher_ios (0.0.1):
     - Flutter
   - video_player_avfoundation (0.0.1):
@@ -51,6 +57,7 @@ DEPENDENCIES:
   - qr_code_scanner_plus (from `.symlinks/plugins/qr_code_scanner_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
+  - tencent_cloud_chat_sdk (from `.symlinks/plugins/tencent_cloud_chat_sdk/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
@@ -58,7 +65,9 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - HydraAsync
     - MTBBarcodeScanner
+    - TXIMSDK_Plus_iOS_XCFramework
 
 EXTERNAL SOURCES:
   audio_session:
@@ -83,6 +92,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite_darwin:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
+  tencent_cloud_chat_sdk:
+    :path: ".symlinks/plugins/tencent_cloud_chat_sdk/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   video_player_avfoundation:
@@ -96,6 +107,7 @@ SPEC CHECKSUMS:
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   gal: baecd024ebfd13c441269ca7404792a7152fde89
+  HydraAsync: 8d589bd725b0224f899afafc9a396327405f8063
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
@@ -105,6 +117,8 @@ SPEC CHECKSUMS:
   qr_code_scanner_plus: 7e087021bc69873140e0754750eb87d867bed755
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
+  tencent_cloud_chat_sdk: 2182475abf83a60de565b91c6eaed4dbef8c825a
+  TXIMSDK_Plus_iOS_XCFramework: a99356b102d4c47ee1c60fa91837d7efb0f8f83d
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   video_player_avfoundation: dd410b52df6d2466a42d28550e33e4146928280a
   wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556

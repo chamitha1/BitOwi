@@ -290,7 +290,12 @@ class _MyAdsPageState extends State<MyAdsPage> {
                             width: 32,
                             child: ClipOval(
                               child: ad.photo.isNotEmpty
-                                  ? CommonImage(ad.photo, fit: BoxFit.cover)
+                                  ? CommonImage(
+                                      ad.photo,
+                                      fit: BoxFit.cover,
+                                      height: 32,
+                                      width: 32,
+                                    )
                                   : Container(
                                       color: const Color(0xFFE8EFFF),
                                       alignment: Alignment.center,

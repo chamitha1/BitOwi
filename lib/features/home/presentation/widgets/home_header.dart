@@ -27,6 +27,8 @@ class HomeHeader extends StatelessWidget {
               child: CommonImage(
                 controller.userAvatar.value,
                 fit: BoxFit.cover,
+                height: 52,
+                width: 52,
               ),
             ),
           ),
