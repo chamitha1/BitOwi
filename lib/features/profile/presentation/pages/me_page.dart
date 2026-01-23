@@ -125,7 +125,12 @@ class ProfileImageContainer extends StatelessWidget {
                     child: ClipOval(
                       child: isLoading
                           ? _AvatarShimmer()
-                          : CommonImage(userAvatar, fit: BoxFit.cover),
+                          : CommonImage(
+                              userAvatar,
+                              fit: BoxFit.cover,
+                              width: 64,
+                              height: 64,
+                            ),
                     ),
                   ),
                   Container(

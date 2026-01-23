@@ -505,7 +505,7 @@ class _P2PPageState extends State<P2PPage> {
                     textInputAction: TextInputAction.search,
                     onSubmitted: (_) => _fetchAds(isRefresh: true),
                     decoration: const InputDecoration(
-                      hintText: "Search by name",
+                      hintText: "Search Here",
                       hintStyle: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,

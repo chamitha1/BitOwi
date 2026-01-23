@@ -27,7 +27,7 @@ android {
 
         ndk {
             abiFilters.clear()
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
 
@@ -72,7 +72,7 @@ android {
     packaging {
         jniLibs {
             // Optional: if you don't support emulators
-            excludes += setOf("**/x86/**")
+            excludes += setOf("**/x86/**", "**/x86_64/**")
         }
     }
 }

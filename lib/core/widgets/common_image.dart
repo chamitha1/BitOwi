@@ -22,10 +22,9 @@ class CommonImage extends StatelessWidget {
 
   final Widget? errorWidgetChild;
 
-  //TODO: chnage to bitowi default images
-  static String squareImg = 'assets/images/public/bitowi_app_icon.png';
-  static String hRectangleImg = 'assets/images/public/bitowi_app_icon.png';
-  static String vRectangleImg = 'assets/images/public/bitowi_app_icon.png';
+  static String squareImg = 'assets/images/public/s_defaultImg.png';
+  static String hRectangleImg = 'assets/images/public/h_defaultImg.png';
+  static String vRectangleImg = 'assets/images/public/v_defaultImg.png';
 
   static const int Image_Maxnum = 50;
   static const int Image_Livenum = 50;
