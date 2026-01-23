@@ -4,6 +4,7 @@ import 'package:BitOwi/models/config.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
 import 'package:BitOwi/models/sms_model.dart';
+import 'package:BitOwi/utils/common_utils.dart';
 
 class CommonApi {
   /// Fetch dictionary list
@@ -70,13 +71,16 @@ class CommonApi {
     try {
       final res = await ApiClient.dio.post(
         '/core/v1/config/public/list',
-        data: {"type": type, "key": key, "typeList": typeList},
+        data: {
+          "type": type,
+          "key": key,
+          "typeList": typeList,
+        },
       );
-      // extract inner data map
       final Map<String, dynamic> data = Map<String, dynamic>.from(
-        res.data['data'],
+        res.data['data'] ?? {},
       );
-      return Config.fromJson(data);
+      return Config.fromJson(CommonUtils.removeNullKeys(data));
     } catch (e) {
       print("getConfig Error: $e");
       rethrow;

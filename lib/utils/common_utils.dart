@@ -38,4 +38,19 @@ class CommonUtils {
       });
     };
   }
+
+  /// Remove keys with null values from a map
+  static Map<String, dynamic> removeNullKeys(Map<String, dynamic> map) {
+    Map<String, dynamic> newMap = {};
+    map.forEach((key, value) {
+      if (value != null) {
+        if (value is Map<String, dynamic>) {
+          newMap[key] = removeNullKeys(value);
+        } else {
+          newMap[key] = value;
+        }
+      }
+    });
+    return newMap;
+  }
 }

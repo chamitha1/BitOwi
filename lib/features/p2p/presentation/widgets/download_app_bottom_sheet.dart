@@ -1,7 +1,63 @@
+import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/config/config.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class DownloadAppBottomSheet extends StatelessWidget {
+class DownloadAppBottomSheet extends StatefulWidget {
   const DownloadAppBottomSheet({super.key});
+
+  @override
+  State<DownloadAppBottomSheet> createState() => _DownloadAppBottomSheetState();
+}
+
+class _DownloadAppBottomSheetState extends State<DownloadAppBottomSheet> {
+  bool _isLoading = false;
+
+  Future<void> _onDownload() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Fetch config with type 'android-c'
+      final res = await CommonApi.getConfig(type: 'android-c');
+      final url = res.data["downloadUrl"] ?? '';
+
+      if (url.isNotEmpty) {
+        final Uri launchUri = Uri.parse(url);
+        if (await canLaunchUrl(launchUri)) {
+          await launchUrl(launchUri, mode: LaunchMode.externalApplication);
+        } else {
+          CustomSnackbar.showError(
+            title: "Error",
+            message: "Could not launch download URL",
+          );
+        }
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Download URL not found",
+        );
+      }
+    } catch (e) {
+      debugPrint("Download error: $e");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Failed to get download information",
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        Navigator.pop(context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +82,7 @@ class DownloadAppBottomSheet extends StatelessWidget {
               _buildHeader(context),
               const SizedBox(height: 24),
               const Text(
-                "This function requires downloading BitDo app.",
+                "This function requires downloading「${AppConfig.appName}」app.",
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
@@ -50,7 +106,7 @@ class DownloadAppBottomSheet extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          "Go Download",
+          "Download",
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 24,
@@ -69,19 +125,19 @@ class DownloadAppBottomSheet extends StatelessWidget {
   Widget _buildDownloadButton() {
     return Container(
       height: 54,
+      // color: Color(0xff1D5DE5),
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
-        ),
+        // gradient: const LinearGradient(
+        //   begin: Alignment.topCenter,
+        //   end: Alignment.bottomCenter,
+        //   colors: [Color(0xFF1D5DE5), Color(0xFF28A6FF)],
+        // ),
+        color: Color(0xff1D5DE5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ElevatedButton(
-        onPressed: () {
-          debugPrint("Download App button clicked");
-        },
+        onPressed: _isLoading ? null : _onDownload,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -89,15 +145,24 @@ class DownloadAppBottomSheet extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          "Download",
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
+        child: _isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : const Text(
+                "Go Download",
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }
