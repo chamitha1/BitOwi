@@ -13,6 +13,8 @@ import 'package:get/get.dart';
 import '../widgets/p2p_order_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/p2p_empty_state.dart';
+import 'package:flutter/foundation.dart'; // for kIsWeb
+import '../widgets/download_app_bottom_sheet.dart';
 
 class P2PPage extends StatefulWidget {
   const P2PPage({super.key});
@@ -33,6 +35,7 @@ class _P2PPageState extends State<P2PPage> {
 
   // Ads List State
   List<AdItem> _adsList = [];
+  List<AdItem> _filteredAds = [];
   int _pageNum = 1;
   bool _isEnd = false;
   
@@ -55,6 +58,9 @@ class _P2PPageState extends State<P2PPage> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _searchController.addListener(() {
+      _filterAds(_searchController.text);
+    });
 
     _fetchCoins();
   }
@@ -103,18 +109,12 @@ class _P2PPageState extends State<P2PPage> {
         "tradeType": isBuySelected ? "1" : "0",
       };
 
-      final String nickName = _searchController.text.trim();
-
-      if (nickName.isNotEmpty) {
-        params["nickName"] = nickName;
-      } else {
-        if (_minPrice != null && _minPrice!.trim().isNotEmpty) {
-          params["minPrice"] = _minPrice!.trim();
-        }
-        // Add tradeCurrency filter if selected via bottom sheet
-        if (_selectedCurrency != null) {
-          params['tradeCurrency'] = _selectedCurrency!.key;
-        }
+      if (_minPrice != null && _minPrice!.trim().isNotEmpty) {
+        params["minPrice"] = _minPrice!.trim();
+      }
+      // Add tradeCurrency filter if selected via bottom sheet
+      if (_selectedCurrency != null) {
+        params['tradeCurrency'] = _selectedCurrency!.key;
       }
       
       debugPrint("P2PPage: Fetching ads with params: $params");
@@ -137,6 +137,7 @@ class _P2PPageState extends State<P2PPage> {
         }
 
         _pageNum++;
+        _filterAds(_searchController.text);
       });
 
       if (isRefresh) {
@@ -156,6 +157,22 @@ class _P2PPageState extends State<P2PPage> {
         _refreshController.finishLoad(IndicatorResult.fail);
       }
     }
+  }
+
+  void _filterAds(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredAds = _adsList;
+      });
+      return;
+    }
+    final lowerQuery = query.toLowerCase();
+    setState(() {
+      _filteredAds = _adsList.where((item) {
+        final name = (item.nickname ?? '').toLowerCase();
+        return name.contains(lowerQuery);
+      }).toList();
+    });
   }
 
   Widget _emptyScrollable() {
@@ -193,19 +210,19 @@ class _P2PPageState extends State<P2PPage> {
                 controller: _refreshController,
                 onRefresh: () => _fetchAds(isRefresh: true),
                 onLoad: () => _fetchAds(),
-                child: _adsList.isEmpty
+                child: _filteredAds.isEmpty
                     ? _emptyScrollable()
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 16,
                         ),
-                        itemCount: _adsList.length,
+                        itemCount: _filteredAds.length,
                         separatorBuilder: (context, index) => const SizedBox(height: 16),
                         itemBuilder: (_, index) {
                           return P2POrderCard(
                             isBuy: isBuySelected,
-                            adItem: _adsList[index],
+                            adItem: _filteredAds[index],
                             onRefresh: () => _fetchAds(isRefresh: true),
                           );
                         },
@@ -234,10 +251,19 @@ class _P2PPageState extends State<P2PPage> {
         ),
         GestureDetector(
           onTap: () async {
-            final result = await Get.toNamed(Routes.postAdsPage);
-            // refresh after coming back
-            if (result == true) {
-              _fetchAds(isRefresh: true);
+            if (kIsWeb) {
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                builder: (_) => const DownloadAppBottomSheet(),
+              );
+            } else {
+              final result = await Get.toNamed(Routes.postAdsPage);
+              // refresh after coming back
+              if (result == true) {
+                _fetchAds(isRefresh: true);
+              }
             }
           },
           child: Container(
@@ -497,6 +523,7 @@ class _P2PPageState extends State<P2PPage> {
           ),
         ),
 
+        
         const SizedBox(width: 8),
 
         // Filter Button

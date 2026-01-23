@@ -15,6 +15,8 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
 
 class MyAdsPage extends StatefulWidget {
   const MyAdsPage({super.key});
@@ -158,13 +160,23 @@ class _MyAdsPageState extends State<MyAdsPage> {
                             child: PrimaryButton(
                               text: 'Post Ads',
                               onPressed: () async {
-                                final result = await Get.toNamed(
-                                  Routes.postAdsPage,
-                                );
-                                // refresh after coming back
-                                if (result == true) {
-                                  // await _controller.callRefresh();
-                                  onRefresh();
+                                if (kIsWeb) {
+                                  await showModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: true,
+                                    builder: (_) =>
+                                        const DownloadAppBottomSheet(),
+                                  );
+                                } else {
+                                  final result = await Get.toNamed(
+                                    Routes.postAdsPage,
+                                  );
+                                  // refresh after coming back
+                                  if (result == true) {
+                                    // await _controller.callRefresh();
+                                    onRefresh();
+                                  }
                                 }
                               },
                             ),
@@ -683,6 +695,15 @@ class _MyAdsPageState extends State<MyAdsPage> {
   }
 
   void onEditTap(AdsMyPageRes ad) async {
+    if (kIsWeb) {
+      await showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (_) => const DownloadAppBottomSheet(),
+      );
+      return;
+    }
     //todo:
     // if (!PlatformUtils().isMobile) {
     //   DownloadModal.showModal(context);
