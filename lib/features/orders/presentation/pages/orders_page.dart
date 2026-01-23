@@ -1,5 +1,6 @@
 import 'package:BitOwi/features/orders/presentation/widgets/order_card.dart';
 import 'package:BitOwi/features/orders/presentation/controllers/orders_controller.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
 import 'package:BitOwi/features/orders/utils/order_helper.dart';
 import 'package:BitOwi/models/trade_order_page_res.dart';
@@ -146,12 +147,10 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
       userAvatar: isBuyer
           ? (orderItem.sellerPhoto ?? '')
           : (orderItem.buyerPhoto ?? ''),
-      isCertified: false,
+      isCertified: Get.find<UserController>().user.value?.merchantStatus == '1',
       hasUnreadMessages: false,
       onTap: () => Get.to(
-        () => OrderDetailsPage(
-          orderId: orderItem.id?.toString() ?? '',
-        ),
+        () => OrderDetailsPage(orderId: orderItem.id?.toString() ?? ''),
       ),
     );
   }
