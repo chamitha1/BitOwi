@@ -1,6 +1,6 @@
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_buy_screen.dart';
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_sell_screen.dart';
-import 'package:BitOwi/features/p2p/presentation/widgets/trade_type_badge.dart';
+
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -257,38 +257,78 @@ class P2POrderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (adItem != null)
-                TradeTypeBadge(isBuy: adItem!.tradeType == '0'),
             ],
           ),
           const SizedBox(height: 16),
-          // Info & Action Row
+          // Info Column
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Total Row
+              _buildInfoRow(
+                "Total",
+                "${adItem?.leftCount ?? '0'} ${adItem?.tradeCoin ?? ''}",
+              ),
+              const SizedBox(height: 8),
+              // Limit Row
+              _buildInfoRow(
+                "Limit",
+                "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade ?? '0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade ?? '0'}",
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Payment Methods
           Row(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Total Row
-                    _buildInfoRow(
-                      "Total",
-                      "${adItem?.leftCount ?? '0'} ${adItem?.tradeCoin ?? ''}",
+              Builder(
+                builder: (context) {
+                  final hasBank = adItem?.bankPic != null;
+                  final payTypeDisplay = hasBank
+                      ? (adItem?.bankName ?? 'Bank Transfer')
+                      : 'Mobile';
+
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    const SizedBox(height: 8), // Space between rows
-                    // Limit Row
-                    _buildInfoRow(
-                      "Limit",
-                      "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade ?? '0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade ?? '0'}",
+                    decoration: BoxDecoration(
+                      color: hasBank
+                          ? const Color(0xFFFDF4F5)
+                          : const Color(0xFFFFFBF6),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
-                ),
+                    child: Text(
+                      payTypeDisplay,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                        color: hasBank
+                            ? const Color(0xFFE74C3C)
+                            : const Color(0xFFFF9B29),
+                      ),
+                    ),
+                  );
+                },
               ),
-              SizedBox(
-                width: 76,
-                height: 32,
-                child: Builder(builder: (context) {
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1, thickness: 1, color: Color(0xFFECEFF5)),
+          const SizedBox(height: 16),
+          // Action Button
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 70,
+              height: 36,
+              child: Builder(
+                builder: (context) {
                   final currentUser = Get.find<UserController>().user.value;
-                  final isMine = currentUser?.id != null &&
+                  final isMine =
+                      currentUser?.id != null &&
                       adItem?.userId != null &&
                       currentUser!.id == adItem!.userId;
 
@@ -338,7 +378,8 @@ class P2POrderCard extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => P2PSellScreen(adItem: adItem!),
+                            builder: (context) =>
+                                P2PSellScreen(adItem: adItem!),
                           ),
                         );
                       }
@@ -351,60 +392,37 @@ class P2POrderCard extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: Text(
-                      isBuy ? "Buy" : "Sell",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          isBuy
+                              ? 'assets/icons/orders/arrow-down-left.svg'
+                              : 'assets/icons/orders/arrow-up-right.svg',
+                          width: 16,
+                          height: 16,
+
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+
+                        const SizedBox(width: 4),
+                        Text(
+                          isBuy ? "Buy" : "Sell",
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   );
-                }),
+                },
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Payment Methods
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(top: 16),
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Color(0xFFECEFF5), width: 1),
-              ),
-            ),
-            child: Row(
-              children: [
-                Builder(builder: (context) {
-                  final hasBank = adItem?.bankPic != null;
-                  final payTypeDisplay = hasBank
-                      ? (adItem?.bankName ?? 'Bank Transfer')
-                      : 'Mobile';
-                      
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: hasBank
-                          ? const Color(0xFFFDF4F5)
-                          : const Color(0xFFFFFBF6),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      payTypeDisplay,
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        color: hasBank
-                            ? const Color(0xFFE74C3C)
-                            : const Color(0xFFFF9B29),
-                      ),
-                    ),
-                  );
-                }),
-              ],
             ),
           ),
         ],
@@ -463,10 +481,9 @@ class P2POrderCard extends StatelessWidget {
     );
   }
 
-
   void _onOffTap(BuildContext context) {
     if (adItem?.id == null) return;
-    
+
     showCommonConfirmDialog(
       context,
       title: "Confirmation to Off",
@@ -477,13 +494,13 @@ class P2POrderCard extends StatelessWidget {
       onPrimary: () async {
         try {
           // 0 = Archive
-          await C2CApi.upDownAds(adItem!.id!, "0"); 
-          
+          await C2CApi.upDownAds(adItem!.id!, "0");
+
           CustomSnackbar.showSuccess(
             title: "Success",
             message: "Ad turned off successfully",
           );
-          
+
           // Trigger refresh
           if (onRefresh != null) {
             onRefresh!();
