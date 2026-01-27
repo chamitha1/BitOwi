@@ -4,6 +4,7 @@ import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -100,7 +101,9 @@ class _ChangeTransactionPasswordPageState
         smsCode: _verifiedOtp,
         tradePwd: pass,
       );
-      print("ChangeTransactionPasswordPage: bindTradePwd result: $result");
+      AppLogger.d(
+        "ChangeTransactionPasswordPage: bindTradePwd result: $result",
+      );
 
       //update tradePwdFlag
       await Get.find<UserController>().loadUser();
@@ -129,7 +132,7 @@ class _ChangeTransactionPasswordPageState
         email: _email,
         bizType: SmsBizType.bindTradePwd,
       );
-      print("ChangeTransactionPasswordPage: sendOtp success: $success");
+      AppLogger.d("ChangeTransactionPasswordPage: sendOtp success: $success");
 
       if (!mounted) return;
 

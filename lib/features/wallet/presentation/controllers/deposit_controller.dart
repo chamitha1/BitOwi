@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/models/chain_symbol_list_res.dart';
@@ -53,7 +54,7 @@ class DepositController extends GetxController {
         updateNetworkList();
       }
     } catch (e) {
-      print("Error fetching coin list: $e");
+      AppLogger.d("Error fetching coin list: $e");
     } finally {
       isLoading.value = false;
     }
@@ -109,7 +110,7 @@ class DepositController extends GetxController {
         }
       }
     } catch (e) {
-      print("Error fetching address: $e");
+      AppLogger.d("Error fetching address: $e");
     } finally {
       isLoading.value = false;
     }
@@ -152,7 +153,7 @@ class DepositController extends GetxController {
         );
       }
     } catch (e) {
-      print("Error saving image: $e");
+      AppLogger.d("Error saving image: $e");
       CustomSnackbar.showError(
         title: "Error",
         message: "Error saving image: $e",

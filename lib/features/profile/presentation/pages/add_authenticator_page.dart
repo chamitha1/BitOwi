@@ -4,6 +4,7 @@ import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -32,7 +33,7 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
   Future<void> _fetchSecretKey() async {
     try {
       final secret = await UserApi.getGoogleSecret();
-      print("AddAuthenticatorPage: getGoogleSecret result: $secret");
+      AppLogger.d("AddAuthenticatorPage: getGoogleSecret result: $secret");
       if (mounted) {
         setState(() {
           _secretKey = secret;
@@ -93,7 +94,7 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
         email: email,
         bizType: SmsBizType.openGoogle,
       );
-      print("AddAuthenticatorPage: sendOtp success: $success");
+      AppLogger.d("AddAuthenticatorPage: sendOtp success: $success");
 
       if (!mounted) return;
 
@@ -123,10 +124,10 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
                 secret: _secretKey,
                 smsCaptcha: pin,
               );
-              print("AddAuthenticatorPage: bindGoogleSecret success");
+              AppLogger.d("AddAuthenticatorPage: bindGoogleSecret success");
               return true;
             } catch (e) {
-              print("AddAuthenticatorPage: bindGoogleSecret error: $e");
+              AppLogger.d("AddAuthenticatorPage: bindGoogleSecret error: $e");
               CustomSnackbar.showError(title: "Error", message: "$e");
               return false;
             }
@@ -136,7 +137,9 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
               email: email,
               bizType: SmsBizType.openGoogle,
             );
-            print("AddAuthenticatorPage: Resend sendOtp success: $success");
+            AppLogger.d(
+              "AddAuthenticatorPage: Resend sendOtp success: $success",
+            );
             return success;
           },
           onVerified: () async {

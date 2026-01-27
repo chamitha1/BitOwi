@@ -10,6 +10,7 @@ import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/models/bankcard_list_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -61,7 +62,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
         isEnd = true;
       });
     } catch (e) {
-      print("getBankCardList getList error: $e");
+      AppLogger.d("getBankCardList getList error: $e");
     } finally {
       setState(() {
         isLoading = false;

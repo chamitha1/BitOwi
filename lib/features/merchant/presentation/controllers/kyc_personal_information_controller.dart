@@ -67,7 +67,6 @@ class KycPersonalInformationController extends GetxController {
     isEdit.value = args['isEdit'] ?? false; // 🔁
     merchantStatus.value = args['merchantStatus'] ?? '-1';
 
-    debugPrint("🚀🔥 merchantStatus: ${merchantStatus.value}");
 
     _nameWorker = ever(name, (v) => nameController.text = v);
     _idWorker = ever(idNumber, (v) => idController.text = v);

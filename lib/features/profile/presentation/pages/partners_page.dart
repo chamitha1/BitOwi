@@ -1,6 +1,7 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/partner_card.dart';
 import 'package:BitOwi/models/user_relation_page_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -82,7 +83,7 @@ class _PartnersPageState extends State<PartnersPage> {
       if (_selectedTabIndex == 1) type = '2';
       if (_selectedTabIndex == 2) type = '0';
 
-      print("Fetching partners list: page=$_pageNum, type=$type");
+      AppLogger.d("Fetching partners list: page=$_pageNum, type=$type");
 
       final res = await UserApi.getUserRelationPageList({
         "pageNum": _pageNum,
@@ -99,7 +100,7 @@ class _PartnersPageState extends State<PartnersPage> {
       }
       _pageNum++;
     } catch (e) {
-      print("Error fetching partners: $e");
+      AppLogger.d("Error fetching partners: $e");
     } finally {
       _isLoading = false;
     }

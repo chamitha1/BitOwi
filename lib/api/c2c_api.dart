@@ -3,6 +3,7 @@ import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
 import 'package:BitOwi/models/ads_my_page_res.dart';
 import 'package:BitOwi/models/page_info.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 
 class C2CApi {
   /// Add new ad
@@ -17,7 +18,7 @@ class C2CApi {
       // assuming backend returns JSON
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print("createAds error: $e");
+      AppLogger.d("createAds error: $e");
       rethrow;
     }
   }
@@ -33,7 +34,7 @@ class C2CApi {
       final responseData = res.data['data'];
       return responseData["truePrice"];
     } catch (e) {
-      print("getPrice error: $e");
+      AppLogger.d("getPrice error: $e");
       rethrow;
     }
   }
@@ -52,7 +53,7 @@ class C2CApi {
       final resData = res.data;
       return AdsDetailRes.fromJson(resData['data']);
     } catch (e) {
-      print("getAdsInfo error: $e");
+      AppLogger.d("getAdsInfo error: $e");
       rethrow;
     }
   }
@@ -66,7 +67,7 @@ class C2CApi {
       );
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print("editAds error: $e");
+      AppLogger.d("editAds error: $e");
       rethrow;
     }
   }
@@ -79,7 +80,7 @@ class C2CApi {
       );
 
       final resData = res.data;
-      print("----ads/public/home RAW RESPONSE----\n $resData");
+      AppLogger.d("----ads/public/home RAW RESPONSE----\n $resData");
       if (resData['code'] == 200 || resData['code'] == '200') {
         return AdsHomeRes.fromJson(resData['data']);
       } else {
@@ -88,7 +89,7 @@ class C2CApi {
         );
       }
     } catch (e) {
-      print("getOtherUserAdsHome error: $e");
+      AppLogger.d("getOtherUserAdsHome error: $e");
       rethrow;
     }
   }
@@ -103,7 +104,7 @@ class C2CApi {
 
       return PageInfo<AdsMyPageRes>.fromJson(resData, AdsMyPageRes.fromJson);
     } catch (e) {
-      print("getMyAdsPageList error: $e");
+      AppLogger.d("getMyAdsPageList error: $e");
       rethrow;
     }
   }
@@ -117,7 +118,7 @@ class C2CApi {
         data: {"id": id, "type": type},
       );
     } catch (e) {
-      print("upDownAds error: $e");
+      AppLogger.d("upDownAds error: $e");
       rethrow;
     }
   }

@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await controller.fetchBalance();
     } catch (e) {
-      print(e);
+      AppLogger.e(e);
     }
     _refreshController.finishRefresh();
   }
@@ -95,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               // Index 1: P2P
-              const P2PPage(),
-              // Index 2: Order
-              const OrdersPage(),
+              // const P2PPage(),
+              // // Index 2: Order
+              // const OrdersPage(),
               // Index 3: Profile
               const ProfileScreen(),
             ],

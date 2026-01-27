@@ -156,15 +156,15 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _sendingOtp = true);
 
     try {
-      final success = await userApi.sendOtp(
+      final result = await userApi.sendSignInOtp(
         email: email,
         bizType: SmsBizType.register,
       );
 
       if (!mounted) return;
 
-      if (!success) {
-        _showTopError("Failed to send OTP. Please try again.");
+      if (!result.success) {
+        _showTopError(result.message ?? "Failed to send OTP");
         return;
       }
 

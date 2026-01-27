@@ -4,6 +4,7 @@ import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -98,7 +99,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         smsCaptchaOld: _oldEmailOtp,
         smsCaptchaNew: _newEmailOtp,
       );
-      print("ChangeEmailPage: modifyEmail result: $result");
+      AppLogger.d("ChangeEmailPage: modifyEmail result: $result");
 
       if (result['code'] == 200 || result['code'] == '200') {
         _showSuccessDialog();
@@ -109,7 +110,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         );
       }
     } catch (e) {
-      print("ChangeEmailPage: modifyEmail error: $e");
+      AppLogger.d("ChangeEmailPage: modifyEmail error: $e");
       CustomSnackbar.showError(title: "Error", message: "$e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -128,7 +129,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         email: _currentEmail,
         bizType: SmsBizType.modifyEmail,
       );
-      print("ChangeEmailPage: sendOtp (OLD) success: $success");
+      AppLogger.d("ChangeEmailPage: sendOtp (OLD) success: $success");
 
       if (!mounted) return;
 
@@ -212,7 +213,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         email: newEmail,
         bizType: SmsBizType.modifyEmail,
       );
-      print("ChangeEmailPage: sendOtp (NEW) success: $success");
+      AppLogger.d("ChangeEmailPage: sendOtp (NEW) success: $success");
 
       if (!mounted) return;
 
@@ -354,7 +355,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                       ),
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0xFFECEFF5), 
+                        fillColor: const Color(0xFFECEFF5),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 15,
                         ),

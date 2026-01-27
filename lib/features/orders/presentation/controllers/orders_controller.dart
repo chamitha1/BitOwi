@@ -1,3 +1,4 @@
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/trade_order_page_res.dart';
@@ -22,7 +23,7 @@ class OrdersController extends GetxController {
   // Filter orders based on current tab
   void filterOrders() {
     List<int> allowedStatuses;
-    
+
     switch (currentTabIndex.value) {
       case 0: // Processing
         allowedStatuses = [-1, 0, 1, 2, 5];
@@ -86,11 +87,11 @@ class OrdersController extends GetxController {
 
       isEnd.value = futures[0].isEnd && futures[1].isEnd;
       pageNum.value++;
-      
+
       // Filter for current tab
       filterOrders();
     } catch (e) {
-      print('Error fetching orders: $e');
+      AppLogger.d('Error fetching orders: $e');
     } finally {
       isLoading.value = false;
     }

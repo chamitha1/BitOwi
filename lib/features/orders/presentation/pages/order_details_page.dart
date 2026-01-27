@@ -1,3 +1,4 @@
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -33,23 +34,25 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   Future<void> _fetchOrderDetail() async {
     try {
-      print('🔄 Fetching order detail for ID: ${widget.orderId}');
+      AppLogger.d('🔄 Fetching order detail for ID: ${widget.orderId}');
       setState(() {
         isLoading = true;
         error = null;
       });
-      
+
       final detail = await P2PApi.getTradeOrderDetail(widget.orderId);
-      print('✅ Order detail fetched: ${detail.id}, Amount: ${detail.tradeAmount}, Currency: ${detail.tradeCurrency}');
-      print('📅 invalidDatetime: ${detail.invalidDatetime}');
-      
+      AppLogger.d(
+        '✅ Order detail fetched: ${detail.id}, Amount: ${detail.tradeAmount}, Currency: ${detail.tradeCurrency}',
+      );
+      AppLogger.d('📅 invalidDatetime: ${detail.invalidDatetime}');
+
       setState(() {
         orderDetail = detail;
         isLoading = false;
       });
-      print('✅ State updated, UI should rebuild now');
+      AppLogger.d('✅ State updated, UI should rebuild now');
     } catch (e) {
-      print('❌ Error fetching order detail: $e');
+      AppLogger.d('❌ Error fetching order detail: $e');
       setState(() {
         error = e.toString();
         isLoading = false;
@@ -72,9 +75,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   void _showCancelOrderBottomSheet() {
     Get.bottomSheet(
-      ActionConfirmationBottomSheet(
-        actionType: ActionType.cancelOrder,
-      ),
+      ActionConfirmationBottomSheet(actionType: ActionType.cancelOrder),
       isScrollControlled: true,
     ).then((confirmed) {
       if (confirmed == true) {
@@ -83,21 +84,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     });
   }
 
-
   Future<void> _handleCancelOrder() async {
     try {
-      print('🔄 Cancelling order: ${widget.orderId}');
+      AppLogger.d('🔄 Cancelling order: ${widget.orderId}');
       _showLoadingDialog();
-      
+
       await P2PApi.cancelOrder(widget.orderId);
-      
+
       _hideLoadingDialog();
       _showSuccessSnackbar('Order cancelled successfully');
-      
 
       await _fetchOrderDetail();
     } catch (e) {
-      print('❌ Error cancelling order: $e');
+      AppLogger.d('❌ Error cancelling order: $e');
       _hideLoadingDialog();
       _showErrorSnackbar(e.toString());
     }
@@ -117,17 +116,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   ///Mark as Paid API Call
   Future<void> _handleNotifyPayment() async {
     try {
-      print('🔄 Marking order as paid: ${widget.orderId}');
+      AppLogger.d('🔄 Marking order as paid: ${widget.orderId}');
       _showLoadingDialog();
-      
+
       await P2PApi.markOrderPay(widget.orderId);
-      
+
       _hideLoadingDialog();
       _showSuccessSnackbar('Payment notification sent');
-   
+
       await _fetchOrderDetail();
     } catch (e) {
-      print('❌ Error notifying payment: $e');
+      AppLogger.d('❌ Error notifying payment: $e');
       _hideLoadingDialog();
       _showErrorSnackbar(e.toString());
     }
@@ -135,9 +134,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   void _showArbitrationBottomSheet() {
     Get.bottomSheet(
-      ActionConfirmationBottomSheet(
-        actionType: ActionType.arbitration,
-      ),
+      ActionConfirmationBottomSheet(actionType: ActionType.arbitration),
       isScrollControlled: true,
     ).then((confirmed) {
       if (confirmed == true) {
@@ -149,18 +146,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   ///Arbitration API Call
   Future<void> _handleArbitrationRequest() async {
     try {
-      print('🔄 Requesting arbitration for order: ${widget.orderId}');
+      AppLogger.d('🔄 Requesting arbitration for order: ${widget.orderId}');
       _showLoadingDialog();
-      
+
       await P2PApi.applyArbitration(widget.orderId);
-      
+
       _hideLoadingDialog();
       _showSuccessSnackbar('Arbitration request submitted');
-      
 
       await _fetchOrderDetail();
     } catch (e) {
-      print('❌ Error requesting arbitration: $e');
+      AppLogger.d('❌ Error requesting arbitration: $e');
       _hideLoadingDialog();
       _showErrorSnackbar(e.toString());
     }
@@ -170,11 +166,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   void _showLoadingDialog() {
     Get.dialog(
-      const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF1D5DE5),
-        ),
-      ),
+      const Center(child: CircularProgressIndicator(color: Color(0xFF1D5DE5))),
       barrierDismissible: false,
     );
   }
@@ -186,17 +178,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }
 
   void _showSuccessSnackbar(String message) {
-    CustomSnackbar.showSuccess(
-      title: 'Success',
-      message: message,
-    );
+    CustomSnackbar.showSuccess(title: 'Success', message: message);
   }
 
   void _showErrorSnackbar(String message) {
-    CustomSnackbar.showError(
-      title: 'Error',
-      message: message,
-    );
+    CustomSnackbar.showError(title: 'Error', message: message);
   }
 
   @override
@@ -377,7 +363,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     String title;
     String? subtitle;
 
-    print('🔍 Building status header - status: $status, orderDetail.status: ${orderDetail?.status}, invalidDatetime: ${orderDetail?.invalidDatetime}');
+    AppLogger.d(
+      '🔍 Building status header - status: $status, orderDetail.status: ${orderDetail?.status}, invalidDatetime: ${orderDetail?.invalidDatetime}',
+    );
 
     switch (status) {
       case OrderStatus.pending:
@@ -390,22 +378,27 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         iconPath = 'assets/icons/orders/clock.svg';
         bgColor = const Color(0xFFFFFBF6);
         title = 'Payment Pending';
-        // Format invalidDatetime 
+        // Format invalidDatetime
         String expiryTime = '00:00:00';
         if (orderDetail?.invalidDatetime != null) {
           try {
-            final dt = DateTime.fromMillisecondsSinceEpoch(orderDetail!.invalidDatetime!);
-            expiryTime = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
-            print('✅ Formatted expiry time: $expiryTime from timestamp: ${orderDetail!.invalidDatetime}');
+            final dt = DateTime.fromMillisecondsSinceEpoch(
+              orderDetail!.invalidDatetime!,
+            );
+            expiryTime =
+                '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+            AppLogger.d(
+              '✅ Formatted expiry time: $expiryTime from timestamp: ${orderDetail!.invalidDatetime}',
+            );
           } catch (e) {
-            print('❌ Error formatting invalidDatetime: $e');
+            AppLogger.d('❌ Error formatting invalidDatetime: $e');
           }
         } else {
-          print('⚠️ invalidDatetime is null');
+          AppLogger.d('⚠️ invalidDatetime is null');
         }
         subtitle =
             'Order will be held until $expiryTime and will be cancelled after deadline';
-        print('📝 Final subtitle: $subtitle');
+        AppLogger.d('📝 Final subtitle: $subtitle');
         break;
       case OrderStatus.pendingReleased:
         iconPath = 'assets/icons/orders/lock.svg';
@@ -471,10 +464,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 String displayTime = '00:00:00';
                 if (orderDetail?.invalidDatetime != null) {
                   try {
-                    final dt = DateTime.fromMillisecondsSinceEpoch(orderDetail!.invalidDatetime!);
-                    displayTime = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+                    final dt = DateTime.fromMillisecondsSinceEpoch(
+                      orderDetail!.invalidDatetime!,
+                    );
+                    displayTime =
+                        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
                   } catch (e) {
-                    print('Error in RichText formatting: $e');
+                    AppLogger.d('Error in RichText formatting: $e');
                   }
                 }
                 return RichText(
@@ -496,7 +492,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           color: Color(0xFF151E2F),
                         ),
                       ),
-                      const TextSpan(text: ' and will be cancelled after deadline'),
+                      const TextSpan(
+                        text: ' and will be cancelled after deadline',
+                      ),
                     ],
                   ),
                 );
@@ -521,7 +519,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget _buildMainAmount() {
     final amount = orderDetail?.tradeAmount?.toString() ?? '0';
     final currency = orderDetail?.tradeCurrency ?? 'USD';
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -537,7 +535,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               TextSpan(text: '$amount '),
               TextSpan(
                 text: currency,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
@@ -581,9 +582,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     final time = orderDetail?.createDatetime != null
         ? OrderHelper.formatDateTime(orderDetail!.createDatetime)
         : 'N/A';
-    final quantity = '${orderDetail?.count ?? '0'} ${orderDetail?.tradeCoin ?? ''}';
-    final total = '${orderDetail?.tradeAmount ?? '0'} ${orderDetail?.tradeCurrency ?? ''}';
-    
+    final quantity =
+        '${orderDetail?.count ?? '0'} ${orderDetail?.tradeCoin ?? ''}';
+    final total =
+        '${orderDetail?.tradeAmount ?? '0'} ${orderDetail?.tradeCurrency ?? ''}';
+
     return Column(
       children: [
         Row(
@@ -647,7 +650,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ? (orderDetail?.buyerPhoto)
         : (orderDetail?.sellerPhoto);
     final counterpartyLabel = isSeller ? 'Buyer' : 'Seller';
-    
+
     return Column(
       children: [
         _buildDetailRow(
@@ -691,10 +694,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ),
         const SizedBox(height: 12),
         if (orderDetail?.leaveMessage?.isNotEmpty ?? false)
-          _buildDetailRow(
-            'Ads Messages',
-            orderDetail!.leaveMessage!,
-          ),
+          _buildDetailRow('Ads Messages', orderDetail!.leaveMessage!),
       ],
     );
   }

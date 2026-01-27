@@ -15,6 +15,7 @@ import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/models/bankcard_list_res.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -235,9 +236,9 @@ class _PostAdsPageState extends State<PostAdsPage> {
         //   if (adsInfo.displayTime?.isNotEmpty ?? false) {
         //     timeList = adsInfo.displayTime!.map((e) {
         //       final apiWeek = int.parse(e.week);
-        //       print({e.week});
+        //       AppLogger.d({e.week});
         //       final dartWeek = (((apiWeek - 2) % 7) + 7) % 7 + 1;
-        //       print("API week: $apiWeek → Dart week: $dartWeek");
+        //       AppLogger.d("API week: $apiWeek → Dart week: $dartWeek");
 
         //       return WeekTimePickModalResult(
         //         week: WeekPickModalResult.fromWeekday(int.parse(e.week)),
@@ -252,7 +253,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
       getPrice();
       setState(() {});
     } catch (e) {
-      print("$e");
+      AppLogger.d("$e");
     } finally {
       setState(() {
         isLoading = false;
@@ -281,7 +282,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
         setState(() {});
       }
     } catch (e) {
-      print("getPrice error: $e");
+      AppLogger.d("getPrice error: $e");
     }
   }
 
@@ -613,7 +614,6 @@ class _PostAdsPageState extends State<PostAdsPage> {
                   )
                   .toList(),
       };
-      debugPrint("🚀👘 doSubmit params : ${params}");
 
       if (id.isEmpty) {
         final resCreate = await C2CApi.createAds(params);
@@ -654,7 +654,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
       }
       Get.back(result: true, closeOverlays: true);
     } catch (e) {
-      print("doSubmit error: $e");
+      AppLogger.d("doSubmit error: $e");
     } finally {
       setState(() {
         isLoading = false;
@@ -1342,7 +1342,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
         bankCardList = resList;
       });
     } catch (e) {
-      print("getBankCardList getList refresh error: $e");
+      AppLogger.d("getBankCardList getList refresh error: $e");
     }
   }
 

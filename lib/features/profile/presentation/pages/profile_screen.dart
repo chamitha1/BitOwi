@@ -31,11 +31,11 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(height: 56, child: _buildTopBar(userController)),
               const SizedBox(height: 20),
               _buildProfileCard(userController),
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: _buildQuickActionsRow(),
-              ),
+              // const SizedBox(height: 24),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              //   child: _buildQuickActionsRow(),
+              // ),
               const SizedBox(height: 24),
               _buildMenuCards(context),
               const SizedBox(height: 40),

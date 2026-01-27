@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/models/account_detail_res.dart';
@@ -47,9 +48,11 @@ class BalanceController extends GetxController {
 
   Future<void> getCoinList() async {
     try {
-      final result = await CommonApi.getDictList(parentKey: 'ads_trade_currency');
+      final result = await CommonApi.getDictList(
+        parentKey: 'ads_trade_currency',
+      );
       coinList.value = result.map((item) => item.key).toList();
-      
+
       // Ensure current selected currency is valid/set
       final current = await StorageService.getCurrency();
       if (coinList.contains(current)) {
@@ -58,7 +61,7 @@ class BalanceController extends GetxController {
         selectedCurrency.value = coinList.first;
       }
     } catch (e) {
-      print("Error fetching coin list: $e");
+      AppLogger.d("Error fetching coin list: $e");
     }
   }
 
@@ -68,16 +71,15 @@ class BalanceController extends GetxController {
 
     try {
       final currency = await StorageService.getCurrency();
-      selectedCurrency.value = currency; 
-      
+      selectedCurrency.value = currency;
+
       // Fetch both APIs concurrently
       await Future.wait([
         _fetchHomeAsset(currency),
         _fetchBalanceAccount(currency),
       ]);
-
     } catch (e) {
-      print("BalanceController Error: $e");
+      AppLogger.d("BalanceController Error: $e");
       errorMessage.value = e.toString();
     } finally {
       isLoading.value = false;
@@ -88,16 +90,16 @@ class BalanceController extends GetxController {
     try {
       final res = await AccountApi.getHomeAsset(currency);
       homeAssetData.value = res;
-      print("BalanceController: Fetched Home Asset for $currency");
+      AppLogger.d("BalanceController: Fetched Home Asset for $currency");
     } catch (e) {
-      print("Error fetching home asset: $e");
+      AppLogger.d("Error fetching home asset: $e");
     }
   }
 
   Future<void> _fetchBalanceAccount(String currency) async {
     try {
       final res = await AccountApi.getBalanceAccount(assetCurrency: currency);
-      print("BalanceController: Fetched Balance Account for $currency");
+      AppLogger.d("BalanceController: Fetched Balance Account for $currency");
       balanceData.value = res;
 
       if (res.accountList.isNotEmpty) {
@@ -105,20 +107,19 @@ class BalanceController extends GetxController {
         await StorageService.saveAccountNumber(accNum);
       }
     } catch (e) {
-      print("Error fetching balance account: $e");
-
+      AppLogger.d("Error fetching balance account: $e");
     }
   }
 
   Future<void> onChangeCurrency(String newCurrency) async {
     if (newCurrency == selectedCurrency.value) return;
-    
+
     // 1. Update UI immediately
     selectedCurrency.value = newCurrency;
-    
+
     // 2. Persist
     await StorageService.setCurrency(newCurrency);
-    
+
     // 3. Refresh Data
     await fetchBalance();
   }

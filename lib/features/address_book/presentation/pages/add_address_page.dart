@@ -1,3 +1,4 @@
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -35,14 +36,14 @@ class _AddAddressPageState extends State<AddAddressPage> {
     });
     try {
       final list = await AccountApi.getCoinList();
-      
+
       if (widget.editId != null) {
         final detail = await AccountApi.getAddressDetail(widget.editId!);
         _nameController.text = detail.name;
         _addressController.text = detail.address;
-        
+
         if (list.isNotEmpty) {
-           final coin = list.firstWhereOrNull(
+          final coin = list.firstWhereOrNull(
             (e) => e.symbol?.toUpperCase() == detail.symbol.toUpperCase(),
           );
           _selectedCoin = coin ?? list.first;
@@ -53,16 +54,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
         _coins = list;
         _isLoadingConfig = false;
       });
-      print("Fetched ${_coins.length} coins");
+      AppLogger.d("Fetched ${_coins.length} coins");
     } catch (e) {
       setState(() {
         _isLoadingConfig = false;
       });
-      print("Error fetching data: $e");
-      CustomSnackbar.showError(
-        title: "Error",
-        message: "Failed to load data",
-      );
+      AppLogger.d("Error fetching data: $e");
+      CustomSnackbar.showError(title: "Error", message: "Failed to load data");
     }
   }
 
@@ -112,19 +110,21 @@ class _AddAddressPageState extends State<AddAddressPage> {
       _nameController.clear();
       _addressController.clear();
       _hasSaved = true;
-      
+
       CustomSnackbar.showSuccess(
         title: "Success",
-        message: widget.editId != null ? "Address updated successfully" : "Address saved successfully",
+        message: widget.editId != null
+            ? "Address updated successfully"
+            : "Address saved successfully",
       );
-      
+
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       if (mounted) {
         Navigator.pop(context, true);
       }
     } catch (e) {
-      print("Save Address Error: $e");
+      AppLogger.d("Save Address Error: $e");
       String errorMsg = e.toString();
       if (errorMsg.startsWith("Exception: ")) {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");

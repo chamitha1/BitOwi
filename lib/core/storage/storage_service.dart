@@ -1,3 +1,4 @@
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String userToken = 'user_token';
@@ -17,12 +18,11 @@ class StorageService {
 
   //set user token
 
-
   //get user token
   static Future<String?> getToken() async {
     if (_prefs == null) await init();
     final token = _prefs!.getString(userToken);
-    print("GETTING TOKEN : $token ");
+    AppLogger.d("GETTING TOKEN : $token ");
     return token;
   }
 
@@ -96,7 +96,11 @@ class StorageService {
   static const String tempWithdrawAmount = 'temp_withdraw_amount';
   static const String tempWithdrawPwd = 'temp_withdraw_pwd';
 
-  static Future<void> saveTempWithdrawData(String addr, String amount, String pwd) async {
+  static Future<void> saveTempWithdrawData(
+    String addr,
+    String amount,
+    String pwd,
+  ) async {
     if (_prefs == null) await init();
     await _prefs!.setString(tempWithdrawAddr, addr);
     await _prefs!.setString(tempWithdrawAmount, amount);
@@ -118,6 +122,7 @@ class StorageService {
     await _prefs!.remove(tempWithdrawAmount);
     await _prefs!.remove(tempWithdrawPwd);
   }
+
   static const String hasCompletedOnboardingKey = 'has_completed_onboarding';
   static const String tokenTimestampKey = 'token_timestamp';
 
@@ -136,8 +141,11 @@ class StorageService {
   // Save Token with Timestamp
   static Future<bool> saveToken(String token) async {
     if (_prefs == null) await init();
-    print("SAVING TOKEN : $token ");
-    await _prefs!.setInt(tokenTimestampKey, DateTime.now().millisecondsSinceEpoch);
+    AppLogger.d("SAVING TOKEN : $token ");
+    await _prefs!.setInt(
+      tokenTimestampKey,
+      DateTime.now().millisecondsSinceEpoch,
+    );
     return await _prefs!.setString(userToken, token);
   }
 
@@ -149,10 +157,10 @@ class StorageService {
 
     final savedTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
     final daysDifference = DateTime.now().difference(savedTime).inDays;
-    
+
     // Check if token is older than 7 days
     if (daysDifference >= 7) {
-      await removeToken(); 
+      await removeToken();
       return false;
     }
     return true;

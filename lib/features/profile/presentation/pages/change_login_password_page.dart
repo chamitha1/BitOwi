@@ -4,6 +4,7 @@ import 'package:BitOwi/features/auth/presentation/controllers/user_controller.da
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -98,7 +99,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         smsCaptcha: _verifiedOtp,
         loginPwd: newPassword,
       );
-      print("ChangeLoginPasswordPage: forgetLoginPwd success");
+      AppLogger.d("ChangeLoginPasswordPage: forgetLoginPwd success");
 
       setState(() => _isLoading = false);
 
@@ -141,7 +142,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         email: _email,
         bizType: SmsBizType.forgetPwd,
       );
-      print("ChangeLoginPasswordPage: sendOtp success: $success");
+      AppLogger.d("ChangeLoginPasswordPage: sendOtp success: $success");
 
       if (!mounted) return;
 
@@ -530,7 +531,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
             return null;
           },
       onChanged: (_) {
-         if (_submitted) setState(() {});
+        if (_submitted) setState(() {});
       },
     );
   }

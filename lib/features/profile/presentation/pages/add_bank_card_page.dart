@@ -62,7 +62,6 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
       coinList = list;
 
       if (bankcardId.isNotEmpty) {
-        debugPrint("🚀🙆🏼‍♀️ ${bankcardId}");
         final res = await AccountApi.getBankCardDetail(bankcardId);
         _realNameController.text = res.realName;
         _accountNumberController.text = res.bankcardNumber ?? '';
@@ -262,7 +261,6 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
         "currency": _selectedCoin,
       };
 
-      debugPrint("🚀👀 ${payload}");
 
       late final dio.Response<dynamic> response;
       if (bankcardId.isNotEmpty) {

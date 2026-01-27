@@ -14,6 +14,7 @@ import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
 import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:dio/dio.dart';
 
 class AccountApi {
@@ -29,7 +30,7 @@ class AccountApi {
         '/core/v1/account/balance_account',
         data: data,
       );
-      print("Get Balance Response ${res.data}");
+      AppLogger.d("Get Balance Response ${res.data}");
 
       final resData = res.data as Map<String, dynamic>;
 
@@ -40,9 +41,9 @@ class AccountApi {
         // Parse the AccountDetailAssetRes from the 'data' object
         final result = AccountDetailAssetRes.fromJson(data);
 
-        print('Parsed result - Total Amount: ${result.totalAmount}');
-        print('Parsed result - Total Asset: ${result.totalAsset}');
-        print(
+        AppLogger.d('Parsed result - Total Amount: ${result.totalAmount}');
+        AppLogger.d('Parsed result - Total Asset: ${result.totalAsset}');
+        AppLogger.d(
           'Parsed result - Account List length: ${result.accountList.length}',
         );
 
@@ -52,7 +53,7 @@ class AccountApi {
       }
       // return AccountDetailAssetRes.fromJson(res.data as Map<String, dynamic>);
     } catch (e) {
-      print("GetBalanceAccount erroe: $e");
+      AppLogger.d("GetBalanceAccount erroe: $e");
       rethrow;
     }
   }
@@ -71,7 +72,7 @@ class AccountApi {
           .toList();
       return list;
     } catch (e) {
-      print("getChainSymbolList error: $e");
+      AppLogger.d("getChainSymbolList error: $e");
       rethrow;
     }
   }
@@ -85,7 +86,7 @@ class AccountApi {
       );
       return res.data['data']["address"];
     } catch (e) {
-      print("getChainAddress error: $e");
+      AppLogger.d("getChainAddress error: $e");
       rethrow;
     }
   }
@@ -108,7 +109,7 @@ class AccountApi {
         throw Exception('API Error: ${resData['errorMsg']}');
       }
     } catch (e) {
-      print("getWithdrawRuleDetail error: $e");
+      AppLogger.d("getWithdrawRuleDetail error: $e");
       rethrow;
     }
   }
@@ -118,7 +119,7 @@ class AccountApi {
       final res = await ApiClient.dio.post(
         '/core/v1/withdraw/detail_front/$id',
       );
-      print("Raw Withdraw Detail Response (Dio): ${res.data}");
+      AppLogger.d("Raw Withdraw Detail Response (Dio): ${res.data}");
 
       var data = res.data;
       if (data is Map) {
@@ -128,7 +129,7 @@ class AccountApi {
       }
 
       if (data == null) {
-        print("Warning: Withdraw detail data is null");
+        AppLogger.d("Warning: Withdraw detail data is null");
         return WithdrawDetailRes(
           id: id,
           userId: '',
@@ -142,11 +143,11 @@ class AccountApi {
       }
 
       final cleanData = _removeNullKeys(Map<String, dynamic>.from(data));
-      print("Cleaned Data for Model: $cleanData");
+      AppLogger.d("Cleaned Data for Model: $cleanData");
 
       return WithdrawDetailRes.fromJson(cleanData);
     } catch (e) {
-      print("getWithdrawDetail error: $e");
+      AppLogger.d("getWithdrawDetail error: $e");
       rethrow;
     }
   }
@@ -169,7 +170,7 @@ class AccountApi {
         );
       }
     } catch (e) {
-      print("withdrawCheck error: $e");
+      AppLogger.d("withdrawCheck error: $e");
       rethrow;
     }
   }
@@ -190,7 +191,7 @@ class AccountApi {
         );
       }
     } catch (e) {
-      print("createWithdraw error: $e");
+      AppLogger.d("createWithdraw error: $e");
       rethrow;
     }
   }
@@ -208,7 +209,7 @@ class AccountApi {
         WithdrawPageRes.fromJson,
       );
     } catch (e) {
-      print("getWithdrawPageList error: $e");
+      AppLogger.d("getWithdrawPageList error: $e");
       rethrow;
     }
   }
@@ -236,11 +237,11 @@ class AccountApi {
           }
         }
       }
-      print(data);
-      // print(data['user']);
+      AppLogger.d(data);
+      // AppLogger.d(data['user']);
       return Account.fromJson(data);
     } catch (e) {
-      print("getDetailAccount error: $e");
+      AppLogger.d("getDetailAccount error: $e");
       rethrow;
     }
   }
@@ -256,7 +257,7 @@ class AccountApi {
       // Assuming res.data is the JSON map
       return PageInfo<Jour>.fromJson(res.data, Jour.fromJson);
     } catch (e) {
-      print("getJourPageList error: $e");
+      AppLogger.d("getJourPageList error: $e");
       rethrow;
     }
   }
@@ -268,7 +269,7 @@ class AccountApi {
         data: {},
       );
       final data = res.data;
-      print('AddressBook Response: $data');
+      AppLogger.d('AddressBook Response: $data');
       if (data is Map<String, dynamic> && data['code'] == '200') {
         final listData = data['data'] as List<dynamic>;
         return listData
@@ -285,7 +286,7 @@ class AccountApi {
       }
       return [];
     } catch (e) {
-      print('Error fetching address list: $e');
+      AppLogger.d('Error fetching address list: $e');
       rethrow;
     }
   }
@@ -301,7 +302,7 @@ class AccountApi {
       );
       return response;
     } catch (e) {
-      print("createBankCard error: $e");
+      AppLogger.d("createBankCard error: $e");
       rethrow;
     }
   }
@@ -317,7 +318,7 @@ class AccountApi {
       );
       return response;
     } catch (e) {
-      print("editBankCard error: $e");
+      AppLogger.d("editBankCard error: $e");
       rethrow;
     }
   }
@@ -327,7 +328,7 @@ class AccountApi {
     try {
       await ApiClient.dio.post('/core/v1/bankcard/remove/$id');
     } catch (e) {
-      print("deleteBankCard error: $e");
+      AppLogger.d("deleteBankCard error: $e");
       rethrow;
     }
   }
@@ -343,7 +344,7 @@ class AccountApi {
       );
       return response;
     } catch (e) {
-      print("createMobileBankCard error: $e");
+      AppLogger.d("createMobileBankCard error: $e");
       rethrow;
     }
   }
@@ -359,7 +360,7 @@ class AccountApi {
       );
       return response;
     } catch (e) {
-      print("editeMobileBankCard error: $e");
+      AppLogger.d("editeMobileBankCard error: $e");
       rethrow;
     }
   }
@@ -383,7 +384,7 @@ class AccountApi {
       final data = res.data['data'];
       // Check if the response is null or not a list
       if (data is! List) {
-        print("API returned null or invalid data: $res");
+        AppLogger.d("API returned null or invalid data: $res");
         return []; // Return an empty list in case of error
       }
       List<BankcardChannelListRes> list = data
@@ -391,7 +392,7 @@ class AccountApi {
           .toList();
       return list;
     } catch (e) {
-      print("getBankChannelList Error: $e");
+      AppLogger.d("getBankChannelList Error: $e");
       rethrow;
     }
   }
@@ -406,7 +407,7 @@ class AccountApi {
           .toList();
       return list;
     } catch (e) {
-      print("getBankCardList error: $e");
+      AppLogger.d("getBankCardList error: $e");
       rethrow;
     }
   }
@@ -422,7 +423,7 @@ class AccountApi {
       final Map<String, dynamic> data = Map<String, dynamic>.from(body['data']);
       return BankcardListRes.fromJson(data);
     } catch (e) {
-      print("getBankCardDetail error: $e");
+      AppLogger.d("getBankCardDetail error: $e");
       rethrow;
     }
   }
@@ -443,7 +444,7 @@ class AccountApi {
       }
       return [];
     } catch (e) {
-      print("getCoinList error: $e");
+      AppLogger.d("getCoinList error: $e");
       rethrow;
     }
   }
@@ -461,7 +462,7 @@ class AccountApi {
         throw Exception(data['errorMsg'] ?? 'Failed to create address');
       }
     } catch (e) {
-      print("createAddress error: $e");
+      AppLogger.d("createAddress error: $e");
       rethrow;
     }
   }
@@ -479,7 +480,7 @@ class AccountApi {
         throw Exception(data['errorMsg'] ?? 'Failed to update address');
       }
     } catch (e) {
-      print("editAddress error: $e");
+      AppLogger.d("editAddress error: $e");
       rethrow;
     }
   }
@@ -496,7 +497,7 @@ class AccountApi {
         throw Exception(data['errorMsg'] ?? 'Failed to delete address');
       }
     } catch (e) {
-      print("deleteAddress error: $e");
+      AppLogger.d("deleteAddress error: $e");
       rethrow;
     }
   }
@@ -515,7 +516,7 @@ class AccountApi {
         );
       }
     } catch (e) {
-      print("getAddressDetail error: $e");
+      AppLogger.d("getAddressDetail error: $e");
       rethrow;
     }
   }
@@ -559,7 +560,7 @@ class AccountApi {
       );
       return AccountAssetRes.fromJson(data);
     } catch (e) {
-      print("getHomeAsset error: $e");
+      AppLogger.d("getHomeAsset error: $e");
       rethrow;
     }
   }
@@ -592,7 +593,7 @@ class AccountApi {
 
       return AccountDetailAccountAndJourRes.fromJson(data);
     } catch (e) {
-      print("getDetailAccountAndJour error: $e");
+      AppLogger.d("getDetailAccountAndJour error: $e");
       rethrow;
     }
   }
@@ -603,7 +604,7 @@ class AccountApi {
       final res = await ApiClient.dio.post('/core/v1/jour/detail_front/$id');
       return JourFrontDetail.fromJson(res.data['data']);
     } catch (e) {
-      print("getJourDetail error: $e");
+      AppLogger.d("getJourDetail error: $e");
       rethrow;
     }
   }

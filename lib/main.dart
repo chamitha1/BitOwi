@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/profile/presentation/controllers/settings_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,11 @@ import 'features/auth/presentation/controllers/user_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  if (kReleaseMode) {
+    // Disable debugPrint
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
   runApp(const BitOwi());
 }
 

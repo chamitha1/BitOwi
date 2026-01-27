@@ -3,6 +3,7 @@ import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
 import 'package:BitOwi/models/account.dart';
 import 'package:BitOwi/models/chain_symbol_list_res.dart'; // Added
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/api/user_api.dart';
@@ -52,7 +53,7 @@ class WithdrawController extends GetxController {
     } else {
       // Fallback Try to get from storage
       final storedAcc = await StorageService.getAccountNumber();
-      print(
+      AppLogger.d(
         "WithdrawController: args account empty, fetched from storage: $storedAcc",
       );
       if (storedAcc != null) {
@@ -84,7 +85,7 @@ class WithdrawController extends GetxController {
         getInitData();
       }
     } catch (e) {
-      print("Error fetching coin list: $e");
+      AppLogger.d("Error fetching coin list: $e");
     }
   }
 
@@ -116,7 +117,7 @@ class WithdrawController extends GetxController {
 
   void getInitData() async {
     if (symbol.value.isEmpty) {
-      print("Symbol is empty");
+      AppLogger.d("Symbol is empty");
       return;
     }
 
@@ -124,7 +125,7 @@ class WithdrawController extends GetxController {
       isLoading.value = true;
 
       // Fetch Rules
-      print("Fetching rules for ${symbol.value}...");
+      AppLogger.d("Fetching rules for ${symbol.value}...");
       final ruleRes = await AccountApi.getWithdrawRuleDetail(symbol.value);
       ruleInfo.value = ruleRes;
 
@@ -134,7 +135,7 @@ class WithdrawController extends GetxController {
       }
 
       // Fetch Account Balance
-      // print("Fetching details for ${symbol.value}...");
+      // AppLogger.d("Fetching details for ${symbol.value}...");
       final accountRes = await AccountApi.getDetailAccount(symbol.value);
 
       note.value = ruleRes.withdrawRule ?? '';
@@ -142,9 +143,7 @@ class WithdrawController extends GetxController {
       availableAmount.value = accountRes.availableAmount?.toString() ?? '0.00';
       if (accountRes.user != null) {
         googleStatus.value = accountRes.user?.googleStatus ?? '';
-        print(
-          "googleStatus from AccountRes ${googleStatus.value}",
-        );
+        AppLogger.d("googleStatus from AccountRes ${googleStatus.value}");
       }
 
       // Fallback: If googleStatus is empt check global User state
@@ -153,13 +152,11 @@ class WithdrawController extends GetxController {
         final globalStatus = userController.user.value?.googleStatus;
         if (globalStatus != null && globalStatus.isNotEmpty) {
           googleStatus.value = globalStatus;
-          print(
-            "googleStatus from UserController ${googleStatus.value}",
-          );
+          AppLogger.d("googleStatus from UserController ${googleStatus.value}");
         }
       }
     } catch (e) {
-      print("Error fetching withdraw init data: $e");
+      AppLogger.d("Error fetching withdraw init data: $e");
     } finally {
       isLoading.value = false;
     }
@@ -205,7 +202,7 @@ class WithdrawController extends GetxController {
       await StorageService.saveTempWithdrawData(payCardNo, amount, tradePwd);
       return true;
     } catch (e) {
-      print("Withdraw check failed: $e");
+      AppLogger.d("Withdraw check failed: $e");
       // Extract error
       String errorMsg = e.toString();
       if (errorMsg.startsWith("Exception: ")) {
@@ -260,7 +257,6 @@ class WithdrawController extends GetxController {
   }
 
   Future<bool> verifyOtp(String otp) async {
-   
     return true;
   }
 
@@ -282,7 +278,7 @@ class WithdrawController extends GetxController {
         return false;
       }
 
-      print("Creating Withdrawal Request");
+      AppLogger.d("Creating Withdrawal Request");
 
       final params = {
         "accountNumber": accountNumber.value,
@@ -313,7 +309,7 @@ class WithdrawController extends GetxController {
           );
         }
       } catch (e) {
-        print("Error updating local balance: $e");
+        AppLogger.d("Error updating local balance: $e");
       }
 
       final newTx = Jour(
@@ -338,7 +334,7 @@ class WithdrawController extends GetxController {
 
       return true;
     } catch (e) {
-      print("Create withdrawal error: $e");
+      AppLogger.d("Create withdrawal error: $e");
       String errorMsg = e.toString();
       if (errorMsg.startsWith("Exception: ")) {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");

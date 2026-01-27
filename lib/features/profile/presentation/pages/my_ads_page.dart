@@ -10,6 +10,7 @@ import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/models/ads_my_page_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/common_utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
         return;
       }
     } catch (e) {
-      print("getMyAdsPageList onRefresh error: $e");
+      AppLogger.d("getMyAdsPageList onRefresh error: $e");
     }
 
     _controller.finishRefresh();
@@ -102,7 +103,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
         pageNum++;
       });
     } catch (e) {
-      print("getMyAdsPageList getList error: $e");
+      AppLogger.d("getMyAdsPageList getList error: $e");
     } finally {
       setState(() {
         isLoading = false;
@@ -280,7 +281,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
                         //   Routes.paymentMethodsPage,
                         //   parameters: {"userId": info.userId},
                         // );
-                        debugPrint("🚀 Navigate to userCenter merchant ads");
+                        debugPrint(" Navigate to userCenter merchant ads");
                       },
 
                       child: Row(
@@ -628,7 +629,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
       //   DownloadModal.showModal(context);
       //   return;
       // }
-      print("Post ad: ${ad.id}");
+      AppLogger.d("Post ad: ${ad.id}");
 
       showCommonConfirmDialog(
         context,
@@ -692,7 +693,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
       //   DownloadModal.showModal(context);
       //   return;
       // }
-      print("Turn off ad: ${ad.id}");
+      AppLogger.d("Turn off ad: ${ad.id}");
 
       showCommonConfirmDialog(
         context,
@@ -752,7 +753,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
     //   DownloadModal.showModal(context);
     //   return;
     // }
-    print(" Navigate to edit ad page / Edit ad: ${ad.id}");
+    AppLogger.d(" Navigate to edit ad page / Edit ad: ${ad.id}");
     final result = await Get.toNamed(
       Routes.postAdsPage,
       parameters: {'id': ad.id},

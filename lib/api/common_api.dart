@@ -4,6 +4,7 @@ import 'package:BitOwi/models/config.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
 import 'package:BitOwi/models/sms_model.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/common_utils.dart';
 
 class CommonApi {
@@ -26,7 +27,7 @@ class CommonApi {
       );
 
       final resData = res.data;
-      print("getDictList Raw Response: $resData");
+      AppLogger.d("getDictList Raw Response: $resData");
       if (resData is List) {
         return resData.map((item) => Dict.fromJson(item)).toList();
       } else if (resData is Map<String, dynamic> && resData['data'] is List) {
@@ -37,7 +38,7 @@ class CommonApi {
 
       return [];
     } catch (e) {
-      print("getDictList error: $e");
+      AppLogger.d("getDictList error: $e");
       rethrow;
     }
   }
@@ -57,7 +58,7 @@ class CommonApi {
           .toList();
       return countryList;
     } catch (e) {
-      print("getCountryList Error: $e");
+      AppLogger.d("getCountryList Error: $e");
       rethrow;
     }
   }
@@ -71,18 +72,14 @@ class CommonApi {
     try {
       final res = await ApiClient.dio.post(
         '/core/v1/config/public/list',
-        data: {
-          "type": type,
-          "key": key,
-          "typeList": typeList,
-        },
+        data: {"type": type, "key": key, "typeList": typeList},
       );
       final Map<String, dynamic> data = Map<String, dynamic>.from(
         res.data['data'] ?? {},
       );
       return Config.fromJson(CommonUtils.removeNullKeys(data));
     } catch (e) {
-      print("getConfig Error: $e");
+      AppLogger.d("getConfig Error: $e");
       rethrow;
     }
   }
@@ -98,7 +95,7 @@ class CommonApi {
 
       // Check if the response is null or not a list
       if (data is! List) {
-        print("API returned null or invalid data: $res");
+        AppLogger.d("API returned null or invalid data: $res");
         return []; // Return an empty list in case of error
       }
 
@@ -110,7 +107,7 @@ class CommonApi {
       return list;
     } catch (e) {
       // ToastUtil.showError('暂无数据'.tr); //No Records
-      print("getCountryList Error: $e");
+      AppLogger.d("getCountryList Error: $e");
       // rethrow;
       return []; // Return an empty list in case of error
     }
@@ -132,10 +129,10 @@ class CommonApi {
         '/core/v1/mySms/public/my_sms_page_by_type',
         data: data,
       );
-      print(response);
+      AppLogger.e(response);
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print("Get SMS Page By Type error: $e");
+      AppLogger.d("Get SMS Page By Type error: $e");
       rethrow;
     }
   }
@@ -149,7 +146,7 @@ class CommonApi {
       );
       return Sms.fromJson(res.data['data']);
     } catch (e) {
-      print("getNoticeDetail error: $e");
+      AppLogger.d("getNoticeDetail error: $e");
       rethrow;
     }
   }
@@ -163,7 +160,7 @@ class CommonApi {
       final data = res.data['data'];
       return data["smsNotReadFlag"] == '1';
     } catch (e) {
-      print("getNoticeUnReadFlag error: $e");
+      AppLogger.d("getNoticeUnReadFlag error: $e");
       rethrow;
     }
   }
@@ -173,7 +170,7 @@ class CommonApi {
     try {
       await ApiClient.dio.post('/core/v1/mySms/read_all');
     } catch (e) {
-      print("readAllNotice error: $e");
+      AppLogger.d("readAllNotice error: $e");
       rethrow;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -85,10 +86,10 @@ class _WalletCardState extends State<WalletCard> {
                     final tradePwdFlag =
                         userController.user.value?.tradePwdFlag;
 
-                    print("Trade Password Flag Value: $tradePwdFlag");
+                    AppLogger.d("Trade Password Flag Value: $tradePwdFlag");
 
                     if (tradePwdFlag == '1') {
-                      print("Transaction password set");
+                      AppLogger.d("Transaction password set");
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -100,7 +101,7 @@ class _WalletCardState extends State<WalletCard> {
                         ),
                       );
                     } else {
-                      print("Transaction password not set");
+                      AppLogger.d("Transaction password not set");
                       CustomSnackbar.showError(
                         title: "Error",
                         message: "Set a transaction password",

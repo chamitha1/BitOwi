@@ -2,6 +2,7 @@ import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/jour_front_detail.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:get/get.dart';
 
 class TransactionDetailController extends GetxController {
@@ -37,17 +38,17 @@ class TransactionDetailController extends GetxController {
       if (type == '2') {
         if (id != null) {
           final res = await AccountApi.getWithdrawDetail(id!);
-          print("Withdraw Details fetched: ${res.toJson()}"); 
-          
-        
+          AppLogger.d("Withdraw Details fetched: ${res.toJson()}");
+
           detail.value = JourFrontDetail(
             id: res.id,
             userId: res.userId,
-            transAmount: (-(double.tryParse(res.actualAmount) ?? 0).abs()).toString(),
+            transAmount: (-(double.tryParse(res.actualAmount) ?? 0).abs())
+                .toString(),
             currency: res.currency,
             status: res.status,
             createDatetime: res.createDatetime,
-            remark: res.remark ?? res.payBank ?? 'Withdrawal', 
+            remark: res.remark ?? res.payBank ?? 'Withdrawal',
             accountNumber: res.payCardNo,
             refNo: res.id,
             bizType: '2',
@@ -62,8 +63,11 @@ class TransactionDetailController extends GetxController {
         }
       }
     } catch (e) {
-      print("Error fetching transaction detail: $e");
-      CustomSnackbar.showError(title: "Error", message: "Failed to load details");
+      AppLogger.d("Error fetching transaction detail: $e");
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Failed to load details",
+      );
     } finally {
       isLoading.value = false;
     }

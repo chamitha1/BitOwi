@@ -45,7 +45,6 @@ class BecomeMerchantPage extends StatelessWidget {
             final latestInfo = controller.latestSubmittedInfo.value;
 
             // 🧠 Keep existing side-effect (bottom sheet)
-            debugPrint("🍐${controller.hasShownMerchantSheet}");
 
             if (controller.merchantStatus == '1' &&
                 !controller.hasShownMerchantSheet) {

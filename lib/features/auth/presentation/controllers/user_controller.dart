@@ -2,6 +2,7 @@ import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/api/c2c_api.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
@@ -51,7 +52,6 @@ class UserController extends GetxController {
     // Fetch latest user info from API
     try {
       final fetchedUser = await UserApi.getUserInfo();
-      debugPrint("🚀✅${fetchedUser.toJson().toString()}");
       user.value = fetchedUser;
 
       if (fetchedUser.nickname != null && fetchedUser.nickname!.isNotEmpty) {
@@ -78,23 +78,23 @@ class UserController extends GetxController {
         getTradeInfo(fetchedUser.id!);
       }
     } catch (e) {
-      print('Error fetching user info: $e');
+      AppLogger.d('Error fetching user info: $e');
     }
   }
 
   Future<void> getTradeInfo(String userId) async {
     try {
-      print("Fetching C2C Ads Info for master: $userId");
+      AppLogger.d("Fetching C2C Ads Info for master: $userId");
       final res = await C2CApi.getOtherUserAdsHome(userId);
       tradeInfo.value = res;
-      print(
+      AppLogger.d(
         "Trade Info Fetched: OrderCount=${res.orderCount}, FinishCount=${res.orderFinishCount}",
       );
-      print("Calculated Good Rate: $goodRate");
-      print("Calculated Finish Rate: $finishRate");
-      print("Trade Info Fetched: OrderCount=$res");
+      AppLogger.d("Calculated Good Rate: $goodRate");
+      AppLogger.d("Calculated Finish Rate: $finishRate");
+      AppLogger.d("Trade Info Fetched: OrderCount=$res");
     } catch (e) {
-      print("Error fetching trade info: $e");
+      AppLogger.d("Error fetching trade info: $e");
     }
   }
 
@@ -112,7 +112,7 @@ class UserController extends GetxController {
 
   Future<void> fetchNotificationCount() async {
     try {
-      print("Fetching notification count...");
+      AppLogger.d("Fetching notification count...");
       final results = await Future.wait([
         CommonApi.getSmsPageByType(
           pageNum: 1,
@@ -143,9 +143,9 @@ class UserController extends GetxController {
       }
 
       notificationCount.value = unreadCount;
-      print("Notification count updated: ${notificationCount.value}");
+      AppLogger.d("Notification count updated: ${notificationCount.value}");
     } catch (e) {
-      print("Error fetching notification count: $e");
+      AppLogger.d("Error fetching notification count: $e");
     }
   }
 
@@ -153,7 +153,7 @@ class UserController extends GetxController {
     try {
       await UserApi.logOff();
     } catch (e) {
-      print("Logout API failed: $e");
+      AppLogger.d("Logout API failed: $e");
     } finally {
       // Clear data regardless of API success
       await StorageService.removeToken();

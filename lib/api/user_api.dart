@@ -5,6 +5,7 @@ import 'package:BitOwi/models/identify_order_list_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/models/user_model.dart';
 import 'package:BitOwi/models/user_relation_page_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get_utils/src/extensions/dynamic_extensions.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
@@ -51,7 +52,7 @@ class UserApi {
       );
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print(e);
+      AppLogger.e(e);
       rethrow;
     }
   }
@@ -63,20 +64,20 @@ class UserApi {
   }) async {
     try {
       final reqData = {'email': email, 'bizType': bizType.value};
-      print("Send OTP Request: $reqData");
+      AppLogger.d("Send OTP Request: $reqData");
 
       final response = await ApiClient.dio.post(
         '/core/v1/sms_out/permission_none/email_code',
         data: reqData,
       );
-      print("Send OTP Response: ${response.data}");
+      AppLogger.d("Send OTP Response: ${response.data}");
 
       Map<String, dynamic> data;
       if (response.data is Map) {
         data = response.data as Map<String, dynamic>;
       } else if (response.data is String) {
         try {
-          print("Response data is String, parsing...");
+          AppLogger.d("Response data is String, parsing...");
 
           return false;
         } catch (e) {
@@ -95,12 +96,53 @@ class UserApi {
       // Default fallback
       return false;
     } on DioException catch (e) {
-      print(e);
-      print('Send OTP Dio error: ${e.response?.data ?? e.message}');
+      AppLogger.e(e);
+      AppLogger.d('Send OTP Dio error: ${e.response?.data ?? e.message}');
       return false;
     } catch (e) {
-      print('Send OTP unexpected error: $e');
+      AppLogger.d('Send OTP unexpected error: $e');
       return false;
+    }
+  }
+
+  Future<ApiResult> sendSignInOtp({
+    required String email,
+    SmsBizType bizType = SmsBizType.register,
+  }) async {
+    try {
+      final reqData = {'email': email, 'bizType': bizType.value};
+
+      final response = await ApiClient.dio.post(
+        '/core/v1/sms_out/permission_none/email_code',
+        data: reqData,
+      );
+
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+
+        if (data['code'] == 200 ||
+            data['code'] == '200' ||
+            data['errorCode'] == 'Success' ||
+            data['errorCode'] == 'SUCCESS') {
+          return ApiResult(success: true);
+        }
+
+        // ❗ Backend logical error (like AUTH00006)
+        return ApiResult(
+          success: false,
+          message: data['errorMsg'] ?? 'Failed to send OTP',
+        );
+      }
+
+      return ApiResult(success: false, message: 'Invalid server response');
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      return ApiResult(
+        success: false,
+        message: data is Map ? data['errorMsg'] : e.message,
+      );
+    } catch (e) {
+      return ApiResult(success: false, message: 'Unexpected error occurred');
     }
   }
 
@@ -119,7 +161,7 @@ class UserApi {
       // Check if OTP is valid
       return response.data;
     } catch (e) {
-      print('Verify OTP error: $e');
+      AppLogger.d('Verify OTP error: $e');
       return false;
     }
   }
@@ -137,7 +179,7 @@ class UserApi {
       );
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print("Bind Trade Password error: $e");
+      AppLogger.d("Bind Trade Password error: $e");
       rethrow;
     }
   }
@@ -176,7 +218,7 @@ class UserApi {
   static Future<void> logOff() async {
     try {
       final response = await ApiClient.dio.get("/core/v1/cuser/logOut");
-      print("Logout Response: ${response.data}");
+      AppLogger.d("Logout Response: ${response.data}");
     } catch (e) {
       e.printError();
       rethrow;
@@ -254,7 +296,7 @@ class UserApi {
           "userKind": "C",
         },
       );
-      print("Forget Login Password Response: ${res.data}");
+      AppLogger.d("Forget Login Password Response: ${res.data}");
     } catch (e) {
       e.printError();
       rethrow;
@@ -275,24 +317,23 @@ class UserApi {
       };
 
       // Print as Map (default toString)
-      print(data);
 
       // Print as formatted JSON
       try {
         JsonEncoder encoder = const JsonEncoder.withIndent('  ');
-        print(encoder.convert(data));
+        AppLogger.d(encoder.convert(data));
       } catch (e) {
-        print("Error printing JSON: $e");
+        AppLogger.d("Error printing JSON: $e");
       }
 
       final response = await ApiClient.dio.post(
         '/core/v1/user/modify_email',
         data: data,
       );
-      print("Modify Email Response: ${response.data}");
+      AppLogger.d("Modify Email Response: ${response.data}");
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      print("Modify Email error: $e");
+      AppLogger.d("Modify Email error: $e");
       rethrow;
     }
   }
@@ -309,7 +350,7 @@ class UserApi {
       }
       throw Exception(data['errorMsg'] ?? 'Failed to get google secret');
     } catch (e) {
-      print("Get Google Secret error: $e");
+      AppLogger.d("Get Google Secret error: $e");
       rethrow;
     }
   }
@@ -329,13 +370,12 @@ class UserApi {
           'smsCaptcha': smsCaptcha,
         },
       );
-      print("Bind Google Secret Response: ${response.data}");
       final data = response.data;
       if (data['code'] != 200 && data['code'] != '200') {
         throw Exception(data['errorMsg'] ?? 'Failed to bind google secret');
       }
     } catch (e) {
-      print("Bind Google Secret error: $e");
+      AppLogger.d("Bind Google Secret error: $e");
       rethrow;
     }
   }
@@ -350,13 +390,13 @@ class UserApi {
         '/core/v1/user/close_google_secret',
         data: {'googleCaptcha': googleCaptcha, 'smsCaptcha': smsCaptcha},
       );
-      print("Close Google Secret Response: ${response.data}");
+      AppLogger.d("Close Google Secret Response: ${response.data}");
       final data = response.data;
       if (data['code'] != 200 && data['code'] != '200') {
         throw Exception(data['errorMsg'] ?? 'Failed to close google secret');
       }
     } catch (e) {
-      print("Close Google Secret error: $e");
+      AppLogger.d("Close Google Secret error: $e");
       rethrow;
     }
   }
@@ -366,12 +406,12 @@ class UserApi {
     Map<String, dynamic> data,
   ) async {
     try {
-      print("getUserRelationPageList Request: $data");
+      AppLogger.d("getUserRelationPageList Request: $data");
       final res = await ApiClient.dio.post(
         '/core/v1/user_relation/page_front',
         data: data,
       );
-      print("getUserRelationPageList Response: ${res.data}");
+      AppLogger.d("getUserRelationPageList Response: ${res.data}");
 
       final responseData = res.data as Map<String, dynamic>;
       if (responseData['code'] == 200 || responseData['code'] == '200') {
@@ -385,7 +425,7 @@ class UserApi {
         );
       }
     } catch (e) {
-      print('getUserRelationPageList Error: $e');
+      AppLogger.d('getUserRelationPageList Error: $e');
       rethrow;
     }
   }
@@ -402,7 +442,7 @@ class UserApi {
         data: {"toUser": toUser, "type": type},
       );
     } catch (e) {
-      print("createUserRelation error: $e");
+      AppLogger.d("createUserRelation error: $e");
       rethrow;
     }
   }
@@ -419,8 +459,15 @@ class UserApi {
         data: {"toUser": toUser, "type": type},
       );
     } catch (e) {
-      print("removeUserRelation error: $e");
+      AppLogger.d("removeUserRelation error: $e");
       rethrow;
     }
   }
+}
+
+class ApiResult {
+  final bool success;
+  final String? message;
+
+  ApiResult({required this.success, this.message});
 }

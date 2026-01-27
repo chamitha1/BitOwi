@@ -176,7 +176,7 @@ class UserKycInformationController extends GetxController {
   //       title: "Image Upload Failed",
   //       message: "Image upload failed, please try again",
   //     );
-  //     print(e);
+  //     AppLogger.d(e);
   //   } finally {
   //     isIdImageUploading.value = false;
   //   }

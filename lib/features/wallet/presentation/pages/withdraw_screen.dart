@@ -7,6 +7,7 @@ import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.d
 import 'package:BitOwi/features/wallet/presentation/pages/transaction_history_page.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/qr_scanner_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -57,7 +58,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     final userController = Get.find<UserController>();
     final user = userController.user.value;
     _userEmail = user?.loginName ?? user?.email ?? "jonothan@gmail.com";
-    print("GOOGLE STATUS : ${user?.googleStatus}");
+    AppLogger.d("GOOGLE STATUS : ${user?.googleStatus}");
   }
 
   void _toggleWithdrawAll() {

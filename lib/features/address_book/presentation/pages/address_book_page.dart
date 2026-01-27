@@ -5,6 +5,7 @@ import 'package:BitOwi/features/address_book/presentation/widgets/address_card.d
 import 'package:BitOwi/features/address_book/presentation/pages/add_address_page.dart';
 import 'package:BitOwi/features/address_book/presentation/widgets/delete_confirmation_dialog.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -50,7 +51,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
       }
     } catch (e) {
       setState(() => isLoading = false);
-      print("Error loading addresses: $e");
+      AppLogger.d("Error loading addresses: $e");
     }
   }
 
@@ -222,23 +223,31 @@ class _AddressBookPageState extends State<AddressBookPage> {
                                             isDeleting = true;
                                           });
                                           try {
-                                            await AccountApi.deleteAddress(item.id);
+                                            await AccountApi.deleteAddress(
+                                              item.id,
+                                            );
                                             if (context.mounted) {
                                               Navigator.pop(context);
                                             }
                                             _fetchAddresses();
                                             CustomSnackbar.showSuccess(
                                               title: "Success",
-                                              message: "Address deleted successfully",
+                                              message:
+                                                  "Address deleted successfully",
                                             );
                                           } catch (e) {
-                                            print("Delete error: $e");
+                                            AppLogger.d("Delete error: $e");
                                             setDialogState(() {
                                               isDeleting = false;
                                             });
                                             CustomSnackbar.showError(
                                               title: "Error",
-                                              message: e.toString().replaceFirst("Exception: ", ""),
+                                              message: e
+                                                  .toString()
+                                                  .replaceFirst(
+                                                    "Exception: ",
+                                                    "",
+                                                  ),
                                             );
                                           }
                                         },

@@ -100,7 +100,6 @@ class _AboutUsState extends State<AboutUs> {
       final name = articleType[index].name;
       final meta = resolveArticleMeta(name);
 
-      debugPrint("🚀🚀 ${meta['icon']}");
 
       return Column(
         children: [

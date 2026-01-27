@@ -7,6 +7,7 @@ import 'package:BitOwi/features/auth/presentation/pages/forgot_password_screen.d
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:BitOwi/features/rich_text_config.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -87,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
           : rawData;
 
       // ignore: avoid_print
-      print('Login response: $data');
+      AppLogger.d('Login response: $data');
 
       if (data['code'] == 200 || data['code'] == '200') {
         final tokenData = data['data'] as Map<String, dynamic>;
@@ -101,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final userId = tokenData['userId'] as String? ?? '';
         await StorageService.saveUserId(userId);
 
-        print('Token saved: $token');
+        AppLogger.d('Token saved: $token');
 
         if (!mounted) return;
 
@@ -112,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
         throw 'Login failed: ${data['errorMsg'] ?? 'Unknown'}';
       }
     } catch (e) {
-      print('Login error: $e');
+      AppLogger.d('Login error: $e');
       final msg = _extractBackendError(e);
       CustomSnackbar.showError(title: 'Login Failed', message: msg);
     } finally {

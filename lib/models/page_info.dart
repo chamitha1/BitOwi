@@ -1,3 +1,5 @@
+import 'package:BitOwi/utils/app_logger.dart';
+
 class PageInfo<T> {
   final List<T> list;
   final int total;
@@ -17,23 +19,27 @@ class PageInfo<T> {
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromJsonT,
   ) {
-    final data = json['data'] != null ? json['data'] as Map<String, dynamic> : json;
-    
+    final data = json['data'] != null
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
     final rawList = data['list'] as List<dynamic>? ?? [];
     List<T> list = [];
     try {
-      list = rawList.map((item) => fromJsonT(item as Map<String, dynamic>)).toList();
+      list = rawList
+          .map((item) => fromJsonT(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print("PageInfo list parsing error: $e");
-    
+      AppLogger.d("PageInfo list parsing error: $e");
+
       rethrow;
     }
-    
+
     final total = _parseInt(data['total']);
     final pages = _parseInt(data['pages']);
     final pageNum = _parseInt(data['pageNum'], defaultValue: 1);
     final pageSize = _parseInt(data['pageSize'], defaultValue: 10);
-    final isEnd = pageNum >= pages; 
+    final isEnd = pageNum >= pages;
 
     return PageInfo(
       list: list,

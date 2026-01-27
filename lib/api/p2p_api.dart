@@ -3,6 +3,7 @@ import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:BitOwi/models/trade_order_page_res.dart';
 import 'package:BitOwi/models/trade_order_detail_res.dart';
 import 'package:BitOwi/models/ads_detail_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/foundation.dart';
 
 class P2PApi {
@@ -14,11 +15,11 @@ class P2PApi {
         data: data,
       );
 
-      print("getAdsPageList Raw Response: ${res.data}");
+      AppLogger.d("getAdsPageList Raw Response: ${res.data}");
       final responseData = res.data['data'];
       return AdsPageRes.fromJson(responseData);
     } catch (e) {
-      print("getAdsPageList Error: $e");
+      AppLogger.d("getAdsPageList Error: $e");
       rethrow;
     }
   }
@@ -33,11 +34,11 @@ class P2PApi {
         data: data,
       );
 
-      print("getTradeOrderPageList Raw Response: ${res.data}");
+      AppLogger.d("getTradeOrderPageList Raw Response: ${res.data}");
       final responseData = res.data['data'];
       return TradeOrderPageRes.fromJson(responseData);
     } catch (e) {
-      print("getTradeOrderPageList Error: $e");
+      AppLogger.d("getTradeOrderPageList Error: $e");
       rethrow;
     }
   }
@@ -48,11 +49,11 @@ class P2PApi {
       final res = await ApiClient.dio.post(
         '/core/v1/trade_order/detail_front/$id',
       );
-      print('getTradeOrderDetail Raw Response: ${res.data}');
+      AppLogger.d('getTradeOrderDetail Raw Response: ${res.data}');
       final responseData = res.data['data'];
       return TradeOrderDetailRes.fromJson(responseData);
     } catch (e) {
-      print('getTradeOrderDetail Error: $e');
+      AppLogger.d('getTradeOrderDetail Error: $e');
       rethrow;
     }
   }
@@ -65,7 +66,7 @@ class P2PApi {
         data: {"id": id},
       );
     } catch (e) {
-      print('cancelOrder Error: $e');
+      AppLogger.d('cancelOrder Error: $e');
       rethrow;
     }
   }
@@ -78,7 +79,7 @@ class P2PApi {
         data: {"id": id},
       );
     } catch (e) {
-      print('markOrderPay Error: $e');
+      AppLogger.d('markOrderPay Error: $e');
       rethrow;
     }
   }
@@ -91,7 +92,7 @@ class P2PApi {
         data: {"id": id},
       );
     } catch (e) {
-      print('applyArbitration Error: $e');
+      AppLogger.d('applyArbitration Error: $e');
       rethrow;
     }
   }
@@ -104,7 +105,7 @@ class P2PApi {
         data: {"id": id, "tradePwd": tradePwd},
       );
     } catch (e) {
-      print('releaseOrder Error: $e');
+      AppLogger.d('releaseOrder Error: $e');
       rethrow;
     }
   }
@@ -197,7 +198,8 @@ class P2PApi {
   /// Get merchant's ads list
   /// params: {pageNum, pageSize, userId}
   static Future<AdsPageRes> getMerchantAdsList(
-      Map<String, dynamic> data) async {
+    Map<String, dynamic> data,
+  ) async {
     try {
       debugPrint("getMerchantAdsList Request: $data");
 

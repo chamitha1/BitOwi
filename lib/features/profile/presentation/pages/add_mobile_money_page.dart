@@ -53,7 +53,6 @@ class _AddMobileMoneyPageState extends State<AddMobileMoneyPage> {
       providerList = list;
 
       if (mobilecardId.isNotEmpty) {
-        debugPrint("🚀🙆🏼‍♀️ ${mobilecardId}");
         final res = await AccountApi.getBankCardDetail(mobilecardId);
         _realNameController.text = res.realName;
         _mobileNumberController.text = res.bindMobile ?? '';
@@ -248,8 +247,6 @@ class _AddMobileMoneyPageState extends State<AddMobileMoneyPage> {
         "bindMobile": _mobileNumberController.text.trim(),
         "bankChannelId": int.tryParse(_selectedProvider ?? ''),
       };
-
-      debugPrint("🚀👀 ${payload}");
 
       late final dio.Response<dynamic> response;
       if (mobilecardId.isNotEmpty) {

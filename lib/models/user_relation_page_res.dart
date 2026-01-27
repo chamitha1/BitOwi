@@ -1,3 +1,5 @@
+import 'package:BitOwi/utils/app_logger.dart';
+
 class UserRelationPageRes {
   final String nickname;
   final String photo;
@@ -44,8 +46,8 @@ class UserRelationPageRes {
         createDatetime: json['createDatetime']?.toString() ?? '',
       );
     } catch (e) {
-      print("Error parsing UserRelationPageRes: $e");
-      print("JSON: $json");
+      AppLogger.d("Error parsing UserRelationPageRes: $e");
+      AppLogger.d("JSON: $json");
       rethrow;
     }
   }

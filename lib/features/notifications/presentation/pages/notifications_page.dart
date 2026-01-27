@@ -2,6 +2,7 @@ import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/models/sms_model.dart';
 import 'package:BitOwi/features/notifications/presentation/pages/notification_detail_page.dart';
 import 'package:BitOwi/features/notifications/presentation/widgets/confirm_read_dialog.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/string_utils.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       await getList(true);
       if (!mounted) return;
     } catch (e) {
-      print("Refresh error: $e");
+      AppLogger.d("Refresh error: $e");
     }
     _controller.finishRefresh();
     _controller.resetFooter();
@@ -54,7 +55,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       await getList();
       if (!mounted) return;
     } catch (e) {
-      print("Load error: $e");
+      AppLogger.d("Load error: $e");
     }
     _controller.finishLoad(
       isEnd ? IndicatorResult.noMore : IndicatorResult.success,
@@ -99,7 +100,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         pageNum++;
       });
     } catch (e) {
-      print("Get list error: $e");
+      AppLogger.d("Get list error: $e");
       setState(() {
         if (isRefresh) isEnd = true;
       });
@@ -150,7 +151,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       await CommonApi.readAllNotice();
                       onRefresh();
                     } catch (e) {
-                      print("Read all error: $e");
+                      AppLogger.d("Read all error: $e");
                     }
                   },
                 ),
@@ -262,61 +263,61 @@ class _NotificationsPageState extends State<NotificationsPage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF151E2F),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF151E2F),
+                    ),
                   ),
                 ),
+                if (item.isRead == '0')
+                  Container(
+                    margin: const EdgeInsets.only(left: 8, top: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Color(0xffE74C3C),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              StringUtils.removeAllHtmlTags(item.content),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: 'Inter',
+                color: Color(0xFF717F9A),
               ),
-              if (item.isRead == '0')
-                Container(
-                  margin: const EdgeInsets.only(left: 8, top: 4),
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xffE74C3C),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            StringUtils.removeAllHtmlTags(item.content),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Inter',
-              color: Color(0xFF717F9A),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            item.createDatetime,
-            style: const TextStyle(
-              fontSize: 12,
-              fontFamily: 'Inter',
-              color: Color(0xFFB0B4C3),
+            const SizedBox(height: 12),
+            Text(
+              item.createDatetime,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+                color: Color(0xFFB0B4C3),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 }

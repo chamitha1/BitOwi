@@ -2,6 +2,7 @@ import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/models/jour.dart';
 import 'package:BitOwi/models/withdraw_page_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:get/get.dart';
 
 class TransactionHistoryController extends GetxController {
@@ -29,7 +30,7 @@ class TransactionHistoryController extends GetxController {
   void onInit() {
     super.onInit();
     final args = Get.arguments;
-    print("TransactionHistoryController onInit - Args: $args");
+    AppLogger.d("TransactionHistoryController onInit - Args: $args");
     if (args != null && args is Map) {
       accountNumber = args['accountNumber'];
       symbol = args['symbol'];
@@ -55,7 +56,7 @@ class TransactionHistoryController extends GetxController {
         statusEnum[element.key] = element.value;
       }
     } catch (e) {
-      print("Error fetching dict: $e");
+      AppLogger.d("Error fetching dict: $e");
     }
   }
 
@@ -98,8 +99,8 @@ class TransactionHistoryController extends GetxController {
         "pageSize": pageSize,
         "pageNum": pageNum,
         "pageSize": pageSize,
-        "type": "0",  
-        "bizCategory": "", 
+        "type": "0",
+        "bizCategory": "",
       };
 
       if (accountNumber != null) {
@@ -109,8 +110,9 @@ class TransactionHistoryController extends GetxController {
       final res = await AccountApi.getJourPageList(params);
 
       final deposits = res.list.where((item) {
-          final amt = double.tryParse(item.transAmount?.replaceAll(',', '') ?? '0') ?? 0;
-          return amt > 0;
+        final amt =
+            double.tryParse(item.transAmount?.replaceAll(',', '') ?? '0') ?? 0;
+        return amt > 0;
       }).toList();
 
       if (deposits.isEmpty && res.list.isEmpty) {
@@ -127,7 +129,7 @@ class TransactionHistoryController extends GetxController {
         }
       }
     } catch (e) {
-      print("Fetch deposits error: $e");
+      AppLogger.d("Fetch deposits error: $e");
       if (!refresh) pageNum--;
     }
   }
@@ -155,7 +157,7 @@ class TransactionHistoryController extends GetxController {
         }
       }
     } catch (e) {
-      print("Fetch withdrawals error: $e");
+      AppLogger.d("Fetch withdrawals error: $e");
       if (!refresh) pageNum--;
     }
   }
