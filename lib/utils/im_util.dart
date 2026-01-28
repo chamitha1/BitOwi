@@ -36,6 +36,8 @@ class IMUtil {
 
   static bool isInitSuccess = false;
   static bool isLogin = false;
+  static IMStatus imStatus = IMStatus.idle;
+  static bool _handledKick = false;
 
   static Future<void> initIMSDKAndAddIMListeners(String userId) async {
     if (isInitSuccess) return;
@@ -131,10 +133,26 @@ class IMUtil {
     }
   }
 
+  // static Future<void> onKickedOffline(String userId) async {
+  //   if (await StorageService.getToken() != null) {
+  //     IMUtil.loginIMUser(userId);
+  //   }
+  // }
   static Future<void> onKickedOffline(String userId) async {
-    if (await StorageService.getToken() != null) {
-      IMUtil.loginIMUser(userId);
-    }
+    if (_handledKick) return;
+    _handledKick = true;
+
+    AppLogger.d("💬🚨 IM kicked offline");
+
+    isLogin = false;
+    imStatus = IMStatus.kicked;
+
+    try {
+      logoutIMUser();
+    } catch (_) {}
+
+    // ToastUtil.showError();
+    AppLogger.d("Your account was logged in on another device");
   }
 
   /// Set custom emoticon
@@ -188,23 +206,54 @@ class IMUtil {
     stickerController.customStickerPackageList = customStickerPackageList;
   }
 
+  // static Future<void> loginIMUser(String userId) async {
+  //   try {
+  //     final sign = await IMApi.getSign();
+  //     AppLogger.d("💬 IMApi sign");
+
+  //     final data = await _coreInstance.login(userID: userId, userSig: sign);
+  //     AppLogger.d("💬 login");
+
+  //     if (data.code != 0) {
+  //       final option1 = data.desc;
+  //       AppLogger.d('error---> $option1');
+  //       AppLogger.d('error---> sign $sign');
+  //       AppLogger.d('error---> uid $userId');
+  //       ToastUtil.showError('im_util $option1');
+  //       return;
+  //     } else {
+  //       isLogin = true;
+  //     }
+  //   } catch (e) {
+  //     AppLogger.d('---im-----error-----');
+  //     AppLogger.e(e);
+  //   }
+  // }
+
   static Future<void> loginIMUser(String userId) async {
+    // Hard block if kicked
+    if (imStatus == IMStatus.kicked) {
+      AppLogger.d("💬 Login blocked — user is kicked");
+      return;
+    }
+
     try {
       final sign = await IMApi.getSign();
       AppLogger.d("💬 IMApi sign");
 
-      final data = await _coreInstance.login(userID: userId, userSig: sign);
+      final res = await _coreInstance.login(userID: userId, userSig: sign);
       AppLogger.d("💬 login");
 
-      if (data.code != 0) {
-        final option1 = data.desc;
-        AppLogger.d('error---> $option1');
-        AppLogger.d('error---> sign $sign');
-        AppLogger.d('error---> uid $userId');
-        ToastUtil.showError('im_util $option1');
-        return;
-      } else {
+      if (res.code == 0) {
+        AppLogger.d("💬 IM login success");
+
         isLogin = true;
+        imStatus = IMStatus.loggedIn;
+
+        //  reset kick guard after successful login
+        _handledKick = false;
+      } else {
+        AppLogger.e("💬 IM login failed — code=${res.code}, desc=${res.desc}");
       }
     } catch (e) {
       AppLogger.d('---im-----error-----');
@@ -221,28 +270,55 @@ class IMUtil {
     }
   }
 
-  // static Future<void> initIM(String userId) async {
-  //   if (!IMUtil.isInitSuccess) {
-  //     try {
-  //       ToastUtil.showLoading();
-  //       await IMUtil.initIMSDKAndAddIMListeners(userId);
-  //       ToastUtil.dismiss();
-  //     } catch (e) {
-  //       ToastUtil.dismiss();
-  //       return;
-  //     }
-  //   }
-  //   // I18nUtils(null, 'zh-Hans');
-  //   // I18nUtils(null, 'en');
-  //   if (!IMUtil.isLogin) {
-  //     try {
-  //       ToastUtil.showLoading();
-  //       await IMUtil.login(userId);
-  //       ToastUtil.dismiss();
-  //     } catch (e) {
-  //       ToastUtil.dismiss();
-  //       return;
-  //     }
-  //   }
-  // }
+  static Future<void> initIM(
+    String userId, {
+    bool force = false, // 🔑 NEW
+  }) async {
+    // //  Never auto-reconnect if kicked
+    // if (imStatus == IMStatus.kicked) {
+    //   AppLogger.d("💬 IM init blocked — user is kicked");
+    //   return;
+    // }
+    // 🚨 Never auto-reconnect if kicked
+    if (imStatus == IMStatus.kicked && !force) {
+      AppLogger.d("💬 IM init blocked — user is kicked");
+      return;
+    }
+
+    // 🔓 Manual reconnect → clear kicked state
+    if (force && imStatus == IMStatus.kicked) {
+      AppLogger.d("💬 Manual reconnect — clearing kick state");
+      imStatus = IMStatus.idle;
+    }
+
+    //  Init SDK (only once)
+    if (!IMUtil.isInitSuccess) {
+      try {
+        ToastUtil.showLoading();
+        await IMUtil.initIMSDKAndAddIMListeners(userId);
+        isInitSuccess = true;
+        imStatus = IMStatus.initialized;
+        ToastUtil.dismiss();
+      } catch (e) {
+        AppLogger.d("💬 IM init failed");
+        ToastUtil.dismiss();
+        return;
+      }
+    }
+    // I18nUtils(null, 'zh-Hans');
+    // I18nUtils(null, 'en');
+    if (!IMUtil.isLogin) {
+      try {
+        ToastUtil.showLoading();
+        await IMUtil.loginIMUser(userId);
+        ToastUtil.dismiss();
+      } catch (e) {
+        AppLogger.d("💬 IM login failed");
+        ToastUtil.dismiss();
+        return;
+      }
+    }
+  }
 }
+
+enum IMStatus { idle, initialized, loggedIn, kicked }

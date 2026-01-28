@@ -123,10 +123,20 @@ class UserController extends GetxController {
       throw Exception("User load failed after login");
     }
     // Init + Login IM (MOBILE ONLY)
-    if (PlatformUtils().isMobile) {
-      await IMUtil.initIMSDKAndAddIMListeners(currentUser.id!);
-      await IMUtil.loginIMUser(currentUser.id!);
-    }
+    // if (PlatformUtils().isMobile) {
+    //   if (!IMUtil.isInitSuccess) {
+    //     await IMUtil.initIMSDKAndAddIMListeners(currentUser.id!);
+    //   }
+    //   if (!IMUtil.isLogin) {
+    //     await IMUtil.loginIMUser(currentUser.id!);
+    //   }
+    // }
+    if (!PlatformUtils().isMobile) return;
+
+    await IMUtil.initIM(
+      currentUser.id!,
+      force: true, // 🔑 manual reconnect
+    );
   }
 
   Future<void> fetchNotificationCount() async {
@@ -197,6 +207,28 @@ class UserController extends GetxController {
   }
 
   Future<void> customerServiceChatNavigate(BuildContext context) async {
+    // 🔒 0️⃣ HARD BLOCK if IM was kicked
+    if (IMUtil.imStatus == IMStatus.kicked) {
+      Get.dialog(
+        AlertDialog(
+          title: const Text("Chat disconnected"),
+          content: const Text(
+            "Your chat session was logged out. Please reconnect.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Get.back();
+                await UserController.to.initIMForCurrentUser();
+              },
+              child: const Text("Reconnect"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     if (customerServiceUserID.isEmpty) {
       await getServiceUserID();
     }
