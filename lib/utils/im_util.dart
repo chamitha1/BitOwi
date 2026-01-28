@@ -294,14 +294,14 @@ class IMUtil {
     //  Init SDK (only once)
     if (!IMUtil.isInitSuccess) {
       try {
-        ToastUtil.showLoading();
+        // ToastUtil.showLoading();
         await IMUtil.initIMSDKAndAddIMListeners(userId);
         isInitSuccess = true;
         imStatus = IMStatus.initialized;
-        ToastUtil.dismiss();
+        // ToastUtil.dismiss();
       } catch (e) {
         AppLogger.d("💬 IM init failed");
-        ToastUtil.dismiss();
+        // ToastUtil.dismiss();
         return;
       }
     }
@@ -309,12 +309,12 @@ class IMUtil {
     // I18nUtils(null, 'en');
     if (!IMUtil.isLogin) {
       try {
-        ToastUtil.showLoading();
+        // ToastUtil.showLoading();
         await IMUtil.loginIMUser(userId);
-        ToastUtil.dismiss();
+        // ToastUtil.dismiss();
       } catch (e) {
         AppLogger.d("💬 IM login failed");
-        ToastUtil.dismiss();
+        // ToastUtil.dismiss();
         return;
       }
     }
