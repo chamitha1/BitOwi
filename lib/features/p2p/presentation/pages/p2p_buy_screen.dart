@@ -5,6 +5,7 @@ import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/utils/debounce_utils.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/order_confirmation_dialog.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:get/get.dart';
@@ -112,6 +113,37 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
 
   Future<void> _onBuyTap() async {
     if (adsDetail == null || amount.isEmpty) return;
+
+    // Validation Logic
+    final double inputVal = double.tryParse(amount) ?? 0;
+    final double minLimit = double.tryParse(adsDetail!.minTrade) ?? 0;
+    final double maxLimit = double.tryParse(adsDetail!.maxTrade) ?? 0;
+    final double price = double.tryParse(adsDetail!.truePrice) ?? 0;
+
+    double tradeVal = 0;
+    if (tabIndex == 1) {
+      // Amount
+      tradeVal = inputVal;
+    } else {
+      // Quantity * Price
+      tradeVal = inputVal * price;
+    }
+
+    if (tradeVal < minLimit) {
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Transaction amount lower than minimum amount",
+      );
+      return;
+    }
+
+    if (tradeVal > maxLimit) {
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "You cannot exceed the maximum transaction amount",
+      );
+      return;
+    }
 
     await OrderConfirmationDialog.show(
       context: context,
