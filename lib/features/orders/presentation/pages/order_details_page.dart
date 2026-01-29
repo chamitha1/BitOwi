@@ -700,7 +700,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           counterpartyLabel,
           counterpartyName,
           hasAvatar: true,
-          avatarPath: counterpartyPhoto,
+          avatarPath:
+              counterpartyPhoto ?? 'assets/images/avatar_placeholder.png',
         ),
         const SizedBox(height: 12),
         _buildDetailRow('Order No', orderDetail?.id ?? 'N/A', hasCopy: true),
@@ -714,7 +715,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         const SizedBox(height: 12),
         _buildDetailRow(
           'Payment Methods',
-          'Bank Transfer',
+          'Bank Cards',
           valueColor: const Color(0xFF1E2C37),
         ),
         const SizedBox(height: 12),
@@ -729,12 +730,26 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           orderDetail?.realName ?? 'N/A',
           valueColor: const Color(0xFF1E2C37),
         ),
+        // const SizedBox(height: 12),
+        // _buildDetailRow(
+        //   'Bank Branches',
+        //   'todo',
+        //   valueColor: const Color(0xFF1E2C37),
+        // ),
         const SizedBox(height: 12),
         _buildDetailRow(
           'Bank Number',
           orderDetail?.bankcardNumber ?? 'N/A',
           hasCopy: true,
         ),
+        // const SizedBox(height: 12),
+        // _buildDetailRow(
+        //   'Buyer',
+        //   orderDetail?.buyerNickname ?? 'N/A',
+        //   hasAvatar: true,
+        //   avatarPath:
+        //       orderDetail?.buyerPhoto ?? 'assets/images/avatar_placeholder.png',
+        // ),
         const SizedBox(height: 12),
         if (orderDetail?.leaveMessage?.isNotEmpty ?? false)
           _buildDetailRow('Ads Messages', orderDetail!.leaveMessage!),
