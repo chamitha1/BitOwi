@@ -33,14 +33,14 @@ class _ConfirmReleaseDialogState extends State<ConfirmReleaseDialog> {
         fontWeight: FontWeight.w600,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FA), 
+        color: const Color(0xFFF5F7FA),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.transparent),
       ),
     );
 
     final focusedPinTheme = defaultPinTheme.copyDecorationWith(
-      border: Border.all(color: const Color(0xFF151E2F)), 
+      border: Border.all(color: const Color(0xFF151E2F)),
     );
 
     final submittedPinTheme = defaultPinTheme.copyDecorationWith(
@@ -138,8 +138,7 @@ class _ConfirmReleaseDialogState extends State<ConfirmReleaseDialog> {
                 ),
               ),
               showCursor: false,
-              onCompleted: (pin) {
-              },
+              onCompleted: (pin) {},
             ),
             const SizedBox(height: 24),
 
@@ -151,8 +150,10 @@ class _ConfirmReleaseDialogState extends State<ConfirmReleaseDialog> {
                     onPressed: () => Get.back(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      side:
-                          const BorderSide(color: Color(0xFF1D5DE5), width: 1.5),
+                      side: const BorderSide(
+                        color: Color(0xFF1D5DE5),
+                        width: 1.5,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -173,30 +174,35 @@ class _ConfirmReleaseDialogState extends State<ConfirmReleaseDialog> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_pinController.text.length == 6) {
-                        Get.back(); 
+                        Get.back();
                         widget.onConfirm(_pinController.text);
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1D5DE5),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 4,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      "Confirm",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontFamily: 'Inter',
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: const Text(
+                        "Confirm",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     ),
                   ),
                 ),
-
               ],
             ),
           ],

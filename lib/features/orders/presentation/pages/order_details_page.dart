@@ -909,7 +909,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         );
 
       case OrderStatus.pendingReleased:
-      //seller view
+        //seller view
         if (isSeller) {
           return Row(
             children: [
@@ -917,19 +917,22 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 child: OutlinedButton(
                   onPressed: _showArbitrationBottomSheet,
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
                     side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Request for Arbitration',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1D5DE5),
-                      fontFamily: 'Inter',
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: const Text(
+                      'Request for Arbitration',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1D5DE5),
+                        fontFamily: 'Inter',
+                      ),
                     ),
                   ),
                 ),
@@ -965,19 +968,22 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             child: OutlinedButton(
               onPressed: _showArbitrationBottomSheet,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
                 side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Request for Arbitration',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1D5DE5),
-                  fontFamily: 'Inter',
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: const Text(
+                  'Request for Arbitration',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1D5DE5),
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ),
             ),
