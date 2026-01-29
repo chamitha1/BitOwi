@@ -81,7 +81,7 @@ class ApiClient {
                     Get.snackbar(
                       'Session Expired',
                       'You have been logged out because your account was used on another device.',
-                      snackPosition: SnackPosition.BOTTOM,
+                      snackPosition: SnackPosition.TOP,
                     );
                   }
 
@@ -140,7 +140,7 @@ class ApiClient {
                   Get.snackbar(
                     'Session Expired',
                     'You have been logged out because your account was used on another device.',
-                    snackPosition: SnackPosition.BOTTOM,
+                    snackPosition: SnackPosition.TOP,
                   );
                 }
               }
