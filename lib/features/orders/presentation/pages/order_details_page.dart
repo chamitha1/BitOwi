@@ -909,53 +909,80 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         );
 
       case OrderStatus.pendingReleased:
-        return Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: _showArbitrationBottomSheet,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+      //seller view
+        if (isSeller) {
+          return Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _showArbitrationBottomSheet,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'Request for Arbitration',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1D5DE5),
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: _showConfirmReleaseDialog,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1D5DE5),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Go Release',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    fontFamily: 'Inter',
+                  child: const Text(
+                    'Request for Arbitration',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1D5DE5),
+                      fontFamily: 'Inter',
+                    ),
                   ),
                 ),
               ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _showConfirmReleaseDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1D5DE5),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Go Release',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        } else {
+          // Buyer view: Only Arbitration
+          return SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: _showArbitrationBottomSheet,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Request for Arbitration',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1D5DE5),
+                  fontFamily: 'Inter',
+                ),
+              ),
             ),
-          ],
-        );
+          );
+        }
 
       case OrderStatus.cryptoReleased:
         return SizedBox(
