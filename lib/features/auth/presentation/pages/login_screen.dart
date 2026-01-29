@@ -14,7 +14,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:BitOwi/utils/device_utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,21 +74,20 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final deviceId = await DeviceUtils.getDeviceId();
-
       final response = await ApiClient.dio.post(
         '/core/v1/cuser/public/login',
         data: {
           'loginName': _emailController?.text.trim(),
           'loginPwd': _passwordController.text,
-          'deviceId': deviceId,
         },
       );
-
       final dynamic rawData = response.data;
-      final Map<String, dynamic> data =
-          rawData is String ? jsonDecode(rawData) : rawData;
 
+      final Map<String, dynamic> data = rawData is String
+          ? jsonDecode(rawData)
+          : rawData;
+
+      // ignore: avoid_print
       AppLogger.d('Login response: $data');
 
       if (data['code'] == 200 || data['code'] == '200') {
@@ -97,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final token = tokenData['token'] as String? ?? '';
 
         await StorageService.saveToken(token);
+
         await StorageService.saveUserName(_emailController?.text.trim() ?? '');
         await StorageService.saveRememberMe(_rememberMe);
 
@@ -109,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Refresh user data in the global controller
         await UserController.to.loadUser();
+
         await UserController.to.initIMForCurrentUser();
 
         Get.offAllNamed(Routes.home);
