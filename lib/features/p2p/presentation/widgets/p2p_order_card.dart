@@ -24,9 +24,11 @@ class P2POrderCard extends StatelessWidget {
     this.adItem,
     this.onRefresh,
     this.isMerchantProfile = false,
+    this.coinIcon,
   });
 
   final bool isMerchantProfile;
+  final String? coinIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -469,14 +471,20 @@ class P2POrderCard extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => P2PBuyScreen(adItem: adItem!),
+                  builder: (context) => P2PBuyScreen(
+                    adItem: adItem!,
+                    coinIcon: coinIcon,
+                  ),
                 ),
               );
             } else {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => P2PSellScreen(adItem: adItem!),
+                  builder: (context) => P2PSellScreen(
+                    adItem: adItem!,
+                    coinIcon: coinIcon,
+                  ),
                 ),
               );
             }

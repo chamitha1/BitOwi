@@ -223,6 +223,7 @@ class _P2PPageState extends State<P2PPage> {
                           return P2POrderCard(
                             isBuy: isBuySelected,
                             adItem: _filteredAds[index],
+                            coinIcon: _selectedCoin?.icon,
                             onRefresh: () => _fetchAds(isRefresh: true),
                           );
                         },

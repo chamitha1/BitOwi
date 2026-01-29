@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/api/p2p_api.dart';
+import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/utils/debounce_utils.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/order_confirmation_dialog.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
@@ -12,8 +13,9 @@ import 'package:get/get.dart';
 
 class P2PBuyScreen extends StatefulWidget {
   final AdItem adItem;
+  final String? coinIcon;
 
-  const P2PBuyScreen({super.key, required this.adItem});
+  const P2PBuyScreen({super.key, required this.adItem, this.coinIcon});
 
   @override
   State<P2PBuyScreen> createState() => _P2PBuyScreenState();
@@ -239,14 +241,19 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
       ),
       child: Row(
         children: [
-          Image.asset(
-            'assets/images/home/bitcoin.png',
+          CommonImage(
+            widget.coinIcon ?? '',
             width: 48,
             height: 48,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.currency_bitcoin,
-              color: Colors.orange,
-              size: 48,
+            errorWidgetChild: Image.asset(
+              'assets/images/home/bitcoin.png',
+              width: 48,
+              height: 48,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.currency_bitcoin,
+                color: Colors.orange,
+                size: 48,
+              ),
             ),
           ),
           const SizedBox(width: 12),
