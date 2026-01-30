@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:dio/dio.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/models/bankcard_list_res.dart';
@@ -200,7 +201,13 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
             Get.offNamed(Routes.orderDetailPage, arguments: orderId);
           }
         } catch (e) {
-          // 
+          String errorMessage = "Transaction failed";
+          if (e is DioException) {
+            errorMessage = e.error.toString();
+          } else {
+            errorMessage = e.toString();
+          }
+          CustomSnackbar.showError(title: "Error", message: errorMessage);
         }
       },
     );
