@@ -35,7 +35,7 @@ class P2POrderCard extends StatelessWidget {
     if (adItem == null) return const SizedBox();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -102,36 +102,38 @@ class P2POrderCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     // Badge Logic
-                    if (adItem?.userStatistics?.isTrust == '1' || Get.find<UserController>().user.value?.merchantStatus == '1')
+                    if (adItem?.userStatistics?.isTrust == '1' ||
+                        Get.find<UserController>().user.value?.merchantStatus ==
+                            '1')
                       Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8EFFF),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/p2p/certified.svg',
-                            width: 12,
-                            height: 12,
-                          ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            "Certified",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Color(0xFF1D5DE5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8EFFF),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/p2p/certified.svg',
+                              width: 12,
+                              height: 12,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            const Text(
+                              "Certified",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                color: Color(0xFF1D5DE5),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -332,7 +334,7 @@ class P2POrderCard extends StatelessWidget {
         const SizedBox(height: 12),
         // Payment Methods (Above Divider)
         Row(
-          mainAxisAlignment: MainAxisAlignment.start, 
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [_buildPaymentMethod()],
         ),
         const SizedBox(height: 16),
@@ -383,10 +385,11 @@ class P2POrderCard extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         const Divider(height: 1, thickness: 1, color: Color(0xFFECEFF5)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 6),
         // Payment Methods
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
+          // crossAxisAlignment: CrossAxisAlignment.end,
           children: [_buildPaymentMethod()],
         ),
       ],
@@ -403,6 +406,7 @@ class P2POrderCard extends StatelessWidget {
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+
           decoration: BoxDecoration(
             color: hasBank ? const Color(0xFFFDF4F5) : const Color(0xFFFFFBF6),
             borderRadius: BorderRadius.circular(8),
@@ -471,20 +475,16 @@ class P2POrderCard extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => P2PBuyScreen(
-                    adItem: adItem!,
-                    coinIcon: coinIcon,
-                  ),
+                  builder: (context) =>
+                      P2PBuyScreen(adItem: adItem!, coinIcon: coinIcon),
                 ),
               );
             } else {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => P2PSellScreen(
-                    adItem: adItem!,
-                    coinIcon: coinIcon,
-                  ),
+                  builder: (context) =>
+                      P2PSellScreen(adItem: adItem!, coinIcon: coinIcon),
                 ),
               );
             }

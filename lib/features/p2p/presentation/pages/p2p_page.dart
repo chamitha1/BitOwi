@@ -38,7 +38,7 @@ class _P2PPageState extends State<P2PPage> {
   List<AdItem> _filteredAds = [];
   int _pageNum = 1;
   bool _isEnd = false;
-  
+
   Dict? _selectedCurrency;
 
   final EasyRefreshController _refreshController = EasyRefreshController(
@@ -48,10 +48,7 @@ class _P2PPageState extends State<P2PPage> {
 
   CoinListRes? _defaultCoin(List<CoinListRes> list) {
     if (list.isEmpty) return null;
-    return list.firstWhere(
-      (e) => e.symbol == 'USDT',
-      orElse: () => list.first,
-    );
+    return list.firstWhere((e) => e.symbol == 'USDT', orElse: () => list.first);
   }
 
   @override
@@ -116,7 +113,7 @@ class _P2PPageState extends State<P2PPage> {
       if (_selectedCurrency != null) {
         params['tradeCurrency'] = _selectedCurrency!.key;
       }
-      
+
       debugPrint("P2PPage: Fetching ads with params: $params");
 
       final res = await P2PApi.getAdsPageList(params);
@@ -178,10 +175,7 @@ class _P2PPageState extends State<P2PPage> {
   Widget _emptyScrollable() {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      children: const [
-        SizedBox(height: 60),
-        P2PEmptyState(),
-      ],
+      children: const [SizedBox(height: 60), P2PEmptyState()],
     );
   }
 
@@ -201,7 +195,7 @@ class _P2PPageState extends State<P2PPage> {
                   _buildTradeTypeToggle(),
                   const SizedBox(height: 20),
                   _buildFilterRow(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 4),
                 ],
               ),
             ),
@@ -218,7 +212,8 @@ class _P2PPageState extends State<P2PPage> {
                           vertical: 16,
                         ),
                         itemCount: _filteredAds.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 16),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
                         itemBuilder: (_, index) {
                           return P2POrderCard(
                             isBuy: isBuySelected,
@@ -230,7 +225,6 @@ class _P2PPageState extends State<P2PPage> {
                       ),
               ),
             ),
-
           ],
         ),
       ),
@@ -358,8 +352,9 @@ class _P2PPageState extends State<P2PPage> {
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
-                  color:
-                      !isBuySelected ? Colors.white : const Color(0xFF717F9A),
+                  color: !isBuySelected
+                      ? Colors.white
+                      : const Color(0xFF717F9A),
                 ),
               ),
             ),
@@ -506,7 +501,7 @@ class _P2PPageState extends State<P2PPage> {
                     textInputAction: TextInputAction.search,
                     onSubmitted: (_) => _fetchAds(isRefresh: true),
                     decoration: const InputDecoration(
-                      hintText: "Search Here",
+                      hintText: "Search By Name",
                       hintStyle: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
@@ -524,7 +519,6 @@ class _P2PPageState extends State<P2PPage> {
           ),
         ),
 
-        
         const SizedBox(width: 8),
 
         // Filter Button
@@ -554,13 +548,15 @@ class _P2PPageState extends State<P2PPage> {
             if (result['type'] == 'filter') {
               final amount = (result['amount'] ?? '').toString();
               final currency = result['currency'] as Dict?;
-              
-              debugPrint("P2PPage: Filter result received. Amount=$amount, Currency=${currency?.key}");
+
+              debugPrint(
+                "P2PPage: Filter result received. Amount=$amount, Currency=${currency?.key}",
+              );
 
               setState(() {
                 _minPrice = amount.trim().isEmpty ? null : amount.trim();
                 if (currency != null) {
-                   _selectedCurrency = currency;
+                  _selectedCurrency = currency;
                 }
               });
 
