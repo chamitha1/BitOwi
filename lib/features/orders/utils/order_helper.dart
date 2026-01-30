@@ -36,6 +36,17 @@ class OrderHelper {
     }
   }
 
+  /// Formats timestamp (milliseconds) to full display format: YYYY-MM-DD HH:mm:ss
+  static String formatDateTimeFull(int? timestamp) {
+    if (timestamp == null) return '';
+    try {
+      final dt = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return '';
+    }
+  }
+
   /// Formats double amount to string
   static String formatAmount(double? amount) {
     if (amount == null) return '0';

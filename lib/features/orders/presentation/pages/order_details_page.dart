@@ -624,9 +624,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }
 
   Widget _buildStatsGrid() {
-    final time = orderDetail?.createDatetime != null
-        ? OrderHelper.formatDateTime(orderDetail!.createDatetime)
-        : 'N/A';
+    // final time = orderDetail?.createDatetime != null
+    //     ? OrderHelper.formatDateTime(orderDetail!.createDatetime)
+    //     : 'N/A';
     final quantity =
         '${orderDetail?.count ?? '0'} ${orderDetail?.tradeCoin ?? ''}';
     final total =
@@ -637,16 +637,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildStatColumn('Time', time, CrossAxisAlignment.start),
+            // _buildStatColumn('Time', time, CrossAxisAlignment.start),
             _buildStatColumn(
               'Quantity(${orderDetail?.tradeCoin ?? 'COIN'})',
               orderDetail?.count?.toString() ?? '0',
-              CrossAxisAlignment.center,
+              CrossAxisAlignment.start,
             ),
             _buildStatColumn(
               'Total(${orderDetail?.tradeCurrency ?? 'USD'})',
               orderDetail?.tradeAmount?.toString() ?? '0',
-              CrossAxisAlignment.end,
+              CrossAxisAlignment.center,
             ),
           ],
         ),
@@ -711,7 +711,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         _buildDetailRow(
           'Order Time',
           orderDetail?.createDatetime != null
-              ? OrderHelper.formatDateTime(orderDetail!.createDatetime)
+              ? OrderHelper.formatDateTimeFull(orderDetail!.createDatetime)
               : 'N/A',
         ),
         const SizedBox(height: 12),
@@ -917,7 +917,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 child: OutlinedButton(
                   onPressed: _showArbitrationBottomSheet,
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 4,
+                    ),
                     side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -968,7 +971,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             child: OutlinedButton(
               onPressed: _showArbitrationBottomSheet,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 4,
+                ),
                 side: const BorderSide(color: Color(0xFF1D5DE5), width: 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
