@@ -131,8 +131,10 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
   }
 
   Widget _buildOrderCard(TradeOrderItem orderItem) {
-    // is user buyer or seller
-    final isBuyer = orderItem.buyUser != null;
+    // Determine if current user is the buyer
+    final currentUser = Get.find<UserController>().user.value;
+    final currentUserId = int.tryParse(currentUser?.id ?? '');
+    final isBuyer = currentUserId != null && currentUserId == orderItem.buyUser;
 
     return OrderCard(
       orderNo: orderItem.id?.toString() ?? '',
@@ -147,8 +149,12 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
       userAvatar: isBuyer
           ? (orderItem.sellerPhoto ?? '')
           : (orderItem.buyerPhoto ?? ''),
-      isCertified: Get.find<UserController>().user.value?.merchantStatus == '1',
-      hasUnreadMessages: orderItem.unReadCount != null && orderItem.unReadCount! > 0,
+      isCertified: isBuyer
+          ? false
+          : Get.find<UserController>().user.value?.merchantStatus == '1',
+
+      hasUnreadMessages:
+          orderItem.unReadCount != null && orderItem.unReadCount! > 0,
       onTap: () => Get.to(
         () => OrderDetailsPage(orderId: orderItem.id?.toString() ?? ''),
       ),
