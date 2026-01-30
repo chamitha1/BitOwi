@@ -860,6 +860,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     switch (status) {
       case OrderStatus.pending:
       case OrderStatus.pendingPayment:
+        // Hide action buttons for Seller in pending states
+        if (isSeller) {
+          return const SizedBox.shrink();
+        }
         return Row(
           children: [
             Expanded(
