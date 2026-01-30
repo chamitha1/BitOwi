@@ -217,10 +217,10 @@ class P2POrderCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           // Price Row
           _buildPriceRow(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 4), //
 
           if (isMerchantProfile)
             _buildMerchantInfo(context)
