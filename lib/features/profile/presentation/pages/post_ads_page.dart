@@ -262,6 +262,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
   }
 
   Future<void> getPrice() async {
+    if (currencyList.isEmpty || coinList.isEmpty) return;
     try {
       String rate = premiumController.text;
       if (rate.isNum || rate.isEmpty) {
@@ -695,7 +696,6 @@ class _PostAdsPageState extends State<PostAdsPage> {
                       child: SingleChildScrollView(
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,
-                        padding: const EdgeInsets.only(top: 16, bottom: 16),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -758,7 +758,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
   ///
   Container stepHeader() {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
+      margin: const EdgeInsets.only(top: 16, bottom: 10),
       padding: const EdgeInsets.all(16),
       width: double.infinity,
       decoration: BoxDecoration(
@@ -1185,7 +1185,15 @@ class _PostAdsPageState extends State<PostAdsPage> {
               ? 'Enter total purchase amount'
               : 'Enter total sales amount',
           suffix: coinList.isNotEmpty ? coinList[coinIndex].symbol : '',
-          onChanged: (_) => setState(() {}),
+          onChanged: (value) {
+            if (value.isNum) {
+              final truePrice = num.parse(priceController.text);
+              totalAmount = (truePrice * num.parse(value)).toStringAsFixed(2);
+            } else {
+              totalAmount = '0.00';
+            }
+            setState(() {});
+          },
         ),
 
         const SizedBox(height: 20),
