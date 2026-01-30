@@ -154,7 +154,9 @@ class _BalanceSectionState extends State<BalanceSection> {
 
     final list = controller.balanceData.value!.accountList.where((item) {
       if (_hideSmallAssets) {
-        return item.microFlag != '1';
+        final cleanAmount = (item.usableAmount ?? '0').replaceAll(',', '');
+        final amount = double.tryParse(cleanAmount) ?? 0.0;
+        return amount >= 0.1;
       }
       return true;
     }).toList();
@@ -215,8 +217,8 @@ class _BalanceSectionState extends State<BalanceSection> {
   Widget _buildNetworkImage(String url) {
     if (url.isEmpty || !url.startsWith('http')) {
       return Container(
-        width: 24,
-        height: 24,
+        width: 36,
+        height: 36,
         decoration: const BoxDecoration(
           color: Color(0xFFF0F0F0),
           shape: BoxShape.circle,
@@ -226,8 +228,8 @@ class _BalanceSectionState extends State<BalanceSection> {
     }
     return Image.network(
       url,
-      width: 24,
-      height: 24,
+      width: 36,
+      height: 36,
       errorBuilder: (context, error, stackTrace) {
         return Container(
           width: 24,
@@ -256,73 +258,107 @@ class _BalanceSectionState extends State<BalanceSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: [
-            _buildNetworkImage(icon),
-            const SizedBox(width: 8),
-            Text(
-              name,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Color(0xff151E2F),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: _assetDetailColumn(
-                "Assets",
-                isObscured ? "********" : total,
-              ),
+            //  Icon + Name
+            Row(
+              children: [
+                _buildNetworkImage(icon),
+                const SizedBox(width: 8),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff151E2F),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 2),
-            Expanded(
-              child: _assetDetailColumn(
-                "Frozen",
-                isObscured ? "********" : frozen,
-              ),
-            ),
-            SizedBox(width: 2),
-            Expanded(
-              child: _assetDetailColumn(
-                currencyLabel,
-                isObscured ? "********" : usdtVal,
-              ),
+            // Available
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text(
+                  "Available",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xff717F9A),
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isObscured ? "********" : total,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff151E2F),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _assetDetailColumn(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Color(0xff454F63),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        const SizedBox(height: 4),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xff151E2F),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            //Frozen
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Frozen",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xff717F9A),
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isObscured ? "********" : frozen,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xff151E2F),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
             ),
-          ),
+            //Total Asset (USDT)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  currencyLabel,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xff717F9A),
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isObscured ? "********" : usdtVal,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff151E2F),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );

@@ -57,6 +57,13 @@ class TradeOrderItem {
 
   final String? sellerNickname;
   final String? sellerPhoto;
+  
+  @JsonKey(name: 'buyerMerchantStatus')
+  final String? buyerIsMerchant;
+  
+  @JsonKey(name: 'sellerMerchantStatus')
+  final String? sellerIsMerchant;
+
   final List<dynamic>? statusList;
 
   @JsonKey(fromJson: _dynamicToInt)
@@ -99,6 +106,8 @@ class TradeOrderItem {
     this.sellUser,
     this.sellerNickname,
     this.sellerPhoto,
+    this.buyerIsMerchant,
+    this.sellerIsMerchant,
     this.statusList,
     this.id,
     this.type,
