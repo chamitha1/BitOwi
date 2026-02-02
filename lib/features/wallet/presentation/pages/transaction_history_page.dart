@@ -196,7 +196,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     (controller.isDeposit.value
                         ? controller.depositList.isEmpty
                         : controller.withdrawList.isEmpty)) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+                    ),
+                  );
                 }
 
                 final list = controller.isDeposit.value

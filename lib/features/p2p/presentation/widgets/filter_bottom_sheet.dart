@@ -339,7 +339,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         child: const SizedBox(
           height: 18,
           width: 18,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+            ),
+          ),
         ),
       );
     }

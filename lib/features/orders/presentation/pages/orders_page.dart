@@ -88,7 +88,11 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
                 child: Obx(() {
                   if (controller.isLoading.value &&
                       controller.ordersList.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+                      ),
+                    );
                   }
 
                   if (controller.ordersList.isEmpty) {

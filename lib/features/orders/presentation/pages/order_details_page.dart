@@ -209,7 +209,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       return Scaffold(
         backgroundColor: const Color(0xFFF6F9FF),
         appBar: _buildAppBar(),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 4,
+            valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+          ),
+        ),
       );
     }
 

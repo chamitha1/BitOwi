@@ -34,7 +34,11 @@ class TransactionDetailPage extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+            ),
+          );
         }
 
         final detail = controller.detail.value;

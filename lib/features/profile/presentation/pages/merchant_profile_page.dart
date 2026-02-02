@@ -211,7 +211,11 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         elevation: 0,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+              ),
+            )
           : EasyRefresh(
               controller: _refreshController,
               onRefresh: () async => await getAdsList(isRefresh: true),

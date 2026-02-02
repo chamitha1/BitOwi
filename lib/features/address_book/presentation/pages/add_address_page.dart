@@ -349,7 +349,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+                        ),
                       )
                     : Text(
                         _selectedCoin?.symbol ?? "Select Currency",

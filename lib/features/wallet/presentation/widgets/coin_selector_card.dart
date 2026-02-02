@@ -37,11 +37,14 @@ class CoinSelectorCard extends StatelessWidget {
             ),
           ),
           if (isLoading || coinList.isEmpty)
-             const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+              ),
+            )
           else
             _buildDropdown(context),
         ],
@@ -50,7 +53,7 @@ class CoinSelectorCard extends StatelessWidget {
   }
 
   Widget _buildDropdown(BuildContext context) {
-     final displayCoin = selectedCoin ?? coinList.first;
+    final displayCoin = selectedCoin ?? coinList.first;
 
     return PopupMenuButton<ChainSymbolListRes>(
       offset: const Offset(0, 40),
@@ -96,18 +99,14 @@ class CoinSelectorCard extends StatelessWidget {
         );
       }).toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           children: [
-            if (displayCoin.icon != null &&
-                displayCoin.icon!.isNotEmpty)
+            if (displayCoin.icon != null && displayCoin.icon!.isNotEmpty)
               Image.network(
                 displayCoin.icon!,
                 width: 24,

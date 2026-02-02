@@ -160,7 +160,12 @@ class _AddressBookPageState extends State<AddressBookPage> {
             // Address List
             Expanded(
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 4,
+                        valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+                      ),
+                    )
                   : filteredAddresses.isEmpty
                   ? const Center(
                       child: Text(

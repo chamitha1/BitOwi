@@ -123,7 +123,12 @@ class _BalanceSectionState extends State<BalanceSection> {
           const SizedBox(height: 16),
           Obx(() {
             if (controller.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+                ),
+              );
             } else if (controller.errorMessage.value.isNotEmpty) {
               return Center(
                 child: Column(

@@ -18,7 +18,6 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
     return '${t.substring(0, max)}...';
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<BalanceHistoryController>()) {
@@ -57,7 +56,13 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                     Obx(() {
                       if (controller.isLoading.value &&
                           controller.transactions.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(
+                              Color(0xff1D5DE5),
+                            ),
+                          ),
+                        );
                       }
                       if (controller.transactions.isEmpty) {
                         return const Center(
@@ -408,18 +413,18 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                 ),
                 const SizedBox(height: 4),
                 if (tx.remark != null && tx.remark!.trim().isNotEmpty)
-                Text(
-                  _shortRemark(tx.remark!, 15),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Color(0xFF717F9A),
+                  Text(
+                    _shortRemark(tx.remark!, 15),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF717F9A),
+                    ),
                   ),
-                ),
-              ]
+              ],
             ),
           ],
         ),
