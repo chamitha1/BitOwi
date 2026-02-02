@@ -220,14 +220,15 @@ class DepositScreen extends StatelessWidget {
                             child: Container(
                               height: 52,
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xff1D5DE5),
-                                    Color(0xff174AB7),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
+                                color: Color(0xff1D5DE5),
+                                // gradient: const LinearGradient(
+                                //   colors: [
+                                //     Color(0xff1D5DE5),
+                                //     Color(0xff174AB7),
+                                //   ],
+                                //   begin: Alignment.topCenter,
+                                //   end: Alignment.bottomCenter,
+                                // ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Center(
