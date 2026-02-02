@@ -616,38 +616,34 @@ class _PostAdsPageState extends State<PostAdsPage> {
 
       if (id.isEmpty) {
         final resCreate = await C2CApi.createAds(params);
-        // BACKEND-LEVEL ERROR (even though HTTP = 200)
-        if (resCreate['code'] != '200') {
-          CustomSnackbar.showError(
-            title: "Error",
-            message: resCreate['errorMsg'] ?? 'Operation failed',
-          );
-          return;
-        } else {
+        if (resCreate.success) {
           // SUCCESS
           CustomSnackbar.showSuccess(
             title: "Success",
             message: "Ad created successfully",
           );
+        } else {
+          CustomSnackbar.showError(
+            title: "Error",
+            message: resCreate.message ?? 'Operation failed',
+          );
+          return;
         }
-
         // EventBusUtil.fireAdsEdit();
       } else {
         final resEdit = await C2CApi.editAds({...params, "id": id});
-
-        // BACKEND-LEVEL ERROR (even though HTTP = 200)
-        if (resEdit['code'] != '200') {
-          CustomSnackbar.showError(
-            title: "Error",
-            message: resEdit['errorMsg'] ?? 'Operation failed',
-          );
-          return;
-        } else {
+        if (resEdit.success) {
           // SUCCESS
           CustomSnackbar.showSuccess(
             title: "Success",
             message: "Ad updated successfully",
           );
+        } else {
+          CustomSnackbar.showError(
+            title: "Error",
+            message: resEdit.message ?? 'Operation failed',
+          );
+          return;
         }
         // EventBusUtil.fireAdsEdit();
       }

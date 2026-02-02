@@ -4,22 +4,57 @@ import 'package:BitOwi/models/ads_home_res.dart';
 import 'package:BitOwi/models/ads_my_page_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/utils/app_logger.dart';
+import 'package:dio/dio.dart';
 
 class C2CApi {
   /// Add new ad
-  static Future<Map<String, dynamic>> createAds(
-    Map<String, dynamic> data,
-  ) async {
+  // static Future<Map<String, dynamic>> createAds(
+  //   Map<String, dynamic> data,
+  // ) async {
+  //   try {
+  //     final response = await ApiClient.dio.post(
+  //       '/core/v1/ads/create',
+  //       data: data,
+  //     );
+  //     // assuming backend returns JSON
+  //     return response.data as Map<String, dynamic>;
+  //   } catch (e) {
+  //     AppLogger.d("createAds error: $e");
+  //     rethrow;
+  //   }
+  // }
+  static Future<ApiResult> createAds(Map<String, dynamic> data) async {
     try {
       final response = await ApiClient.dio.post(
         '/core/v1/ads/create',
         data: data,
       );
-      // assuming backend returns JSON
-      return response.data as Map<String, dynamic>;
+
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+
+        if (data['code'] == 200 ||
+            data['code'] == '200' ||
+            data['errorCode'] == 'Success' ||
+            data['errorCode'] == 'SUCCESS') {
+          return ApiResult(success: true);
+        }
+
+        // ❗ Backend logical error (like AUTH00006)
+        return ApiResult(
+          success: false,
+          message: data['errorMsg'] ?? 'Something went wrong',
+        );
+      }
+      return ApiResult(success: false, message: 'Invalid server response');
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      return ApiResult(
+        success: false,
+        message: data is Map ? data['errorMsg'] : e.message,
+      );
     } catch (e) {
-      AppLogger.d("createAds error: $e");
-      rethrow;
+      return ApiResult(success: false, message: 'Unexpected error occurred');
     }
   }
 
@@ -59,16 +94,38 @@ class C2CApi {
   }
 
   /// Edit ad
-  static Future<Map<String, dynamic>> editAds(Map<String, dynamic> data) async {
+  static Future<ApiResult> editAds(Map<String, dynamic> data) async {
     try {
       final response = await ApiClient.dio.post(
         '/core/v1/ads/edit_ads',
         data: data,
       );
-      return response.data as Map<String, dynamic>;
+
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+
+        if (data['code'] == 200 ||
+            data['code'] == '200' ||
+            data['errorCode'] == 'Success' ||
+            data['errorCode'] == 'SUCCESS') {
+          return ApiResult(success: true);
+        }
+
+        // ❗ Backend logical error (like AUTH00006)
+        return ApiResult(
+          success: false,
+          message: data['errorMsg'] ?? 'Something went wrong',
+        );
+      }
+      return ApiResult(success: false, message: 'Invalid server response');
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      return ApiResult(
+        success: false,
+        message: data is Map ? data['errorMsg'] : e.message,
+      );
     } catch (e) {
-      AppLogger.d("editAds error: $e");
-      rethrow;
+      return ApiResult(success: false, message: 'Unexpected error occurred');
     }
   }
 
@@ -124,16 +181,20 @@ class C2CApi {
   }
 }
 
-  // static Future<PageInfo<TradeOrderPageRes>> getTradeOrderPageList(
-  //     Map<String, dynamic> data) async {
-  //   try {
-  //     final res =
-  //         await ApiClient.dio.post('/core/v1/trade_order/my_page_front', data);
-  //     return PageInfo.fromJson<TradeOrderPageRes>(
-  //         res, TradeOrderPageRes.fromJson);
-  //   } catch (e) {
-  //     e.printError();
-  //     rethrow;
-  //   }
-  // }
+class ApiResult {
+  final bool success;
+  final String? message;
 
+  ApiResult({required this.success, this.message});
+
+  Map<String, dynamic> toJson() {
+    return {'success': success, 'message': message};
+  }
+
+  factory ApiResult.fromJson(Map<String, dynamic> json) {
+    return ApiResult(
+      success: json['success'] as bool,
+      message: json['message'] as String?,
+    );
+  }
+}
