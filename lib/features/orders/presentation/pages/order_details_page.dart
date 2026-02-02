@@ -3,6 +3,7 @@ import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_she
 import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/im_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -323,7 +324,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () async {
-            if (PlatformUtils().isMobile) {
+            if (!kIsWeb ) {
               // 🔹 Build group conversation ID
               final String groupId = 'group_${widget.orderId}';
 

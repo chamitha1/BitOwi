@@ -621,15 +621,6 @@ class _MyAdsPageState extends State<MyAdsPage> {
         builder: (_) => const DownloadAppBottomSheet(),
       );
     } else {
-      if (!PlatformUtils().isMobile) {
-        await showModalBottomSheet(
-          context: context,
-          backgroundColor: Colors.transparent,
-          isScrollControlled: true,
-          builder: (_) => const DownloadAppBottomSheet(),
-        );
-        return;
-      }
       AppLogger.d("Post ad: ${ad.id}");
 
       showCommonConfirmDialog(
@@ -689,16 +680,6 @@ class _MyAdsPageState extends State<MyAdsPage> {
         builder: (_) => const DownloadAppBottomSheet(),
       );
     } else {
-      if (!PlatformUtils().isMobile) {
-        await showModalBottomSheet(
-          context: context,
-          backgroundColor: Colors.transparent,
-          isScrollControlled: true,
-          builder: (_) => const DownloadAppBottomSheet(),
-        );
-        return;
-      }
-
       AppLogger.d("Turn off ad: ${ad.id}");
 
       showCommonConfirmDialog(
@@ -746,16 +727,6 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
   void onEditTap(AdsMyPageRes ad) async {
     if (kIsWeb) {
-      await showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        isScrollControlled: true,
-        builder: (_) => const DownloadAppBottomSheet(),
-      );
-      return;
-    }
-    //todo:
-    if (!PlatformUtils().isMobile) {
       await showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,

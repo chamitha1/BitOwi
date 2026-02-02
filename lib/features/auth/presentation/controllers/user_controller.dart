@@ -8,6 +8,7 @@ import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_she
 import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/im_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
@@ -131,7 +132,7 @@ class UserController extends GetxController {
     //     await IMUtil.loginIMUser(currentUser.id!);
     //   }
     // }
-    if (!PlatformUtils().isMobile) return;
+    if (kIsWeb) return;
 
     await IMUtil.initIM(
       currentUser.id!,
@@ -242,7 +243,7 @@ class UserController extends GetxController {
       return;
     }
 
-    if (PlatformUtils().isMobile) {
+    if (!kIsWeb) {
       String conversationID = 'c2c_$customerServiceUserID';
       final res = await IMUtil.sdkInstance
           .getConversationManager()

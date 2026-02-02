@@ -1,6 +1,7 @@
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
 import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
 import 'package:BitOwi/utils/im_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
@@ -266,7 +267,7 @@ class OrderCard extends StatelessWidget {
   Widget _buildChatIcon(BuildContext context, String id) {
     return GestureDetector(
       onTap: () async {
-        if (PlatformUtils().isMobile) {
+        if (!kIsWeb ) {
           // 🔹 Build group conversation ID
           final String groupId = 'group_$id';
 

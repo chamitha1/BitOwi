@@ -70,7 +70,7 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
   @override
   void initState() {
     super.initState();
-    if (PlatformUtils().isMobile) {
+    if (!kIsWeb) {
       _tUICore.getService(TUICALLKIT_SERVICE_NAME).then((value) {
         setState(() {
           isInstallCallkit = value;
@@ -82,7 +82,7 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
   List<MorePanelItem> itemList(TUIChatSeparateViewModel model, TUITheme theme) {
     final config = widget.morePanelConfig ?? MorePanelConfig();
     return [
-      if (PlatformUtils().isMobile)
+      if (!kIsWeb)
         MorePanelItem(
           id: "screen",
           title: TIM_t("拍摄"),
@@ -191,7 +191,7 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
           ),
         ),
       ),
-      if (isInstallCallkit && PlatformUtils().isMobile)
+      if (isInstallCallkit && !kIsWeb)
         MorePanelItem(
           id: "videoCall",
           title: TIM_t("视频通话"),
@@ -214,7 +214,7 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
             ),
           ),
         ),
-      if (isInstallCallkit && PlatformUtils().isMobile)
+      if (isInstallCallkit && !kIsWeb)
         MorePanelItem(
           id: "voiceCall",
           title: TIM_t("语音通话"),
@@ -323,7 +323,7 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
     TUITheme theme,
   ) async {
     try {
-      if (PlatformUtils().isMobile) {
+      if (!kIsWeb) {
         if (PlatformUtils().isAndroid) {
           AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
           if ((androidInfo.version.sdkInt) >= 33) {
@@ -365,7 +365,7 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
 
-      if (PlatformUtils().isMobile) {
+      if (!kIsWeb) {
         final pickedAssets = await AssetPicker.pickAssets(context);
 
         if (pickedAssets != null) {

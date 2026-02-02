@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tencent_chat_i18n_tool/tools/i18n_tool.dart';
@@ -470,7 +471,7 @@ class _TIMUIKitTextFieldLayoutNarrowProState
                           ),
                         ),
                       ),
-                    if (PlatformUtils().isMobile &&
+                    if (!kIsWeb &&
                         widget.showSendAudio &&
                         widget.forbiddenText == null)
                       InkWell(
