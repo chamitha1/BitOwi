@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/models/account.dart';
 import 'package:BitOwi/models/account_asset_res.dart';
@@ -222,24 +224,26 @@ class AccountApi {
       );
 
       final data = res.data['data'];
+      AppLogger.d('Data before parsing: ${jsonEncode(data)}');
+      final Map<String, dynamic> accountData = {};
       if (data != null && data is Map<String, dynamic>) {
-        final fields = [
-          'availableAmount',
-          'totalAmount',
-          'frozenAmount',
-          'usableAmount',
-          'amount',
-          'amountUsdt',
-        ];
-        for (var field in fields) {
-          if (data[field] is num) {
-            data[field] = data[field].toString();
-          }
-        }
+        // Map API fields to model fields
+        accountData['id'] = data['id']?.toString();
+        accountData['accountNumber'] = data['accountNumber']?.toString();
+        accountData['accountType'] = data['accountType']?.toString();
+        accountData['currency'] = data['currency']?.toString();
+        accountData['totalAmount'] = data['amount']
+            ?.toString(); // Map 'amount' to 'totalAmount'
+        accountData['availableAmount'] = data['availableAmount']?.toString();
+        accountData['frozenAmount'] = data['frozenAmount']?.toString();
+        accountData['usableAmount'] = data['usableAmount']?.toString();
+        accountData['amount'] = data['amount']?.toString(); //keep as 'amount'
       }
-      AppLogger.d(data);
-      // AppLogger.d(data['user']);
-      return Account.fromJson(data);
+
+      AppLogger.d("Account data prepared: $accountData");
+      return Account.fromJson(accountData);
+      // AppLogger.d(data);
+      // return Account.fromJson(data);
     } catch (e) {
       AppLogger.d("getDetailAccount error: $e");
       rethrow;

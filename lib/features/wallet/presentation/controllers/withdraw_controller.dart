@@ -140,7 +140,7 @@ class WithdrawController extends GetxController {
 
       note.value = ruleRes.withdrawRule ?? '';
 
-      availableAmount.value = accountRes.availableAmount?.toString() ?? '0.00';
+      availableAmount.value = accountRes.usableAmount?.toString() ?? '0.00';
       if (accountRes.user != null) {
         googleStatus.value = accountRes.user?.googleStatus ?? '';
         AppLogger.d("googleStatus from AccountRes ${googleStatus.value}");
