@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/c2c_api.dart';
 import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_empty_state.dart';
@@ -171,13 +172,44 @@ class _MyAdsPageState extends State<MyAdsPage> {
                                         const DownloadAppBottomSheet(),
                                   );
                                 } else {
-                                  final result = await Get.toNamed(
-                                    Routes.postAdsPage,
-                                  );
-                                  // refresh after coming back
-                                  if (result == true) {
-                                    // await _controller.callRefresh();
-                                    onRefresh();
+                                  // final result = await Get.toNamed(
+                                  //   Routes.postAdsPage,
+                                  // );
+                                  // // refresh after coming back
+                                  // if (result == true) {
+                                  //   // await _controller.callRefresh();
+                                  //   onRefresh();
+                                  // }
+
+                                  final token = await StorageService.getToken();
+                                  if (token != null) {
+                                    if (Get.find<UserController>()
+                                            .user
+                                            .value
+                                            ?.merchantStatus ==
+                                        '1') {
+                                      final result = await Get.toNamed(
+                                        Routes.postAdsPage,
+                                      );
+                                      // refresh after coming back
+                                      if (result == true) {
+                                        // await _controller.callRefresh();
+                                        onRefresh();
+                                      }
+                                    } else {
+                                      // ToastUtil.showToast('您还未完成商家认证'.tr);
+                                      CustomSnackbar.showWarning(
+                                        title: 'Warning',
+                                        message:
+                                            'You have not completed merchant certification yet',
+                                      );
+                                      await Future.delayed(
+                                        const Duration(seconds: 1),
+                                      );
+                                      Get.toNamed(Routes.becomeMerchant);
+                                    }
+                                  } else {
+                                    Get.toNamed(Routes.login);
                                   }
                                 }
                               },

@@ -1,3 +1,4 @@
+import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
@@ -198,7 +199,8 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
           });
 
           if (mounted) {
-            Get.offNamed(Routes.orderDetailPage, arguments: orderId);
+            // Get.offNamed(Routes.orderDetailPage, arguments: orderId);
+            Get.off(() => OrderDetailsPage(orderId: orderId));
           }
         } catch (e) {
           String errorMessage = "Transaction failed";

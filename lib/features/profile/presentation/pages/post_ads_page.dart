@@ -647,6 +647,8 @@ class _PostAdsPageState extends State<PostAdsPage> {
         }
         // EventBusUtil.fireAdsEdit();
       }
+      await Future.delayed(const Duration(seconds: 1)); 
+
       Get.back(result: true, closeOverlays: true);
     } catch (e) {
       AppLogger.d("doSubmit error: $e");

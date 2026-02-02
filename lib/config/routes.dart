@@ -138,16 +138,13 @@ class AppPages {
     GetPage(name: Routes.paymentMethodsPage, page: () => PaymentMethodsPage()),
     GetPage(name: Routes.addBankCardPage, page: () => AddBankCardPage()),
     GetPage(name: Routes.addMobileMoneyPage, page: () => AddMobileMoneyPage()),
-    GetPage(name: Routes.postAdsPage, page: () => PostAdsPage()),
+    GetPage(name: Routes.postAdsPage, page: () =>PostAdsPage()),
     GetPage(name: Routes.myAdsPage, page: () => MyAdsPage()),
     GetPage(
       name: Routes.orderDetailPage,
       page: () {
-        var orderId = Get.parameters['orderId'];
-        if (orderId == null || orderId.isEmpty) {
-          orderId = Get.arguments?.toString();
-        }
-        return OrderDetailsPage(orderId: orderId ?? '');
+        final orderId = Get.parameters['orderId'] ?? '';
+        return OrderDetailsPage(orderId: orderId);
       },
     ),
     GetPage(

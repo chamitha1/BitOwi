@@ -126,16 +126,24 @@ class BecomeMerchantPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // 💰 STEP 2
-                  StepCard(
-                    title: "Deposit Fund",
-                    description:
-                        "Deposit amount ${controller.frozenAmount} USDT",
-                    iconPath: "assets/icons/merchant_details/money.svg",
-                    stepNumber: "2",
-                    iconBackgroundColor: const Color(0xFFF4E9FE),
-                    secondaryIconPath: controller.hasEnoughAmount
-                        ? "assets/icons/merchant_details/tick-circle.svg"
-                        : null,
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed(
+                        Routes.deposit,
+                        parameters: {"symbol": "USDT"},
+                      );
+                    },
+                    child: StepCard(
+                      title: "Deposit Fund",
+                      description:
+                          "Deposit amount ${controller.frozenAmount} USDT",
+                      iconPath: "assets/icons/merchant_details/money.svg",
+                      stepNumber: "2",
+                      iconBackgroundColor: const Color(0xFFF4E9FE),
+                      secondaryIconPath: controller.hasEnoughAmount
+                          ? "assets/icons/merchant_details/tick-circle.svg"
+                          : null,
+                    ),
                   ),
 
                   const SizedBox(height: 24),
@@ -302,6 +310,9 @@ _ActionButtonConfig? _getActionConfig(
   Future<void> Function() onMerchantApply,
   Future<void> Function() onReturn,
 ) {
+  final BecomeMerchantController becomeMerchantController =
+      Get.find<BecomeMerchantController>();
+
   // merchant KYC stil not applied
   if ((merchantStatus == '-1')) {
     if (identifyOrderLatestSubmittedInfoStatus == '') {
@@ -355,13 +366,25 @@ _ActionButtonConfig? _getActionConfig(
       );
     }
 
-    if (identifyOrderLatestSubmittedInfoStatus == '1') {
+    if (identifyOrderLatestSubmittedInfoStatus == '1' &&
+        becomeMerchantController.hasEnoughAmount == true) {
       return _ActionButtonConfig(
         label: "Apply for Merchant KYC",
         backgroundColor: const Color(0xFF1D5DE5),
         textColor: Colors.white,
         onPressed: () {
           onMerchantApply();
+        },
+      );
+    }
+    if (identifyOrderLatestSubmittedInfoStatus == '1' &&
+        becomeMerchantController.hasEnoughAmount == false) {
+      return _ActionButtonConfig(
+        label: "Apply for Merchant KYC",
+        backgroundColor: const Color(0xFFB9C6E2),
+        textColor: const Color(0xFF717F9A),
+        onPressed: () {
+          // null;
         },
       );
     }

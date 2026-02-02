@@ -1,4 +1,7 @@
 import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -254,10 +257,33 @@ class _P2PPageState extends State<P2PPage> {
                 builder: (_) => const DownloadAppBottomSheet(),
               );
             } else {
-              final result = await Get.toNamed(Routes.postAdsPage);
-              // refresh after coming back
-              if (result == true) {
-                _fetchAds(isRefresh: true);
+              // final result = await Get.toNamed(Routes.postAdsPage);
+              // // refresh after coming back
+              // if (result == true) {
+              //   _fetchAds(isRefresh: true);
+              // }
+              final token = await StorageService.getToken();
+              if (token != null) {
+                if (Get.find<UserController>().user.value?.merchantStatus ==
+                    '1') {
+                  final result = await Get.toNamed(Routes.postAdsPage);
+                  // refresh after coming back
+                  if (result == true) {
+                    // await _controller.callRefresh();
+                    _fetchAds(isRefresh: true);
+                  }
+                } else {
+                  // ToastUtil.showToast('您还未完成商家认证'.tr);
+                  CustomSnackbar.showWarning(
+                    title: 'Warning',
+                    message:
+                        'You have not completed merchant certification yet',
+                  );
+                  await Future.delayed(const Duration(seconds: 1));
+                  Get.toNamed(Routes.becomeMerchant);
+                }
+              } else {
+                Get.toNamed(Routes.login);
               }
             }
           },

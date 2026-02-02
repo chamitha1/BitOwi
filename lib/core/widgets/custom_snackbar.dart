@@ -66,6 +66,38 @@ class CustomSnackbar {
     );
   }
 
+  static void showWarning({required String title, required String message}) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: const Color(0xFFFFFBF6),
+      borderColor: const Color(0xFFFFE2C1),
+      borderWidth: 1,
+      colorText: const Color(0xFFC9710D),
+      titleText: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFFC9710D),
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+        ),
+      ),
+      messageText: Text(
+        message,
+        style: const TextStyle(
+          color: Color(0xFFC9710D),
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
+        ),
+      ),
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+    );
+  }
+
   static void showSimpleValidation({required String message}) {
     Get.rawSnackbar(
       messageText: Text(
