@@ -26,6 +26,13 @@ class UserController extends GetxController {
   final RxString userAvatar = ''.obs;
   final RxString userRealName = 'User'.obs;
 
+  bool get isKyc {
+    if (user.value != null) {
+      return user.value!.identifyStatus == '1';
+    }
+    return false;
+  }
+
   @override
   void onInit() {
     super.onInit();

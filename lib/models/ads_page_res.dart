@@ -103,8 +103,38 @@ class UserStatistics {
     this.photo,
   });
 
-  factory UserStatistics.fromJson(Map<String, dynamic> json) =>
-      _$UserStatisticsFromJson(json);
+  factory UserStatistics.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> data = Map<String, dynamic>.from(json);
+
+    void normalizeInt(String key, List<String> alts) {
+      dynamic value = data[key];
+      if (value == null) {
+        for (final alt in alts) {
+          if (data[alt] != null) {
+            value = data[alt];
+            break;
+          }
+        }
+      }
+      
+      if (value != null) {
+        if (value is String) {
+          data[key] = int.tryParse(value);
+        } else if (value is num) {
+          data[key] = value.toInt();
+        }
+      }
+    }
+
+    // Normalize specific fields
+    normalizeInt('orderFinishCount', ['order_finish_count']);
+    normalizeInt('orderCount', ['order_count']);
+    normalizeInt('commentGoodCount', ['comment_good_count']);
+    normalizeInt('commentCount', ['comment_count']);
+    normalizeInt('confidenceCount', ['confidence_count']);
+
+    return _$UserStatisticsFromJson(data);
+  }
 
   Map<String, dynamic> toJson() => _$UserStatisticsToJson(this);
 }

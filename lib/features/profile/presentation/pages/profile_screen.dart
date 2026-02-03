@@ -168,7 +168,8 @@ class ProfileScreen extends StatelessWidget {
                       }),
                       // Certified Badge
                       Obx(
-                        () => (controller.user.value?.merchantStatus == '1')
+                        () => (controller.isKyc ||
+                                controller.user.value?.merchantStatus == '1')
                             ? Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -272,7 +273,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(width: 4),
                     Obx(
                       () => Text(
-                        "${controller.tradeInfo.value?.totalTradeCount ?? "0"} / ${controller.finishRate}%",
+                        "${controller.tradeInfo.value?.orderCount ?? 0} / ${controller.finishRate}%",
                         style: _statTextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),

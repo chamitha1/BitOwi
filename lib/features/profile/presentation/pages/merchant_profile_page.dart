@@ -408,7 +408,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      "${merchantInfo?.orderFinishCount ?? 0} / ${_calculateCompletionRate()}%",
+                      "${merchantInfo?.orderCount ?? 0} / ${_calculateCompletionRate()}%",
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,

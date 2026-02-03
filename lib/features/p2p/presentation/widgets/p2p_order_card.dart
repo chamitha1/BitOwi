@@ -102,117 +102,133 @@ class P2POrderCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     // Badge Logic
-                    if (adItem?.userStatistics?.isTrust == '1' ||
-                        Get.find<UserController>().user.value?.merchantStatus ==
-                            '1')
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8EFFF),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/p2p/certified.svg',
-                              width: 12,
-                              height: 12,
-                            ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              "Certified",
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: Color(0xFF1D5DE5),
-                              ),
-                            ),
-                          ],
-                        ),
+                    // if (adItem?.userStatistics?.isTrust == '1' ||
+                    //     Get.find<UserController>().user.value?.merchantStatus ==
+                    //         '1')
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
                       ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8EFFF),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/p2p/certified.svg',
+                            width: 12,
+                            height: 12,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            "Certified",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 // Stats
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/p2p/like.svg',
-                      width: 12,
-                      height: 12,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFFFF9B29),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "${adItem?.userStatistics?.commentGoodCount ?? 0}%",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Color(0xFF717F9A),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 1,
-                      height: 10,
-                      color: const Color(0xFFDAE0EE),
-                    ),
-                    const SizedBox(width: 8),
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 12,
-                          color: Color(0xFF717F9A),
-                        ),
-                        children: [
-                          const TextSpan(text: "Trust "),
-                          TextSpan(
-                            text: "${adItem?.userStatistics?.orderCount ?? 0}",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF151E2F),
-                            ),
+                Builder(
+                  builder: (context) {
+                    final stats = adItem?.userStatistics;
+                    final commentCount = stats?.commentCount ?? 0;
+                    final goodCount = stats?.commentGoodCount ?? 0;
+                    final goodRate = commentCount == 0
+                        ? '0.0'
+                        : ((goodCount / commentCount) * 100).toStringAsFixed(1);
+
+                    final orderCount = stats?.orderCount ?? 0;
+                    final finishCount = stats?.orderFinishCount ?? 0;
+                    final finishRate = orderCount == 0
+                        ? 0
+                        : ((finishCount / orderCount) * 100).toStringAsFixed(1);
+
+                    return Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/p2p/like.svg',
+                          width: 12,
+                          height: 12,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFFF9B29),
+                            BlendMode.srcIn,
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 1,
-                      height: 10,
-                      color: const Color(0xFFDAE0EE),
-                    ),
-                    const SizedBox(width: 8),
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 12,
-                          color: Color(0xFF717F9A),
                         ),
-                        children: [
-                          const TextSpan(text: "Trade "),
-                          TextSpan(
-                            text:
-                                "${adItem?.userStatistics?.orderCount ?? 0} / ${adItem?.userStatistics?.orderFinishCount ?? 0}%",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF151E2F),
-                            ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "$goodRate%",
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Color(0xFF717F9A),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 10,
+                          color: const Color(0xFFDAE0EE),
+                        ),
+                        const SizedBox(width: 8),
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
+                              color: Color(0xFF717F9A),
+                            ),
+                            children: [
+                              const TextSpan(text: "Trust "),
+                              TextSpan(
+                                text: "${stats?.confidenceCount ?? 0}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF151E2F),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 10,
+                          color: const Color(0xFFDAE0EE),
+                        ),
+                        const SizedBox(width: 8),
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
+                              color: Color(0xFF717F9A),
+                            ),
+                            children: [
+                              const TextSpan(text: "Trade "),
+                              TextSpan(
+                                text: "$orderCount / $finishRate%",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF151E2F),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
