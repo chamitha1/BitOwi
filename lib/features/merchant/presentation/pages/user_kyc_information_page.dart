@@ -804,60 +804,20 @@ class UserKycInformationPage extends StatelessWidget {
       );
     });
   }
-
-  // Widget buildSubmitButton(BuildContext context) {
-  //   return Obx(() {
-  //     // 🔁 reactive wrapper
-  //     final isReady = controller.isFormReady; // 🔁 from controller
-  //     final isRejected =
-  //         controller.latestIdentifyOrderStatus.value == '2'; // 🔁
-
-  //     return SizedBox(
-  //       width: double.infinity,
-  //       height: 56,
-  //       child: ElevatedButton(
-  //         onPressed: isReady
-  //             ? () async {
-  //                 if (!_formKey.currentState!.validate()) return;
-
-  //                 await controller.submit(); // 🔁 delegate to controller
-  //               }
-  //             : null, //DISABLED
-  //         style: ElevatedButton.styleFrom(
-  //           backgroundColor: isReady
-  //               ? const Color(0xFF1D5DE5)
-  //               : const Color(0xFFB9C6E2),
-  //           elevation: 0,
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(12),
-  //           ),
-  //         ),
-  //         child: Text(
-  //           isRejected ? "Resubmit" : "Submit", // 🔁 reactive label
-  //           style: TextStyle(
-  //             fontFamily: 'Inter',
-  //             fontWeight: FontWeight.w600,
-  //             fontSize: 16,
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //       ),
-  //     );
-  //   });
-  // }
+  
   Widget buildSubmitButton(BuildContext context) {
     return Obx(() {
-      final isReady = controller.isFormReady; // 🔁 reactive
+      final isReady = controller.isFormReady; 
       final isRejected =
-          controller.latestIdentifyOrderStatus.value == '2'; // 🔁
+          controller.latestIdentifyOrderStatus.value == '2'; 
 
       return PrimaryButton(
-        text: isRejected ? "Resubmit" : "Submit", // 🔁 reactive label
+        text: isRejected ? "Resubmit" : "Submit", 
         enabled: isReady,
         onPressed: () async {
           if (!_formKey.currentState!.validate()) return;
 
-          await controller.submit(); // 🔁 delegate to controller
+          await controller.submitUserKyc(); 
         },
       );
     });

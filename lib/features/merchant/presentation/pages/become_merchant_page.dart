@@ -2,6 +2,7 @@ import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
+import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/merchant/presentation/controllers/become_merchant_controller.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/decertification_result_dialog.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/decertify_confirmation_bottom_sheet.dart';
@@ -136,7 +137,7 @@ class BecomeMerchantPage extends StatelessWidget {
                     child: StepCard(
                       title: "Deposit Fund",
                       description:
-                          "Deposit amount ${controller.frozenAmount} USDT",
+                          "Deposit minimum ${controller.frozenAmount} USDT to activate merchant account",
                       iconPath: "assets/icons/merchant_details/money.svg",
                       stepNumber: "2",
                       iconBackgroundColor: const Color(0xFFF4E9FE),
@@ -179,17 +180,20 @@ class BecomeMerchantPage extends StatelessWidget {
                           onProceed: () async {
                             controller.isLoading.value = true;
 
-                            final res = await controller.removeMerchant(); // 🧠
-
+                            final resRemoveMerchant = await controller
+                                .removeMerchant();
                             controller.isLoading.value = false;
-
-                            final errorCode = res['errorCode'] ?? '';
-
+                            // final errorCode = res['errorCode'] ?? '';
                             showDecertificationResultDialog(
                               context,
-                              result: errorCode == 'Success'
+                              result: resRemoveMerchant.success
                                   ? DecertificationResult.success
                                   : DecertificationResult.failed,
+                              errorMsg: resRemoveMerchant.message,
+                              onCustomerCare: () async {
+                                await Get.find<UserController>()
+                                    .customerServiceChatNavigate(context);
+                              },
                             );
 
                             await controller.refreshPage();

@@ -1,5 +1,8 @@
+import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 void showVerifiedMerchantBottomSheet(BuildContext context) {
   showModalBottomSheet(
@@ -77,8 +80,7 @@ void showVerifiedMerchantBottomSheet(BuildContext context) {
 
           // Description
           const Text(
-            "You are a new verified merchant.",
-            // "You are a new verified merchant. you can start posting ads",
+            "You are a new verified merchant. you can start posting ads",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Inter',
@@ -88,33 +90,22 @@ void showVerifiedMerchantBottomSheet(BuildContext context) {
               height: 1.5,
             ),
           ),
-          // const SizedBox(height: 32),
-          // // Posting Ads Button
-          // SizedBox(
-          //   width: double.infinity,
-          //   height: 56,
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       Navigator.pop(context);
-          //     },
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: const Color(0xFF1D5DE5),
-          //       elevation: 0,
-          //       shape: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(12),
-          //       ),
-          //     ),
-          //     child: const Text(
-          //       "Posting Ads Now",
-          //       style: TextStyle(
-          //         fontFamily: 'Inter',
-          //         fontWeight: FontWeight.w600,
-          //         fontSize: 16,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          const SizedBox(height: 32),
+          // Post ads button
+          PrimaryButton(
+            text: "Posting Ads Now",
+            enabled: true,
+            onPressed: () async {
+              Navigator.pop(context); // pop model sheet first
+              // final result =
+              await Get.toNamed(Routes.postAdsPage);
+              // refresh after coming back
+              // if (result == true) {
+              // await _controller.callRefresh();
+              // _fetchAds(isRefresh: true);
+              // }
+            },
+          ),
           const SizedBox(height: 16),
           // Back to Home Button
           TextButton.icon(

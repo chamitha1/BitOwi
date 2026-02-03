@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
+import 'package:BitOwi/models/api_result.dart';
 import 'package:BitOwi/models/identify_order_list_res.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/models/user_model.dart';
@@ -226,7 +227,7 @@ class UserApi {
   }
 
   /// Real name authentication (USER KYC)
-  static Future<Map<String, dynamic>> createIdentifyOrder(
+  static Future<ApiResult> createIdentifyOrder(
     Map<String, dynamic> data,
   ) async {
     try {
@@ -234,13 +235,34 @@ class UserApi {
         "/core/v1/identify_order/create",
         data: data,
       );
-      return Map<String, dynamic>.from(res.data);
+       if (res.data is Map<String, dynamic>) {
+        final data = res.data as Map<String, dynamic>;
+
+        if (data['code'] == 200 ||
+            data['code'] == '200' ||
+            data['errorCode'] == 'Success' ||
+            data['errorCode'] == 'SUCCESS') {
+          return ApiResult(success: true);
+        }
+
+        // ❗ Backend logical error (like AUTH00006)
+        return ApiResult(
+          success: false,
+          message: data['errorMsg'] ?? 'Something went wrong',
+        );
+      }
+      return ApiResult(success: false, message: 'Invalid server response');
+    } on DioException catch (e) {
+      // like 500 error
+      final data = e.response?.data;
+      return ApiResult(
+        success: false,
+        message: data is Map ? data['errorMsg'] : e.message,
+      );
     } catch (e) {
-      e.printError();
-      rethrow;
+      return ApiResult(success: false, message: 'Unexpected error occurred');
     }
   }
-
   /// Get User KYC requests status
   static Future<List<IdentifyOrderListRes>> getIdentifyOrderList() async {
     try {
@@ -270,13 +292,37 @@ class UserApi {
   }
 
   /// Remove merchant certification
-  static Future<Map<String, dynamic>> removeMerchantOrder() async {
+  // static Future<Map<String, dynamic>> removeMerchantOrder() async {
+  static Future<ApiResult> removeMerchantOrder() async {
     try {
       final res = await ApiClient.dio.post("/core/v1/merchant_record/reliever");
-      return Map<String, dynamic>.from(res.data);
+
+      if (res.data is Map<String, dynamic>) {
+        final data = res.data as Map<String, dynamic>;
+
+        if (data['code'] == 200 ||
+            data['code'] == '200' ||
+            data['errorCode'] == 'Success' ||
+            data['errorCode'] == 'SUCCESS') {
+          return ApiResult(success: true);
+        }
+
+        // ❗ Backend logical error (like AUTH00006)
+        return ApiResult(
+          success: false,
+          message: data['errorMsg'] ?? 'Something went wrong',
+        );
+      }
+      return ApiResult(success: false, message: 'Invalid server response');
+    } on DioException catch (e) {
+      // like 500 error
+      final data = e.response?.data;
+      return ApiResult(
+        success: false,
+        message: data is Map ? data['errorMsg'] : e.message,
+      );
     } catch (e) {
-      e.printError();
-      rethrow;
+      return ApiResult(success: false, message: 'Unexpected error occurred');
     }
   }
 
@@ -463,11 +509,4 @@ class UserApi {
       rethrow;
     }
   }
-}
-
-class ApiResult {
-  final bool success;
-  final String? message;
-
-  ApiResult({required this.success, this.message});
 }
