@@ -293,44 +293,42 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (merchantInfo?.isTrust == '1') ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8EFFF),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/profile_page/shield.svg',
-                              width: 14,
-                              height: 14,
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xFF1D5DE5),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              "Certified",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Inter',
-                                color: Color(0xFF1D5DE5),
-                              ),
-                            ),
-                          ],
-                        ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
-                    ],
-                  ],
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8EFFF),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/profile_page/shield.svg',
+                            width: 14,
+                            height: 14,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF1D5DE5),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            "Certified",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Inter',
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ], 
                 ),
               ),
             ],

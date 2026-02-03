@@ -259,7 +259,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
             _buildTradingAlertCard(),
             const SizedBox(height: 24),
             _buildBottomActions(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20 + MediaQuery.of(context).padding.bottom),
           ],
         ),
       ),

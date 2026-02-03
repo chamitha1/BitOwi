@@ -235,7 +235,7 @@ class UserApi {
         "/core/v1/identify_order/create",
         data: data,
       );
-       if (res.data is Map<String, dynamic>) {
+      if (res.data is Map<String, dynamic>) {
         final data = res.data as Map<String, dynamic>;
 
         if (data['code'] == 200 ||
@@ -263,6 +263,7 @@ class UserApi {
       return ApiResult(success: false, message: 'Unexpected error occurred');
     }
   }
+
   /// Get User KYC requests status
   static Future<List<IdentifyOrderListRes>> getIdentifyOrderList() async {
     try {
@@ -483,10 +484,12 @@ class UserApi {
     required String type,
   }) async {
     try {
+      AppLogger.d("createUserRelation Request: {toUser: $toUser, type: $type}");
       await ApiClient.dio.post(
         "/core/v1/user_relation/create",
         data: {"toUser": toUser, "type": type},
       );
+      AppLogger.d("createUserRelation Response: Success");
     } catch (e) {
       AppLogger.d("createUserRelation error: $e");
       rethrow;
@@ -500,10 +503,12 @@ class UserApi {
     required String type,
   }) async {
     try {
+      AppLogger.d("removeUserRelation Request: {toUser: $toUser, type: $type}");
       await ApiClient.dio.post(
         "/core/v1/user_relation/modify",
         data: {"toUser": toUser, "type": type},
       );
+      AppLogger.d("removeUserRelation Response: Success");
     } catch (e) {
       AppLogger.d("removeUserRelation error: $e");
       rethrow;

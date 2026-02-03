@@ -227,7 +227,7 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
             _buildTradingAlertCard(),
             const SizedBox(height: 24),
             _buildBottomActions(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20 + MediaQuery.of(context).padding.bottom),
           ],
         ),
       ),
