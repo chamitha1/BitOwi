@@ -222,10 +222,7 @@ class P2POrderCard extends StatelessWidget {
           _buildPriceRow(),
           const SizedBox(height: 4), //
 
-          if (isMerchantProfile)
-            _buildMerchantInfo(context)
-          else
-            _buildStandardP2PInfo(context),
+          _buildStandardP2PInfo(context),
         ],
       ),
     );
@@ -258,95 +255,7 @@ class P2POrderCard extends StatelessWidget {
                 color: Color(0xFF717F9A),
               ),
             ),
-            if (isMerchantProfile) ...[
-              const SizedBox(width: 12),
-              TradeTypeBadge(isBuy: isBuy),
-            ],
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMerchantInfo(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Two-column Info
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Total",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
-                    color: Color(0xFF929EB8),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "${adItem?.leftCount ?? '0'} ${adItem?.tradeCoin ?? ''}",
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xFF151E2F),
-                  ),
-                ),
-              ],
-            ),
-            Expanded(child: Container()), // Spacer
-            SizedBox(
-              width: 150,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Limit",
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Color(0xFF929EB8),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade ?? '0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade ?? '0'}",
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF151E2F),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        // Payment Methods (Above Divider)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [_buildPaymentMethod()],
-        ),
-        const SizedBox(height: 16),
-        const Divider(height: 1, thickness: 1, color: Color(0xFFECEFF5)),
-        const SizedBox(height: 16),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: 110,
-            height: 36,
-            child: _buildActionButton(context),
-          ),
         ),
       ],
     );
@@ -380,7 +289,7 @@ class P2POrderCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             // Action Button
-            SizedBox(width: 70, height: 36, child: _buildActionButton(context)),
+            _buildActionButton(context),
           ],
         ),
         const SizedBox(height: 16),
@@ -491,7 +400,7 @@ class P2POrderCard extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1D5DE5),
-            padding: EdgeInsets.zero,
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
