@@ -2,6 +2,7 @@ import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/models/ads_detail_res.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
 import 'package:BitOwi/models/ads_my_page_res.dart';
+import 'package:BitOwi/models/api_result.dart';
 import 'package:BitOwi/models/page_info.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:dio/dio.dart';
@@ -178,23 +179,5 @@ class C2CApi {
       AppLogger.d("upDownAds error: $e");
       rethrow;
     }
-  }
-}
-
-class ApiResult {
-  final bool success;
-  final String? message;
-
-  ApiResult({required this.success, this.message});
-
-  Map<String, dynamic> toJson() {
-    return {'success': success, 'message': message};
-  }
-
-  factory ApiResult.fromJson(Map<String, dynamic> json) {
-    return ApiResult(
-      success: json['success'] as bool,
-      message: json['message'] as String?,
-    );
   }
 }

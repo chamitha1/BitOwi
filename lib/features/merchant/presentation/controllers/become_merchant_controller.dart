@@ -1,3 +1,4 @@
+import 'package:BitOwi/models/api_result.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/api/account_api.dart';
@@ -113,7 +114,7 @@ class BecomeMerchantController extends GetxController {
   }
 
   /// ❌ Decertify
-  Future<Map<String, dynamic>> removeMerchant() async {
+  Future<ApiResult> removeMerchant() async {
     return await UserApi.removeMerchantOrder();
   }
 
@@ -122,6 +123,8 @@ class BecomeMerchantController extends GetxController {
     isLoading.value = true;
     await getHomeAsset();
     await getLatestIdentifyOrderList();
+    await getLockAmount();
+    await getUSDTAmount();
     isLoading.value = false;
   }
 }

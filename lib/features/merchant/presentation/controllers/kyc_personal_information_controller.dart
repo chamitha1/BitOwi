@@ -67,7 +67,6 @@ class KycPersonalInformationController extends GetxController {
     isEdit.value = args['isEdit'] ?? false; // 🔁
     merchantStatus.value = args['merchantStatus'] ?? '-1';
 
-
     _nameWorker = ever(name, (v) => nameController.text = v);
     _idWorker = ever(idNumber, (v) => idController.text = v);
 
@@ -189,7 +188,7 @@ class KycPersonalInformationController extends GetxController {
   }
 
   /// 📝 SUBMIT KYC
-  Future<bool> submitKyc() async {
+  Future<void> submitKyc() async {
     try {
       isLoading.value = true;
 
@@ -198,12 +197,12 @@ class KycPersonalInformationController extends GetxController {
       //     : "00/0000";
       final formattedDate = ExpiryDateUtils.format(selectedExpiryDate.value);
 
-      // Guard invalid index access
-      if (countryIndex.value < 0 || idTypeIndex.value < 0) {
-        return false;
-      }
+      // // Guard invalid index access
+      // if (countryIndex.value < 0 || idTypeIndex.value < 0) {
+      //   return false;
+      // }
 
-      final res = await UserApi.createIdentifyOrder({
+      final resCreateIdentifyOrder = await UserApi.createIdentifyOrder({
         "countryId": countryList[countryIndex.value].id,
         "realName": name.value,
         "kind": idTypeList[idTypeIndex.value].key,
@@ -211,22 +210,24 @@ class KycPersonalInformationController extends GetxController {
         "idNo": idNumber.value,
         "frontImage": faceUrl.value,
       });
-      final success =
-          res['errorCode'] == 'Success' || res['errorMsg'] == 'SUCCESS';
 
-      if (success) {
+      if (resCreateIdentifyOrder.success) {
         // 🔁 FETCH LATEST STATUS
         final list = await UserApi.getIdentifyOrderList();
-
         if (list.isNotEmpty) {
           latestSubmittedInfo = list.first;
           merchantStatus.value = latestSubmittedInfo!.status; // ✅ CRITICAL
         }
+        CustomSnackbar.showSuccess(
+          title: "Success",
+          message: "KYC Information Submitted!",
+        );
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: resCreateIdentifyOrder.message ?? "Submission failed",
+        );
       }
-
-      return success;
-    } catch (e) {
-      return false;
     } finally {
       isLoading.value = false;
     }

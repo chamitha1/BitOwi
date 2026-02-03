@@ -809,7 +809,7 @@ class KycPersonalInformationPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget buildSubmitButton(BuildContext context) {
     return Obx(() {
       final canSubmit = controller.isFormReady;
@@ -820,19 +820,20 @@ class KycPersonalInformationPage extends StatelessWidget {
         onPressed: () async {
           if (!_formKey.currentState!.validate()) return;
 
-          final success = await controller.submitKyc();
+          // final success =
+          await controller.submitKyc();
 
-          if (success) {
-            CustomSnackbar.showSuccess(
-              title: "Success",
-              message: "KYC Information Submitted!",
-            );
-          } else {
-            CustomSnackbar.showError(
-              title: "Error",
-              message: "Submission failed",
-            );
-          }
+          // if (success) {
+          //   CustomSnackbar.showSuccess(
+          //     title: "Success",
+          //     message: "KYC Information Submitted!",
+          //   );
+          // } else {
+          //   CustomSnackbar.showError(
+          //     title: "Error",
+          //     message: "Submission failed",
+          //   );
+          // }
         },
       );
     });

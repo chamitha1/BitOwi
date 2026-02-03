@@ -239,7 +239,7 @@ class UserKycInformationController extends GetxController {
   }
 
   /// ───────────────── SUBMIT ─────────────────
-  Future<void> submit() async {
+  Future<void> submitUserKyc() async {
     try {
       isLoading.value = true;
 
@@ -256,7 +256,7 @@ class UserKycInformationController extends GetxController {
         return;
       }
 
-      final res = await UserApi.createIdentifyOrder({
+      final resCreateIdentifyOrder = await UserApi.createIdentifyOrder({
         "countryId": countryList[countryIndex.value].id,
         "realName": name.value,
         "kind": idTypeList[idTypeIndex.value].key,
@@ -265,14 +265,14 @@ class UserKycInformationController extends GetxController {
         "frontImage": faceUrl.value,
       });
 
-      if (res['errorCode'] == 'Success' || res['errorMsg'] == 'SUCCESS') {
+      if (resCreateIdentifyOrder.success) {
         await getLatestIdentifyOrderList();
         CustomSnackbar.showSuccess(
           title: "Success",
           message: "KYC Information Submitted!",
         );
       } else {
-        CustomSnackbar.showError(title: "Error", message: "Submission failed");
+        CustomSnackbar.showError(title: "Error", message: resCreateIdentifyOrder.message ?? "Submission failed");
       }
     } finally {
       isLoading.value = false;
