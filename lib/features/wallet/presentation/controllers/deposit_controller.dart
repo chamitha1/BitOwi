@@ -50,7 +50,17 @@ class DepositController extends GetxController {
       }
 
       if (nameList.isNotEmpty) {
-        selectedCoin.value = nameList.first;
+        if (Get.parameters.containsKey('symbol')) {
+           final paramSymbol = Get.parameters['symbol'];
+           final match = nameList.firstWhereOrNull((e) => e.symbol == paramSymbol);
+           if (match != null) {
+             selectedCoin.value = match;
+           } else {
+             selectedCoin.value = nameList.first;
+           }
+        } else {
+           selectedCoin.value = nameList.first;
+        }
         updateNetworkList();
       }
     } catch (e) {

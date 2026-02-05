@@ -296,72 +296,75 @@ class WalletDetailPage extends GetView<WalletDetailController> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: 48.w,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Deposit
-                  Get.toNamed(
-                    Routes.deposit,
-                    parameters: {'symbol': info.currency ?? ''},
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1D5DE5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 48.w,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Deposit
+                    Get.toNamed(
+                      Routes.deposit,
+                      parameters: {'symbol': info.currency ?? ''},
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1D5DE5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
                   ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  "Deposit",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16.sp,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: SizedBox(
-              height: 48.w,
-              child: OutlinedButton(
-                onPressed: () {
-                  // Withdraw
-                  Get.toNamed(
-                    Routes.withdrawal,
-                    parameters: {
-                      'symbol': info.currency ?? '',
-                      'accountNumber': controller.accountNumber,
-                    },
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF1D5DE5)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  "Withdraw",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16.sp,
-                    color: const Color(0xFF1D5DE5),
+                  child: Text(
+                    "Deposit",
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.sp,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+            SizedBox(width: 16.w),
+            Expanded(
+              child: SizedBox(
+                height: 48.w,
+                child: OutlinedButton(
+                  onPressed: () {
+                    // Withdraw
+                    Get.toNamed(
+                      Routes.withdrawal,
+                      parameters: {
+                        'symbol': info.currency ?? '',
+                        'accountNumber': controller.accountNumber,
+                      },
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF1D5DE5)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "Withdraw",
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.sp,
+                      color: const Color(0xFF1D5DE5),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
