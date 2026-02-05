@@ -1,6 +1,7 @@
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:collection/collection.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
@@ -31,7 +32,18 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
   @override
   void initState() {
     super.initState();
-    userId = Get.arguments as String;
+
+    final args = Get.arguments;
+    if (args != null) {
+      userId = args.toString();
+    } else {
+      // handle error or return
+      userId = '';
+      AppLogger.d(
+        "--------------------------⚠️⚠️⚠️⚠️⚠️⚠️MERCHANT PROFILE PAGE args⚠️⚠️⚠️⚠️⚠️⚠️-----------------------------------",
+      );
+    }
+
     _refreshController = EasyRefreshController(
       controlFinishRefresh: true,
       controlFinishLoad: true,
