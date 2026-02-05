@@ -155,32 +155,32 @@ class P2POrderCard extends StatelessWidget {
 
                     return Row(
                       children: [
-                        SvgPicture.asset(
-                          'assets/icons/p2p/like.svg',
-                          width: 12,
-                          height: 12,
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xFFFF9B29),
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "$goodRate%",
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Color(0xFF717F9A),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 1,
-                          height: 10,
-                          color: const Color(0xFFDAE0EE),
-                        ),
-                        const SizedBox(width: 8),
+                        // SvgPicture.asset(
+                        //   'assets/icons/p2p/like.svg',
+                        //   width: 12,
+                        //   height: 12,
+                        //   colorFilter: const ColorFilter.mode(
+                        //     Color(0xFFFF9B29),
+                        //     BlendMode.srcIn,
+                        //   ),
+                        // ),
+                        // const SizedBox(width: 4),
+                        // Text(
+                        //   "$goodRate%",
+                        //   style: const TextStyle(
+                        //     fontFamily: 'Inter',
+                        //     fontWeight: FontWeight.w400,
+                        //     fontSize: 12,
+                        //     color: Color(0xFF717F9A),
+                        //   ),
+                        // ),
+                        // const SizedBox(width: 8),
+                        // Container(
+                        //   width: 1,
+                        //   height: 10,
+                        //   color: const Color(0xFFDAE0EE),
+                        // ),
+                        // const SizedBox(width: 8),
                         RichText(
                           text: TextSpan(
                             style: const TextStyle(

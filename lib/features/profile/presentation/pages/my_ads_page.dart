@@ -398,23 +398,23 @@ class _MyAdsPageState extends State<MyAdsPage> {
                 Row(
                   children: [
                     // completion rate
-                    SvgPicture.asset(
-                      'assets/icons/profile_page/like.svg',
-                      width: 16,
-                      height: 16,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.orange,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    AppText.p4Regular("$finishRate%", color: Color(0xFF717F9A)),
-                    Container(
-                      height: 17,
-                      width: 1,
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      color: Color(0xFFB9C6E2),
-                    ),
+                    // SvgPicture.asset(
+                    //   'assets/icons/profile_page/like.svg',
+                    //   width: 16,
+                    //   height: 16,
+                    //   colorFilter: const ColorFilter.mode(
+                    //     Colors.orange,
+                    //     BlendMode.srcIn,
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 6),
+                    // AppText.p4Regular("$finishRate%", color: Color(0xFF717F9A)),
+                    // Container(
+                    //   height: 17,
+                    //   width: 1,
+                    //   margin: const EdgeInsets.symmetric(horizontal: 6),
+                    //   color: Color(0xFFB9C6E2),
+                    // ),
                     // Trust
                     AppText.p4Regular("Trust", color: Color(0xFF717F9A)),
                     AppText.p4SemiBold(

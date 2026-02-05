@@ -328,7 +328,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                         ],
                       ),
                     ),
-                  ], 
+                  ],
                 ),
               ),
             ],
@@ -341,32 +341,32 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/profile_page/like.svg',
-                      width: 14,
-                      height: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "${_calculatePositiveRate()}%",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  width: 1,
-                  height: 14,
-                  color: Colors.white.withOpacity(0.3),
-                ),
+                // Row(
+                //   children: [
+                //     SvgPicture.asset(
+                //       'assets/icons/profile_page/like.svg',
+                //       width: 14,
+                //       height: 14,
+                //     ),
+                //     const SizedBox(width: 4),
+                //     Text(
+                //       "${_calculatePositiveRate()}%",
+                //       style: const TextStyle(
+                //         fontFamily: 'Inter',
+                //         fontWeight: FontWeight.w400,
+                //         fontSize: 12,
+                //         color: Colors.white,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // Container(
+                //   width: 1,
+                //   height: 14,
+                //   color: Colors.white.withOpacity(0.3),
+                // ),
                 Row(
                   children: [
                     const Text(
@@ -390,11 +390,15 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                     ),
                   ],
                 ),
+                const SizedBox(width: 8),
+
                 Container(
                   width: 1,
                   height: 14,
                   color: Colors.white.withOpacity(0.3),
                 ),
+                const SizedBox(width: 8),
+
                 Row(
                   children: [
                     const Text(

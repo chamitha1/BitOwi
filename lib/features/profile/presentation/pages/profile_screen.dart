@@ -168,7 +168,8 @@ class ProfileScreen extends StatelessWidget {
                       }),
                       // Certified Badge
                       Obx(
-                        () => (controller.isKyc ||
+                        () =>
+                            (controller.isKyc ||
                                 controller.user.value?.merchantStatus == '1')
                             ? Container(
                                 padding: const EdgeInsets.symmetric(
@@ -221,29 +222,29 @@ class ProfileScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/profile_page/like.svg',
-                      width: 14,
-                      height: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Obx(
-                      () => Text(
-                        "${controller.goodRate}%",
-                        style: _statTextStyle(fontWeight: FontWeight.w400),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  width: 1,
-                  height: 14,
-                  color: Colors.white.withOpacity(0.3),
-                ),
+                // Row(
+                //   children: [
+                //     SvgPicture.asset(
+                //       'assets/icons/profile_page/like.svg',
+                //       width: 14,
+                //       height: 14,
+                //     ),
+                //     const SizedBox(width: 4),
+                //     Obx(
+                //       () => Text(
+                //         "${controller.goodRate}%",
+                //         style: _statTextStyle(fontWeight: FontWeight.w400),
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // Container(
+                //   width: 1,
+                //   height: 14,
+                //   color: Colors.white.withOpacity(0.3),
+                // ),
                 Row(
                   children: [
                     Text(
@@ -259,11 +260,15 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(width: 8),
+
                 Container(
                   width: 1,
                   height: 14,
                   color: Colors.white.withOpacity(0.3),
                 ),
+                const SizedBox(width: 8),
+
                 Row(
                   children: [
                     Text(
