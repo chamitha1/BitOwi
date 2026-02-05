@@ -60,11 +60,11 @@ class DepositScreen extends StatelessWidget {
                   const Spacer(),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TransactionHistoryPage(),
-                        ),
+                      Get.to(
+                        () => const TransactionHistoryPage(),
+                        arguments: {
+                          'symbol': controller.selectedCoin.value?.symbol,
+                        },
                       );
                     },
                     child: Image.asset(

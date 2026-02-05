@@ -438,7 +438,7 @@ class P2POrderCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                "${isBuy ? "Buy" : "Sell"}${isMerchantProfile ? " Ad" : ""}",
+                isBuy ? "Buy" : "Sell",
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,

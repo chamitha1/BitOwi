@@ -662,17 +662,16 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
           GestureDetector(
             onTap: () {
               if (mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TransactionHistoryPage(),
-                    settings: RouteSettings(
-                      arguments: {
-                        'symbol': widget.symbol,
-                        'accountNumber': widget.accountNumber,
-                      },
-                    ),
-                  ),
+                Get.to(
+                  () => const TransactionHistoryPage(),
+                  arguments: {
+                    'symbol':
+                        controller.selectedCoin.value?.symbol, // coin symbol
+                    'accountNumber': controller
+                        .accountNumber
+                        .value, // optional account number
+                    'isDeposit': false,
+                  },
                 );
               }
             },

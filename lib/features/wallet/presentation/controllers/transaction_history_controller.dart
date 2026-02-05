@@ -27,7 +27,7 @@ class TransactionHistoryController extends GetxController {
   var statusEnum = <String, String>{}.obs;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     final args = Get.arguments;
     AppLogger.d("TransactionHistoryController onInit - Args: $args");
@@ -35,7 +35,14 @@ class TransactionHistoryController extends GetxController {
       accountNumber = args['accountNumber'];
       symbol = args['symbol'];
     }
+    if (accountNumber == null && symbol != null) {
+      final account = await AccountApi.getDetailAccount(symbol!);
+      accountNumber = account.accountNumber;
+    }
 
+    if (args.containsKey('isDeposit')) {
+      isDeposit.value = args['isDeposit'];
+    }
     // Fetch Dictionary for status mapping
     fetchDict();
 
@@ -141,6 +148,9 @@ class TransactionHistoryController extends GetxController {
         "pageSize": pageSize,
       };
 
+      if (symbol != null) {
+        params['currency'] = symbol;
+      }
       final res = await AccountApi.getWithdrawPageList(params);
 
       if (res.list.isEmpty) {

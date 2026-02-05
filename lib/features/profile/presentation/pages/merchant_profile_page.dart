@@ -1,4 +1,7 @@
+import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/api/p2p_api.dart';
+import 'package:BitOwi/models/coin_list_res.dart';
+import 'package:collection/collection.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/p2p_order_card.dart';
@@ -19,6 +22,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
   late String userId;
   UserStatistics? merchantInfo;
   List<AdItem> adsList = [];
+  List<CoinListRes> coinList = [];
   int pageNum = 1;
   bool isEnd = false;
   bool isLoading = false;
@@ -55,6 +59,9 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
           merchantInfo = stats;
         });
       }
+
+      // Fetch Coins for icons
+      await getCoins();
 
       // Fetch first page of ads
       await getAdsList(isRefresh: true);
@@ -119,6 +126,19 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
       }
     } catch (e) {
       debugPrint("Blacklist action failed: $e");
+    }
+  }
+
+  Future<void> getCoins() async {
+    try {
+      final list = await AccountApi.getCoinList();
+      if (mounted) {
+        setState(() {
+          coinList = list;
+        });
+      }
+    } catch (e) {
+      debugPrint("getCoins Error: $e");
     }
   }
 
@@ -520,6 +540,11 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
     return Column(
       children: adsList.map((ad) {
         final isBuy = ad.tradeType == '0'; // 0 = buy, 1 = sell
+        // Find icon
+        final coin = coinList.firstWhereOrNull(
+          (element) => element.symbol == ad.tradeCoin,
+        );
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: P2POrderCard(
@@ -527,6 +552,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
             isBuy: isBuy,
             onRefresh: () => getAdsList(isRefresh: true),
             isMerchantProfile: true,
+            coinIcon: coin?.icon,
           ),
         );
       }).toList(),

@@ -137,7 +137,7 @@ class WithdrawController extends GetxController {
       // Fetch Account Balance
       // AppLogger.d("Fetching details for ${symbol.value}...");
       final accountRes = await AccountApi.getDetailAccount(symbol.value);
-
+      accountNumber.value = accountRes.accountNumber ?? '';
       note.value = ruleRes.withdrawRule ?? '';
 
       availableAmount.value = accountRes.usableAmount?.toString() ?? '0.00';

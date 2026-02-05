@@ -26,9 +26,9 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: Container(
-            margin: EdgeInsets.all(10),
+            margin: EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(8),
@@ -191,27 +191,29 @@ class WalletDetailPage extends GetView<WalletDetailController> {
               ),
               SizedBox(height: 20.w),
               _buildRow(
-                  "Total Amount",
-                  double.tryParse(info.totalAmount ?? '0')
-                          ?.toStringAsFixed(2) ??
-                      '0.00'),
+                "Total Amount",
+                double.tryParse(info.totalAmount ?? '0')?.toStringAsFixed(2) ??
+                    '0.00',
+              ),
               _buildRow(
-                  "Available",
-                  double.tryParse(info.usableAmount ?? '0')
-                          ?.toStringAsFixed(2) ??
-                      '0.00'),
+                "Available",
+                double.tryParse(info.usableAmount ?? '0')?.toStringAsFixed(2) ??
+                    '0.00',
+              ),
               _buildRow(
-                  "Frozen",
-                  double.tryParse(info.frozenAmount ?? '0')
-                          ?.toStringAsFixed(2) ??
-                      '0.00'),
+                "Frozen",
+                double.tryParse(info.frozenAmount ?? '0')?.toStringAsFixed(2) ??
+                    '0.00',
+              ),
               Divider(height: 24.w, color: const Color(0xFFF3F4F6)),
               _buildRow(
-                  "Valuation (USDT)",
-                  " ${double.tryParse(info.totalAmountUsdt ?? '0')?.toStringAsFixed(2) ?? '0.00'}"),
+                "Valuation (USDT)",
+                " ${double.tryParse(info.totalAmountUsdt ?? '0')?.toStringAsFixed(2) ?? '0.00'}",
+              ),
               _buildRow(
-                  "Valuation (USD)",
-                  " ${double.tryParse(info.totalAsset ?? '0')?.toStringAsFixed(2) ?? '0.00'}"),
+                "Valuation (USD)",
+                " ${double.tryParse(info.totalAsset ?? '0')?.toStringAsFixed(2) ?? '0.00'}",
+              ),
             ],
           ),
         ),
