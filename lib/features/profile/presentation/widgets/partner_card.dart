@@ -165,23 +165,23 @@ class PartnerCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   // Stats row
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/profile_page/like.svg',
-                            width: 14,
-                            height: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "${item.goodRate}%",
-                            style: _statTextStyle(fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                      _buildDivider(),
+                      // Row(
+                      //   children: [
+                      //     SvgPicture.asset(
+                      //       'assets/icons/profile_page/like.svg',
+                      //       width: 14,
+                      //       height: 14,
+                      //     ),
+                      //     const SizedBox(width: 4),
+                      //     Text(
+                      //       "${item.goodRate}%",
+                      //       style: _statTextStyle(fontWeight: FontWeight.w400),
+                      //     ),
+                      //   ],
+                      // ),
+                      // _buildDivider(),
                       // Trust Count
                       Row(
                         children: [
@@ -196,7 +196,9 @@ class PartnerCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(width: 8),
                       _buildDivider(),
+                      const SizedBox(width: 8),
                       // Trade Count
                       Row(
                         children: [

@@ -60,10 +60,12 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
   Future<void> getInitData() async {
     try {
       await getDetail();
-      
+
       if (adsDetail != null) {
         // Fetch available balance
-        final accountRes = await AccountApi.getDetailAccount(adsDetail!.tradeCoin);
+        final accountRes = await AccountApi.getDetailAccount(
+          adsDetail!.tradeCoin,
+        );
         if (mounted) {
           setState(() {
             availableBalance = accountRes.availableAmount ?? '0';
@@ -80,7 +82,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
         }
       }
     } catch (e) {
-      // 
+      //
     }
   }
 
@@ -97,7 +99,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
         });
       }
     } catch (e) {
-      // 
+      //
     }
   }
 
@@ -125,7 +127,9 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
 
   String _calculatePositiveRate() {
     final stats = widget.adItem.userStatistics;
-    if (stats == null || stats.commentCount == null || stats.commentCount == 0) {
+    if (stats == null ||
+        stats.commentCount == null ||
+        stats.commentCount == 0) {
       return '0.0';
     }
     final rate = (stats.commentGoodCount ?? 0) / stats.commentCount! * 100;
@@ -140,8 +144,6 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
     final rate = (stats.orderFinishCount ?? 0) / stats.orderCount! * 100;
     return rate.toStringAsFixed(1);
   }
-
-
 
   Future<void> _onSellTap() async {
     if (adsDetail == null || amount.isEmpty || selectedBankcard == null) {
@@ -182,7 +184,8 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
     await OrderConfirmationDialog.show(
       context: context,
       type: "Selling",
-      price: "${_getCurrencySymbol(adsDetail!.tradeCurrency)} ${adsDetail!.truePrice}",
+      price:
+          "${_getCurrencySymbol(adsDetail!.tradeCurrency)} ${adsDetail!.truePrice}",
       amount: tabIndex == 0
           ? "${_getCurrencySymbol(adsDetail!.tradeCurrency)} ${adsDetail!.tradeAmount}"
           : "${_getCurrencySymbol(adsDetail!.tradeCurrency)} $amount",
@@ -270,7 +273,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
     if (adsDetail == null) {
       return const SizedBox.shrink();
     }
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -318,9 +321,8 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                   color: Color(0xFF151E2F),
                 ),
               ),
-              ],
-            ),
-
+            ],
+          ),
         ],
       ),
     );
@@ -339,33 +341,25 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildToggleButton(
-                  "Sell Quantity",
-                  tabIndex == 0,
-                  () {
-                    setState(() {
-                      tabIndex = 0;
-                      _amountController.clear();
-                      amount = '';
-                    });
-                    getDetail();
-                  },
-                ),
+                child: _buildToggleButton("Sell Quantity", tabIndex == 0, () {
+                  setState(() {
+                    tabIndex = 0;
+                    _amountController.clear();
+                    amount = '';
+                  });
+                  getDetail();
+                }),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildToggleButton(
-                  "Sell Amount",
-                  tabIndex == 1,
-                  () {
-                    setState(() {
-                      tabIndex = 1;
-                      _amountController.clear();
-                      amount = '';
-                    });
-                    getDetail();
-                  },
-                ),
+                child: _buildToggleButton("Sell Amount", tabIndex == 1, () {
+                  setState(() {
+                    tabIndex = 1;
+                    _amountController.clear();
+                    amount = '';
+                  });
+                  getDetail();
+                }),
               ),
             ],
           ),
@@ -384,7 +378,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                 ),
               ),
               Text(
-                "${adsDetail?.leftCount ?? '0'} ${adsDetail?.tradeCoin ?? ''}", 
+                "${adsDetail?.leftCount ?? '0'} ${adsDetail?.tradeCoin ?? ''}",
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
@@ -625,153 +619,163 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
         }
       },
       child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Merchant Info",
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF151E2F),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Merchant Info",
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF151E2F),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: adsDetail?.photo != null
-                    ? NetworkImage(adsDetail!.photo)
-                    : const AssetImage('assets/images/home/avatar.png')
-                        as ImageProvider,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                adsDetail?.nickname ?? "Merchant",
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF151E2F),
-                ),
-              ),
-              const Spacer(),
-              // Verified Badge conditionally shown
-              if (widget.adItem.userStatistics?.isTrust == '1')
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xffEAF9F0),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFABEAC6),
-                      width: 1.0,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/forgot_password/check_circle.svg',
-                        width: 14,
-                        height: 14,
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xFF40A372),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        "Verified",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF40A372),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Stats Row using userStatistics data
-          Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/p2p/like.svg',
-                width: 16,
-                height: 16,
-                colorFilter: const ColorFilter.mode(
-                  Colors.orange,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "${_calculatePositiveRate()}%",
-                style: const TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
-              ),
-              _buildDivider(),
-              Text(
-                "Trust  ${widget.adItem.userStatistics?.confidenceCount ?? 0}",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF717F9A),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              _buildDivider(),
-              Text(
-                "Trade  ${widget.adItem.userStatistics?.orderFinishCount ?? 0} / ${_calculateCompletionRate()}%",
-                style: const TextStyle(fontSize: 12, color: Color(0xFF717F9A)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFDAE0EE)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 16),
+            Row(
               children: [
-                const Text(
-                  "Ads Message",
-                  style: TextStyle(
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: adsDetail?.photo != null
+                      ? NetworkImage(adsDetail!.photo)
+                      : const AssetImage('assets/images/home/avatar.png')
+                            as ImageProvider,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  adsDetail?.nickname ?? "Merchant",
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF151E2F),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const Spacer(),
+                // Verified Badge conditionally shown
+                if (widget.adItem.userStatistics?.isTrust == '1')
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffEAF9F0),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFFABEAC6),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/forgot_password/check_circle.svg',
+                          width: 14,
+                          height: 14,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF40A372),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          "Verified",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF40A372),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Stats Row using userStatistics data
+            Row(
+              children: [
+                // SvgPicture.asset(
+                //   'assets/icons/p2p/like.svg',
+                //   width: 16,
+                //   height: 16,
+                //   colorFilter: const ColorFilter.mode(
+                //     Colors.orange,
+                //     BlendMode.srcIn,
+                //   ),
+                // ),
+                const SizedBox(width: 4),
                 Text(
-                  adsDetail?.leaveMessage ?? "No message",
+                  "${_calculatePositiveRate()}%",
                   style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
                     color: Color(0xFF717F9A),
-                    height: 1.4,
+                  ),
+                ),
+                _buildDivider(),
+                Text(
+                  "Trust  ${widget.adItem.userStatistics?.confidenceCount ?? 0}",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF717F9A),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                _buildDivider(),
+                Text(
+                  "Trade  ${widget.adItem.userStatistics?.orderFinishCount ?? 0} / ${_calculateCompletionRate()}%",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF717F9A),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFDAE0EE)),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Ads Message",
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF151E2F),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    adsDetail?.leaveMessage ?? "No message",
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF717F9A),
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildTradingAlertCard() {
@@ -881,11 +885,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isValid
-                      ? Colors.white
-                      : const Color(
-                          0xFF717F9A,
-                        ),
+                  color: isValid ? Colors.white : const Color(0xFF717F9A),
                 ),
               ),
             ),
