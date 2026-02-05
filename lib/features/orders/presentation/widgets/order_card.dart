@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
+import 'package:get/get.dart';
 import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
 import 'package:BitOwi/utils/im_util.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,7 @@ class OrderCard extends StatelessWidget {
   final String userName;
   final bool isCertified;
   final bool hasUnreadMessages;
+  final String? targetUserId;
   final VoidCallback? onTap;
 
   const OrderCard({
@@ -42,6 +44,7 @@ class OrderCard extends StatelessWidget {
     required this.userName,
     this.isCertified = false,
     this.hasUnreadMessages = false,
+    this.targetUserId,
     this.onTap,
   });
 
@@ -147,34 +150,44 @@ class OrderCard extends StatelessWidget {
             const SizedBox(height: 12),
 
             //User Info
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFECEFF5).withOpacity(0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  ClipOval(
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      child: CommonImage(userAvatar, fit: BoxFit.cover),
+            GestureDetector(
+              onTap: () {
+                if (targetUserId != null) {
+                  Get.toNamed(
+                    '/merchantProfile',
+                    arguments: targetUserId,
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFECEFF5).withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    ClipOval(
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        child: CommonImage(userAvatar, fit: BoxFit.cover),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    userName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF151E2F),
-                      fontFamily: 'Inter',
+                    const SizedBox(width: 8),
+                    Text(
+                      userName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF151E2F),
+                        fontFamily: 'Inter',
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  if (isCertified) _buildCertifiedBadge(),
-                ],
+                    const Spacer(),
+                    if (isCertified) _buildCertifiedBadge(),
+                  ],
+                ),
               ),
             ),
           ],

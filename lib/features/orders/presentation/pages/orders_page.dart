@@ -159,6 +159,9 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
 
       hasUnreadMessages:
           orderItem.unReadCount != null && orderItem.unReadCount! > 0,
+      targetUserId: isBuyer
+          ? orderItem.sellUser?.toString()
+          : orderItem.buyUser?.toString(),
       onTap: () => Get.to(
         () => OrderDetailsPage(orderId: orderItem.id?.toString() ?? ''),
       ),

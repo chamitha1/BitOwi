@@ -710,6 +710,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           hasAvatar: true,
           avatarPath:
               counterpartyPhoto ?? 'assets/images/avatar_placeholder.png',
+          targetUserId: isSeller
+              ? orderDetail?.buyUser
+              : orderDetail?.sellUser,
         ),
         const SizedBox(height: 12),
         _buildDetailRow('Order No', orderDetail?.id ?? 'N/A', hasCopy: true),
@@ -772,6 +775,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     String? avatarPath,
     bool hasCopy = false,
     Color? valueColor,
+    String? targetUserId,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -791,71 +795,78 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               fontFamily: 'Inter',
             ),
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (hasAvatar && avatarPath != null) ...[
-                ClipOval(
-                  child: avatarPath.startsWith('http')
-                      ? Image.network(
-                          avatarPath,
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 24,
-                              height: 24,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.person, size: 16),
-                            );
-                          },
-                        )
-                      : Image.asset(
-                          avatarPath,
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                child: Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: valueColor ?? const Color(0xFF151E2F),
-                    fontFamily: 'Inter',
+          GestureDetector(
+            onTap: () {
+              if (targetUserId != null) {
+                Get.toNamed('/merchantProfile', arguments: targetUserId);
+              }
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasAvatar && avatarPath != null) ...[
+                  ClipOval(
+                    child: avatarPath.startsWith('http')
+                        ? Image.network(
+                            avatarPath,
+                            width: 24,
+                            height: 24,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 24,
+                                height: 24,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.person, size: 16),
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            avatarPath,
+                            width: 24,
+                            height: 24,
+                            fit: BoxFit.cover,
+                          ),
                   ),
-                  textAlign: TextAlign.right,
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: valueColor ?? const Color(0xFF151E2F),
+                      fontFamily: 'Inter',
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
                 ),
-              ),
-              if (hasCopy) ...[
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: value));
-                    Get.snackbar(
-                      'Copied',
-                      '$label copied to clipboard',
-                      snackPosition: SnackPosition.TOP,
-                      duration: const Duration(seconds: 2),
-                    );
-                  },
-                  child: SvgPicture.asset(
-                    'assets/icons/deposit/copy.svg',
-                    width: 16,
-                    height: 16,
-                    colorFilter: const ColorFilter.mode(
-                      Color(0xff2495E5),
-                      BlendMode.srcIn,
+                if (hasCopy) ...[
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: value));
+                      Get.snackbar(
+                        'Copied',
+                        '$label copied to clipboard',
+                        snackPosition: SnackPosition.TOP,
+                        duration: const Duration(seconds: 2),
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/deposit/copy.svg',
+                      width: 16,
+                      height: 16,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xff2495E5),
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
         ],
       ),
