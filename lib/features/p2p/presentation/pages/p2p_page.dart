@@ -399,44 +399,78 @@ class _P2PPageState extends State<P2PPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDAE0EE)),
+        border: Border.all(color: const Color(0xFFF1F1F8)),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<CoinListRes>(
-          value: hasCoins ? _selectedCoin : null,
-          isDense: true,
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 22,
-            color: Color(0xFF151E2F),
-          ),
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: Color(0xFF151E2F),
-          ),
-          items: _coinList.map((CoinListRes coin) {
-            return DropdownMenuItem<CoinListRes>(
-              value: coin,
-              child: Text(
-                coin.symbol ?? 'USDT',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Color(0xFF151E2F),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          shadowColor: const Color(0x331D5DE5),
+          hoverColor: Colors.transparent,
+          focusColor: Color(0XFFF6F9FF),
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<CoinListRes>(
+            value: hasCoins ? _selectedCoin : null,
+            isDense: true,
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 22,
+              color: Color(0xFF151E2F),
+            ),
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: Color(0xFF151E2F),
+            ),
+            items: _coinList.map((CoinListRes coin) {
+              final isSelected = coin == _selectedCoin;
+              return DropdownMenuItem<CoinListRes>(
+                value: coin,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    coin.symbol ?? 'USDT',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Color(0xff151E2F),
+                    ),
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
-          onChanged: hasCoins
-              ? (CoinListRes? newValue) {
-                  if (newValue == null) return;
-                  setState(() => _selectedCoin = newValue);
-                  _fetchAds(isRefresh: true);
-                }
-              : null,
+              );
+            }).toList(),
+            selectedItemBuilder: (BuildContext context) {
+              return _coinList.map<Widget>((CoinListRes coin) {
+                return Center(
+                  child: Text(
+                    coin.symbol ?? 'USDT',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Color(0xFF151E2F),
+                    ),
+                  ),
+                );
+              }).toList();
+            },
+            onChanged: hasCoins
+                ? (CoinListRes? newValue) {
+                    if (newValue == null) return;
+                    setState(() => _selectedCoin = newValue);
+                    _fetchAds(isRefresh: true);
+                  }
+                : null,
+          ),
         ),
       ),
     );

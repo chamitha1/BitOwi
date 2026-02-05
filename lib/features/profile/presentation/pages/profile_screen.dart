@@ -62,7 +62,16 @@ class ProfileScreen extends StatelessWidget {
         ),
         Row(
           children: [
-            const SizedBox(width: 12),
+            // const SizedBox(width: 12),
+            // _buildCircleIconButton(
+            //   icon: SvgPicture.asset(
+            //     'assets/icons/profile_page/user-add.svg',
+            //   ),
+            //   onTap: () {
+            //     // TODO: Implement user add action
+            //   },
+            // ),
+            // const SizedBox(width: 12),
             Obx(
               () => _buildCircleIconButton(
                 icon: SvgPicture.asset(
@@ -140,32 +149,38 @@ class ProfileScreen extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Obx(() {
-                  return buildAvatar(controller.userAvatar.value);
-                }),
-                const SizedBox(width: 16),
-                // Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Obx(() {
+              return buildAvatar(controller.userAvatar.value);
+            }),
+            const SizedBox(width: 16),
+            // Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name and Badge Row
+                  Row(
                     children: [
-                      Obx(() {
-                        return Text(
-                          controller.userName.value,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Inter',
-                            color: Colors.white,
-                          ),
-                        );
-                      }),
+                      Expanded(
+                        child: Obx(() {
+                          return Text(
+                            controller.userName.value,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Inter',
+                              color: Colors.white,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        }),
+                      ),
+                      const SizedBox(width: 8),
                       // Certified Badge
                       Obx(
                         () =>
@@ -209,85 +224,87 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          // Stats Row
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Row(
-                //   children: [
-                //     SvgPicture.asset(
-                //       'assets/icons/profile_page/like.svg',
-                //       width: 14,
-                //       height: 14,
-                //     ),
-                //     const SizedBox(width: 4),
-                //     Obx(
-                //       () => Text(
-                //         "${controller.goodRate}%",
-                //         style: _statTextStyle(fontWeight: FontWeight.w400),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // Container(
-                //   width: 1,
-                //   height: 14,
-                //   color: Colors.white.withOpacity(0.3),
-                // ),
-                Row(
-                  children: [
-                    Text(
-                      "Trust ",
-                      style: _statTextStyle(fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(width: 4),
-                    Obx(
-                      () => Text(
-                        "${controller.tradeInfo.value?.confidenceCount ?? 0}",
-                        style: _statTextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 8),
+                  const SizedBox(height: 8),
 
-                Container(
-                  width: 1,
-                  height: 14,
-                  color: Colors.white.withOpacity(0.3),
-                ),
-                const SizedBox(width: 8),
-
-                Row(
-                  children: [
-                    Text(
-                      "Trade ",
-                      style: _statTextStyle(fontWeight: FontWeight.w400),
+                  // Stats Row
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 12,
                     ),
-                    const SizedBox(width: 4),
-                    Obx(
-                      () => Text(
-                        "${controller.tradeInfo.value?.orderCount ?? 0} / ${controller.finishRate}%",
-                        style: _statTextStyle(fontWeight: FontWeight.w600),
-                      ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ],
-                ),
-              ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Trust ",
+                                style: _statTextStyle(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Obx(
+                                  () => Text(
+                                    "${controller.tradeInfo.value?.confidenceCount ?? 0}",
+                                    style: _statTextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 12,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Trade ",
+                                style: _statTextStyle(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Obx(
+                                  () => Text(
+                                    "${controller.tradeInfo.value?.orderCount ?? 0} / ${controller.finishRate}%",
+                                    style: _statTextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

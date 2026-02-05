@@ -711,15 +711,15 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                 //     BlendMode.srcIn,
                 //   ),
                 // ),
-                const SizedBox(width: 4),
-                Text(
-                  "${_calculatePositiveRate()}%",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF717F9A),
-                  ),
-                ),
-                _buildDivider(),
+                // const SizedBox(width: 4),
+                // Text(
+                //   "${_calculatePositiveRate()}%",
+                //   style: const TextStyle(
+                //     fontSize: 12,
+                //     color: Color(0xFF717F9A),
+                //   ),
+                // ),
+                // _buildDivider(),
                 Text(
                   "Trust  ${widget.adItem.userStatistics?.confidenceCount ?? 0}",
                   style: const TextStyle(
