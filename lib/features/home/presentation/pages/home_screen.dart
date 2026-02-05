@@ -43,7 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> onRefresh() async {
     try {
-      await controller.fetchBalance();
+      if (_navIndex == 0) {
+        // Home Tab
+        await controller.fetchBalance();
+      } else if (_navIndex == 3) {
+        // Profile Tab
+        final userController = Get.find<UserController>();
+        await userController.loadUser();
+        await userController.fetchNotificationCount();
+      }
     } catch (e) {
       AppLogger.e(e);
     }
