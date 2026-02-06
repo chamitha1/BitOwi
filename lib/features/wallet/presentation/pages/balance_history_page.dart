@@ -39,6 +39,8 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _buildCoinTabs(),
+                    const SizedBox(height: 24),
                     _buildBalanceCard(),
                     const SizedBox(height: 24),
                     const Text(
@@ -141,6 +143,9 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
 
   Widget _buildBalanceCard() {
     return Obx(() {
+      final coin = controller.selectedCoin.value;
+      final iconUrl = controller.iconUrl;
+
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
@@ -150,26 +155,40 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
         ),
         child: Column(
           children: [
+            // Header Row
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset(
-                  'assets/icons/balance_history/usdt.png',
-                  width: 44,
-                  height: 44,
+                // Left: Icon + Name
+                Row(
+                  children: [
+                    ClipOval(
+                      child: iconUrl.isNotEmpty
+                          ? Image.network(
+                              iconUrl,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  _buildPlaceholderIcon(coin),
+                            )
+                          : _buildPlaceholderIcon(coin),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      coin,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: Color(0xFF151E2F),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                const Text(
-                  "USDT",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: Color(0xFF151E2F),
-                  ),
-                ),
-                const Spacer(),
+                // Right: Balance Info
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Total Balance",
@@ -186,30 +205,30 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Color(0xFF151E2F),
+                        fontSize: 24,
+                        color: Color(0xFF111827),
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 24),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildInfoColumn("Valuation (USDT)", controller.valuationUsdt),
-                _buildInfoColumn(
-                  "Frozen",
-                  controller.frozen,
-                  crossAlign: CrossAxisAlignment.end,
-                ),
-              ],
-            ),
+            const SizedBox(height: 16),
+            const Divider(height: 1, color: Color(0xFFECEFF5)),
+            const SizedBox(height: 16),
+
+            // Valuation Row
+            _buildRowItem("Valuation ($coin)", controller.valuationUsdt),
+
+            const SizedBox(height: 12),
+
+            // Frozen Row
+            _buildRowItem("Frozen", controller.frozen),
 
             const SizedBox(height: 16),
 
+            // Grey Container 
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -224,7 +243,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                     controller.valuationUsdt,
                   ),
                   _buildInfoColumn(
-                    "Valuation (Local)",
+                    "Valuation (USD)",
                     controller.valuationOther,
                     crossAlign: CrossAxisAlignment.end,
                   ),
@@ -235,6 +254,32 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
         ),
       );
     });
+  }
+
+  Widget _buildRowItem(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+             fontFamily: 'Inter',
+             fontWeight: FontWeight.w400,
+             fontSize: 14,
+             color: Color(0xFF717F9A), 
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+             fontFamily: 'Inter',
+             fontWeight: FontWeight.w500,
+             fontSize: 16,
+             color: Color(0xFF151E2F),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildInfoColumn(
@@ -266,6 +311,45 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
         ),
       ],
     );
+  }
+
+  Widget _buildCoinTabs() {
+    return Row(
+      children: [
+        _buildCoinTabButton("USDT"),
+        const SizedBox(width: 12),
+        _buildCoinTabButton("BTC"),
+      ],
+    );
+  }
+
+  Widget _buildCoinTabButton(String coin) {
+    return Obx(() {
+      final isSelected = controller.selectedCoin.value == coin;
+      return GestureDetector(
+        onTap: () => controller.changeCoin(coin),
+        child: Container(
+          height: 40,
+          width: 100,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF1D5DE5)
+                : const Color(0xFFECEFF5),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            coin,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              color: isSelected ? Colors.white : const Color(0xFF717F9A),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildFilterTabs() {
@@ -504,6 +588,26 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildPlaceholderIcon(String coin) {
+    return Container(
+      width: 32,
+      height: 32,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Color(0xFFECEFF5),
+        shape: BoxShape.circle,
+      ),
+      child: Text(
+        coin.isNotEmpty ? coin[0] : "?",
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          color: Color(0xFF717F9A),
+        ),
       ),
     );
   }

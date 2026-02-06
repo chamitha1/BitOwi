@@ -238,11 +238,13 @@ class ProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Expanded(
+                        Flexible(
+                          fit: FlexFit.loose,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
                                 "Trust ",
@@ -265,16 +267,18 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        // const SizedBox(width: 8),
                         Container(
                           width: 1,
                           height: 12,
                           color: Colors.white.withOpacity(0.3),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
+                        // const SizedBox(width: 8),
+                        Flexible(
+                          fit: FlexFit.loose,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
                                 "Trade ",

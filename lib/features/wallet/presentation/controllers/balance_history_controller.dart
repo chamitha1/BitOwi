@@ -21,6 +21,8 @@ class BalanceHistoryController extends GetxController {
   String? accountNumber;
   String? symbol;
 
+  var selectedCoin = "USDT".obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -29,6 +31,9 @@ class BalanceHistoryController extends GetxController {
     if (args != null && args is Map) {
       accountNumber = args['accountNumber'];
       symbol = args['symbol'];
+      if (symbol != null) {
+        selectedCoin.value = symbol!;
+      }
     }
     refreshData();
   }
@@ -40,10 +45,34 @@ class BalanceHistoryController extends GetxController {
     refreshData();
   }
 
+  void changeCoin(String coin) {
+    if (selectedCoin.value == coin) return;
+    AppLogger.d("Switching coin to $coin");
+    selectedCoin.value = coin;
+
+    // Update internal symbol/accountNumber if needed based on new coin
+    // Find asset for new coin to correct account number if structure requires it
+    // For now we assume refreshData relies on selectedCoin logic in _currentAssetItem
+    // But transactions might need the correct account number for that coin?
+    // Let's rely on finding the asset:
+
+    if (accountDetail.value != null) {
+      try {
+        final item = accountDetail.value!.accountList.firstWhere(
+          (e) => e.currency.toUpperCase() == coin.toUpperCase(),
+        );
+        accountNumber = item.accountNumber;
+        symbol = item.currency;
+      } catch (e) {
+        AppLogger.d("Asset for $coin not found yet.");
+      }
+    }
+
+    refreshData();
+  }
+
   Future<void> refreshData() async {
-    AppLogger.d(
-      "refreshData called. Symbol: $symbol, AccountNumber: $accountNumber",
-    );
+    AppLogger.d("refreshData called. Coin: ${selectedCoin.value}");
     isLoading.value = true;
     pageNum = 1;
     isEnd = false;
@@ -51,6 +80,17 @@ class BalanceHistoryController extends GetxController {
 
     try {
       await Future.wait([_fetchBalance(), _fetchTransactions()]);
+
+      // Update local account/symbol refs if balance fetched new data
+      if (accountDetail.value != null) {
+        try {
+          final item = accountDetail.value!.accountList.firstWhere(
+            (e) => e.currency.toUpperCase() == selectedCoin.value.toUpperCase(),
+          );
+          accountNumber = item.accountNumber;
+          symbol = item.currency;
+        } catch (_) {}
+      }
     } catch (e) {
       AppLogger.d("Error refreshing data: $e");
     } finally {
@@ -145,24 +185,6 @@ class BalanceHistoryController extends GetxController {
         AppLogger.d("Jour fetched. Count: ${res.list.length}");
 
         List<Jour> processedList = res.list.map((item) {
-          /*
-              String finalBizType = item.bizType ?? '';
-              final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
-
-              if (finalBizType != '1' && finalBizType != '2') {
-                 if (amount < 0) {
-                   finalBizType = '2'; // Withdraw
-                 } else {
-                   finalBizType = '1'; // Deposit
-                 }
-              }
-              return item.copyWith(bizType: finalBizType);
-              */
-
-          // Just return item as is, or ensure bizType is NOT '2' unless it really is a withdrawal ID source.
-          // Since this is getJourPageList, these are always Journal IDs.
-          // We force '1' (or just leave it) to ensure getJourDetail is used.
-
           return item;
         }).toList();
 
@@ -173,8 +195,6 @@ class BalanceHistoryController extends GetxController {
             return item.bizType == '1' || amount > 0;
           }).toList();
         }
-
-        //Tab 0 shows everything from getJourPageList
 
         handleResponse(processedList, res.isEnd);
       }
@@ -200,29 +220,14 @@ class BalanceHistoryController extends GetxController {
   }
 
   AccountDetailAssetInnerItem? get _currentAssetItem {
-    if (accountDetail.value == null) {
-      AppLogger.d("DEBUG: accountDetail.value is null");
-      return null;
-    }
-    if (symbol == null) {
-      AppLogger.d("DEBUG: symbol is null in getter");
-      return null;
-    }
+    if (accountDetail.value == null) return null;
     try {
       final item = accountDetail.value!.accountList.firstWhere(
-        (e) => e.currency.toUpperCase() == symbol!.toUpperCase(),
-        orElse: () {
-          AppLogger.d(
-            "DEBUG: Asset not found for symbol: $symbol. Available: ${accountDetail.value!.accountList.map((e) => e.currency).toList()}",
-          );
-          throw Exception("Not found");
-        },
+        (e) => e.currency.toUpperCase() == selectedCoin.value.toUpperCase(),
+        orElse: () => throw Exception("Not found"),
       );
       return item;
     } catch (e) {
-      if (e.toString() != "Exception: Not found") {
-        AppLogger.d("DEBUG: Error finding asset: $e");
-      }
       return null;
     }
   }
@@ -230,6 +235,6 @@ class BalanceHistoryController extends GetxController {
   String get totalBalance => _currentAssetItem?.totalAmount ?? "0.00";
   String get frozen => _currentAssetItem?.frozenAmount ?? "0.00";
   String get valuationUsdt => _currentAssetItem?.amountUsdt ?? "0.00";
-
   String get valuationOther => _currentAssetItem?.totalAsset ?? "0.00";
+  String get iconUrl => _currentAssetItem?.icon ?? "";
 }

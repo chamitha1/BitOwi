@@ -208,7 +208,16 @@ class UserApi {
   /// Modify user information
   static Future<void> modifyUser(Map<String, dynamic> data) async {
     try {
-      await ApiClient.dio.post("/core/v1/user/edit_profile", data: data);
+      final response = await ApiClient.dio.post(
+        "/core/v1/user/edit_profile",
+        data: data,
+      );
+      final resData = response.data;
+      if (resData is Map &&
+          resData['code'] != 200 &&
+          resData['code'] != '200') {
+        throw Exception(resData['errorMsg'] ?? 'Update failed');
+      }
     } catch (e) {
       e.printError();
       rethrow;

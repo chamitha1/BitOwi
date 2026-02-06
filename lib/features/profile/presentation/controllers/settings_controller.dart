@@ -109,10 +109,11 @@ class SettingsController extends GetxController {
 
     final nickname = nickNameController.text.trim();
 
-    if (nickname.isEmpty) {
+    // Length Check
+    if (nickname.isEmpty || nickname.length > 16) {
       CustomSnackbar.showError(
         title: "Warning",
-        message: "Please enter new nickname",
+        message: "Nickname must be 1-16 characters",
       );
       return;
     }
@@ -127,9 +128,13 @@ class SettingsController extends GetxController {
         message: "Nickname changed successfully",
       );
     } catch (e) {
+      String msg = e.toString();
+      if (msg.startsWith("Exception: ")) {
+        msg = msg.substring(11);
+      }
       CustomSnackbar.showError(
         title: "Error",
-        message: "Nickname change failed",
+        message: msg,
       );
     } finally {
       userNicknameLoading.value = false;
