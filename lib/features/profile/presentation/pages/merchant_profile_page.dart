@@ -39,9 +39,6 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
     } else {
       // handle error or return
       userId = '';
-      AppLogger.d(
-        "--------------------------⚠️⚠️⚠️⚠️⚠️⚠️MERCHANT PROFILE PAGE args⚠️⚠️⚠️⚠️⚠️⚠️-----------------------------------",
-      );
     }
 
     _refreshController = EasyRefreshController(
@@ -280,7 +277,6 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
   Widget _buildProfileHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
@@ -289,24 +285,33 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         ),
         borderRadius: BorderRadius.circular(20),
       ),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 64,
                 height: 64,
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
+                width: 64,
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF779DEF), width: 3),
+                  color: Color(0xFF779DEF),
                 ),
+                padding: const EdgeInsets.all(3),
                 child: ClipOval(
                   child: merchantInfo?.photo != null
-                      ? CommonImage(merchantInfo!.photo!, fit: BoxFit.cover)
+                      ? CommonImage(
+                          merchantInfo!.photo!,
+                          fit: BoxFit.cover,
+                          height: 64,
+                          width: 64,
+                        )
                       : Image.asset(
                           'assets/images/home/avatar.png',
                           fit: BoxFit.cover,
+                          height: 64,
+                          width: 64,
                         ),
                 ),
               ),
@@ -315,46 +320,138 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      merchantInfo?.nickname ?? "Merchant",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                    // Name and Badge Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            merchantInfo?.nickname ?? "Merchant",
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8EFFF),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/profile_page/shield.svg',
+                                width: 14,
+                                height: 14,
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xFF1D5DE5),
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                "Certified",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Inter',
+                                  color: Color(0xFF1D5DE5),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
+                    // Stats Row
                     Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        vertical: 6,
+                        horizontal: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8EFFF),
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          SvgPicture.asset(
-                            'assets/icons/profile_page/shield.svg',
-                            width: 14,
-                            height: 14,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF1D5DE5),
-                              BlendMode.srcIn,
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Trust ",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Inter',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    "${merchantInfo?.confidenceCount ?? 0}",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'Inter',
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            "Certified",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'Inter',
-                              color: Color(0xFF1D5DE5),
+                          Container(
+                            width: 1,
+                            height: 12,
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Trade ",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Inter',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    "${merchantInfo?.orderCount ?? 0} / ${_calculateCompletionRate()}%",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'Inter',
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -364,98 +461,6 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Row(
-                //   children: [
-                //     SvgPicture.asset(
-                //       'assets/icons/profile_page/like.svg',
-                //       width: 14,
-                //       height: 14,
-                //     ),
-                //     const SizedBox(width: 4),
-                //     Text(
-                //       "${_calculatePositiveRate()}%",
-                //       style: const TextStyle(
-                //         fontFamily: 'Inter',
-                //         fontWeight: FontWeight.w400,
-                //         fontSize: 12,
-                //         color: Colors.white,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // Container(
-                //   width: 1,
-                //   height: 14,
-                //   color: Colors.white.withOpacity(0.3),
-                // ),
-                Row(
-                  children: [
-                    const Text(
-                      "Trust ",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "${merchantInfo?.confidenceCount ?? 0}",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 8),
-
-                Container(
-                  width: 1,
-                  height: 14,
-                  color: Colors.white.withOpacity(0.3),
-                ),
-                const SizedBox(width: 8),
-
-                Row(
-                  children: [
-                    const Text(
-                      "Trade ",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      "${merchantInfo?.orderCount ?? 0} / ${_calculateCompletionRate()}%",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 24),
           Row(
@@ -476,7 +481,6 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                   label: merchantInfo?.isAddBlackList == '1'
                       ? "Remove Blacklist"
                       : "Blacklist",
-
                   onTap: onBlacklistTap,
                 ),
               ),
