@@ -12,7 +12,7 @@ import 'package:screenshot/screenshot.dart';
 
 class DepositController extends GetxController {
   var isLoading = false.obs;
-
+  var symbol = ''.obs;
   //coins: key = symbol, value = list of coins
   var realCoinEnum = <String, List<ChainSymbolListRes>>{}.obs;
 
@@ -28,7 +28,18 @@ class DepositController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    if (Get.parameters.containsKey('symbol')) {
+      symbol.value = Get.parameters['symbol'] ?? '';
+      getInitData();
+    }
     fetchCoinList();
+  }
+
+  void getInitData() async {
+    if (symbol.value.isEmpty) {
+      AppLogger.d("Symbol is empty");
+      return;
+    }
   }
 
   Future<void> fetchCoinList() async {
@@ -50,16 +61,17 @@ class DepositController extends GetxController {
       }
 
       if (nameList.isNotEmpty) {
-        if (Get.parameters.containsKey('symbol')) {
-           final paramSymbol = Get.parameters['symbol'];
-           final match = nameList.firstWhereOrNull((e) => e.symbol == paramSymbol);
-           if (match != null) {
-             selectedCoin.value = match;
-           } else {
-             selectedCoin.value = nameList.first;
-           }
+        if (symbol.value.isNotEmpty) {
+          final match = nameList.firstWhereOrNull(
+            (e) => e.symbol == symbol.value,
+          );
+          if (match != null) {
+            selectedCoin.value = match;
+          } else {
+            selectedCoin.value = nameList.first;
+          }
         } else {
-           selectedCoin.value = nameList.first;
+          selectedCoin.value = nameList.first;
         }
         updateNetworkList();
       }

@@ -1,5 +1,6 @@
 import 'package:BitOwi/models/chain_symbol_list_res.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class CoinSelectorCard extends StatelessWidget {
@@ -131,8 +132,8 @@ class CoinSelectorCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Image.asset(
-              "assets/icons/deposit/arrow_down.png",
+            SvgPicture.asset(
+              "assets/icons/deposit/chevron-down.svg",
               width: 16,
               height: 16,
               color: const Color(0xff151E2F),
