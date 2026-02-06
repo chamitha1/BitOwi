@@ -67,8 +67,8 @@ class DepositScreen extends StatelessWidget {
                         },
                       );
                     },
-                    child: Image.asset(
-                      "assets/icons/deposit/clock.png",
+                    child: SvgPicture.asset(
+                      "assets/icons/deposit/clock.svg",
                       width: 24,
                       height: 24,
                     ),

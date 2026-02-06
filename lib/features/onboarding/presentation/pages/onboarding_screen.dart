@@ -93,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ? const LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [Color(0xFF1D5DE5), Color(0xFF174AB7)],
+                            colors: [Color(0xFF1D5DE5), Color(0xff28A6FF)],
                           )
                         : null,
                     color: _currentPage == index ? null : Colors.grey[300],
@@ -111,11 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: double.infinity,
                 height: 58,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF1D5DE5), Color(0xFF174AB7)],
-                  ),
+                  color: Color(0xff1D5DE5),
                   borderRadius: BorderRadius.circular(12),
                 ),
 
