@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/partner_card.dart';
 import 'package:BitOwi/models/user_relation_page_res.dart';
@@ -6,6 +7,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class PartnersPage extends StatefulWidget {
   const PartnersPage({super.key});
@@ -21,6 +23,7 @@ class _PartnersPageState extends State<PartnersPage> {
   late EasyRefreshController _controller;
 
   List<UserRelationPageRes> _list = [];
+  List<UserRelationPageRes> _filteredList = [];
   int _pageNum = 1;
   bool _isEnd = false;
   bool _isLoading = false;
@@ -41,6 +44,25 @@ class _PartnersPageState extends State<PartnersPage> {
     _controller.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _filterList(query);
+  }
+
+  void _filterList(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredList = List.from(_list);
+      });
+    } else {
+      setState(() {
+        _filteredList = _list.where((item) {
+          final name = (item.nickname).toLowerCase();
+          return name.contains(query.toLowerCase());
+        }).toList();
+      });
+    }
   }
 
   Future<void> _onRefresh() async {
@@ -98,6 +120,9 @@ class _PartnersPageState extends State<PartnersPage> {
       } else {
         _list.addAll(res.list);
       }
+
+      _filterList(_searchController.text);
+
       _pageNum++;
     } catch (e) {
       AppLogger.d("Error fetching partners: $e");
@@ -164,7 +189,7 @@ class _PartnersPageState extends State<PartnersPage> {
               onLoad: _onLoad,
               header: const ClassicHeader(),
               footer: const ClassicFooter(),
-              child: _list.isEmpty
+              child: _filteredList.isEmpty
                   ? SingleChildScrollView(
                       child: Container(
                         height: 400,
@@ -199,11 +224,11 @@ class _PartnersPageState extends State<PartnersPage> {
                         right: 20,
                         bottom: 20,
                       ),
-                      itemCount: _list.length,
+                      itemCount: _filteredList.length,
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 12),
                       itemBuilder: (context, index) {
-                        final data = _list[index];
+                        final data = _filteredList[index];
 
                         String goodRate = "0";
                         if (data.commentCount > 0) {
@@ -224,6 +249,42 @@ class _PartnersPageState extends State<PartnersPage> {
                             ? data.userId.toString()
                             : data.toUser.toString();
 
+                        //Format Date
+                        String formattedDate = '';
+                        final dynamic rawDate = data.createDatetime;
+                        try {
+                          DateTime? date;
+
+                          // Handle timestamp (ms)
+                          if (rawDate is int) {
+                            date = DateTime.fromMillisecondsSinceEpoch(rawDate);
+                          } else if (rawDate is String) {
+                            // Handle string timestamp
+                            if (RegExp(r'^\d+$').hasMatch(rawDate)) {
+                              date = DateTime.fromMillisecondsSinceEpoch(
+                                int.parse(rawDate),
+                              );
+                            } else {
+                              // Handle standard date strings
+                              date =
+                                  DateTime.tryParse(rawDate) ??
+                                  DateFormat(
+                                    "yyyy-MM-dd HH:mm:ss",
+                                  ).parse(rawDate);
+                            }
+                          }
+
+                          if (date != null) {
+                            formattedDate = DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(date);
+                          } else {
+                            formattedDate = rawDate.toString();
+                          }
+                        } catch (e) {
+                          formattedDate = rawDate.toString();
+                        }
+
                         final item = PartnerItem(
                           name: data.nickname,
                           userId: partnerId,
@@ -236,7 +297,7 @@ class _PartnersPageState extends State<PartnersPage> {
                           trustCount: data.confidenceCount,
                           tradeCount: data.orderCount,
                           finishRate: finishRate,
-                          addedDate: data.createDatetime.split(' ').first,
+                          addedDate: formattedDate,
                         );
 
                         return PartnerCard(item: item);
@@ -294,6 +355,7 @@ class _PartnersPageState extends State<PartnersPage> {
       ),
       child: TextField(
         controller: _searchController,
+        onChanged: _onSearchChanged,
         decoration: InputDecoration(
           hintText: "Search by name",
           hintStyle: const TextStyle(
@@ -306,14 +368,6 @@ class _PartnersPageState extends State<PartnersPage> {
             padding: const EdgeInsets.all(12.0),
             child: SvgPicture.asset(
               'assets/icons/profile_page/address/search.svg',
-              width: 20,
-              height: 20,
-            ),
-          ),
-          suffixIcon: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: SvgPicture.asset(
-              'assets/icons/profile_page/microphone.svg',
               width: 20,
               height: 20,
             ),
