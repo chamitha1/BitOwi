@@ -64,14 +64,39 @@ class ApiClient {
               if (response.data is Map) {
                 final map = response.data as Map;
 
-                final code = (map['code'] ?? '').toString();          // <- important
-                final errorCode = (map['errorCode'] ?? '').toString(); // <- important
+                final code = (map['code'] ?? '').toString(); // <- important
+                final errorCode = (map['errorCode'] ?? '')
+                    .toString(); // <- important
 
                 // ✅ Detect auth/session invalid (token revoked / logged in other device)
-                final isAuthExpired = _isAuthError(errorCode, code) || code == '401';
+                final isAuthExpired =
+                    _isAuthError(errorCode, code) || code == '401';
 
                 if (isAuthExpired) {
-                  AppLogger.d("Auth expired detected. Logging out... code=$code errorCode=$errorCode");
+                  final currentToken = await StorageService.getToken();
+                  final requestToken =
+                      response.requestOptions.headers['Authorization'];
+                  // If we have a currency token, and it's different from the one used in this failed request,
+                  // it means the user has already re-logged in. Ignore this old error.
+                  if (currentToken != null &&
+                      requestToken != null &&
+                      currentToken != requestToken) {
+                    AppLogger.d(
+                      "Ignoring 401 from old token. Current session is valid.",
+                    );
+                    return handler.reject(
+                      DioException(
+                        requestOptions: response.requestOptions,
+                        error: "Session expired (Ignored)",
+                        response: response,
+                      ),
+                    );
+                  }
+
+                  AppLogger.d("Auth expired detected. Logging out...");
+                  AppLogger.d(
+                    "Auth expired detected. Logging out... code=$code errorCode=$errorCode",
+                  );
 
                   await StorageService.removeToken();
                   await IMUtil.logoutIMUser();
@@ -123,11 +148,27 @@ class ApiClient {
               }
 
               // 2) Some APIs return 200 but include code inside body
-              if (data is Map && (data['code'] == 401 || data['code'] == '401')) {
+              if (data is Map &&
+                  (data['code'] == 401 || data['code'] == '401')) {
                 isSessionExpired = true;
               }
 
               if (isSessionExpired) {
+                final currentToken = await StorageService.getToken();
+                final requestToken = e.requestOptions.headers['Authorization'];
+                if (currentToken != null &&
+                    requestToken != null &&
+                    currentToken != requestToken) {
+                  AppLogger.d(
+                    "Ignoring 401 from old token. Current session is valid.",
+                  );
+                  return handler.next(
+                    e,
+                  ); // Just forward the error without logging out
+                }
+                // clear local session
+                await StorageService.removeToken();
+
                 // clear local session
                 await StorageService.removeToken();
                 await IMUtil.logoutIMUser();
@@ -147,8 +188,6 @@ class ApiClient {
 
               return handler.next(e);
             },
-
-
           ),
         );
 
