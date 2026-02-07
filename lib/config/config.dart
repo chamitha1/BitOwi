@@ -13,5 +13,6 @@ class AppConfig {
   // static const String webApiUrl = 'https://m.bitowi.com/api';
 
   /// im appID
-  static const int imAppId = 20032678; // todo not ideal use compile time env setting 💬
+  static const int imAppId = 20032678; // test
+  // static const int imAppId = 20012299; // prod
 }
