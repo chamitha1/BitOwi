@@ -254,31 +254,34 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Flexible(
-                                child: Obx(
-                                  () => Text(
-                                    "${controller.tradeInfo.value?.confidenceCount ?? 0}",
-                                    style: _statTextStyle(
-                                      fontWeight: FontWeight.w600,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Obx(
+                                    () => Text(
+                                      "${controller.tradeInfo.value?.confidenceCount ?? 0}",
+                                      style: _statTextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      // overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // const SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Container(
                           width: 1,
                           height: 12,
                           color: Colors.white.withOpacity(0.3),
                         ),
-                        // const SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Flexible(
                           fit: FlexFit.loose,
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Text(
                                 "Trade ",
@@ -288,13 +291,16 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Flexible(
-                                child: Obx(
-                                  () => Text(
-                                    "${controller.tradeInfo.value?.orderCount ?? 0} / ${controller.finishRate}%",
-                                    style: _statTextStyle(
-                                      fontWeight: FontWeight.w600,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Obx(
+                                    () => Text(
+                                      "${controller.tradeInfo.value?.orderCount ?? 0} / ${controller.finishRate}%",
+                                      style: _statTextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      // overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
