@@ -91,13 +91,15 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
   bool _isWithdrawEnabled() {
     final amount = double.tryParse(controller.amountController.text) ?? 0.0;
+    final minAmount =
+        double.tryParse(controller.ruleInfo.value?.minAmount ?? '1') ?? 0.0;
 
     final isGoogleEnabled = controller.googleStatus.value == '1';
     final isGoogleCodeEntered =
         !isGoogleEnabled || _authenticatorCodeController.text.isNotEmpty;
 
     return controller.addrController.text.isNotEmpty &&
-        amount >= 10 &&
+        amount >= minAmount &&
         controller.tradeController.text.isNotEmpty &&
         _isVerified &&
         isGoogleCodeEntered;
@@ -287,7 +289,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         ),
                         Obx(
                           () => Text(
-                            "= ${controller.availableAmount.value}",
+                            "Available: ${controller.availableAmount.value} ${controller.symbol.value}",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
@@ -304,7 +306,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      onChanged: (val) {},
+                      onChanged: (val) {
+                        setState(() {});
+                      },
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -383,7 +387,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         ),
                         Obx(
                           () => Text(
-                            "Fee : ${controller.fee.value.toStringAsFixed(2)} ${controller.symbol.value}",
+                            "Fee : ${controller.fee.value.toStringAsFixed(double.tryParse(controller.fee.value.toString()) == 0 ? 0 : 4)} ${controller.symbol.value}",
                             style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w500,

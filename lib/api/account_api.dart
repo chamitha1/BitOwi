@@ -122,6 +122,7 @@ class AccountApi {
         '/core/v1/withdraw/detail_front/$id',
       );
       AppLogger.d("Raw Withdraw Detail Response (Dio): ${res.data}");
+      AppLogger.d("Raw Withdraw Detail Response (Dio): $res");
 
       var data = res.data;
       if (data is Map) {
