@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:BitOwi/config/api_client.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/models/api_result.dart';
 import 'package:BitOwi/models/identify_order_list_res.dart';
@@ -165,32 +166,28 @@ for register and forgetPwd
     SmsBizType bizType = SmsBizType.register,
   }) async {
     try {
-      String url =
-          '/core/v1/otp/permission_none/verify_public'; 
+      String url = '/core/v1/otp/permission_none/verify_public';
       Options? options;
       // Switch to public endpoint for Register and Forgot Password
       if (bizType == SmsBizType.register || bizType == SmsBizType.forgetPwd) {
-        url = '/core/v1/otp/permission_none/verify_public';
+        url = '/core/v1/otp/verify_public';
 
         // 🚀 CRITICAL FIX: Use a NEW Dio instance to BYPASS global ApiClient interceptors.
         // The global interceptor logs out on code 300/300000, which this endpoint might return.
         final publicDio = Dio(
           BaseOptions(
             baseUrl: ApiClient.dio.options.baseUrl,
-            headers: {'Content-Type': 'application/json'},
-            responseType: ResponseType
-                .plain, 
-            validateStatus: (status) =>
-                true, 
+            headers: {'Content-Type': 'application/json', 'Authorization': ''},
+            responseType: ResponseType.plain,
+            validateStatus: (status) => true,
           ),
         );
-
-        final response = await publicDio.post(
-          url,
-          data: {'email': email, 'bizType': bizType.value, 'otp': otp},
-        );
+        final reqData = {'email': email, 'bizType': bizType.value, 'otp': otp};
+        final response = await publicDio.post(url, data: reqData);
 
         AppLogger.d("URL :  $url");
+        AppLogger.d("Req Data :  $reqData");
+
         // Manual parsing
         Map<String, dynamic> data;
         if (response.data is String) {
@@ -205,12 +202,12 @@ for register and forgetPwd
         AppLogger.d("Verify OTP Public Response: $data");
         return data;
       }
-  
+
       final response = await ApiClient.dio.post(
         url,
         data: {'email': email, 'bizType': bizType.value, 'otp': otp},
       );
-      AppLogger.d("Verify OTP Response: ${response.data}"); 
+      AppLogger.d("Verify OTP Response: ${response.data}");
 
       return response.data as Map<String, dynamic>;
       // return response.data;
@@ -230,24 +227,67 @@ for register and forgetPwd
   }'
 
 for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw */
-
   Future<Map<String, dynamic>> verifyOtp({
     required String email,
     required String otp,
     SmsBizType bizType = SmsBizType.register,
   }) async {
     try {
-      final response = await ApiClient.dio.post(
-        '/core/v1/otp/verify_public',
-        data: {'email': email, 'otp': otp, 'bizType': bizType.value},
+      String? token = await StorageService.getToken();
+
+      if (token == null || token.isEmpty) {
+        return {'success': false, 'error': 'No auth token found'};
+      }
+
+      AppLogger.d("Manual Token for Verify: $token");
+
+      final freshDio = Dio(
+        BaseOptions(
+          baseUrl: ApiClient.dio.options.baseUrl,
+          connectTimeout: const Duration(seconds: 5),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept-Language': 'en_US',
+            'Authorization': token,
+          },
+          responseType: ResponseType.plain,
+          validateStatus: (status) => true,
+        ),
       );
 
-      AppLogger.d('VERIFY OTP RESPONSE ${response.data}');
-      // Check if OTP is valid
-      AppLogger.d("Verify OTP Response: ${response.data}"); // Debug logging
+      final reqData = {'email': email, 'bizType': bizType.value, 'otp': otp};
+      AppLogger.d("Request Data $reqData");
+      final response = await freshDio.post(
+        '/core/v1/otp/verify',
+        data: {'email': email, 'bizType': bizType.value, 'otp': otp},
+      );
 
-      return response.data as Map<String, dynamic>;
-      // return response.data;
+      AppLogger.d("Verify OTP Raw Response: ${response.data}");
+
+      Map<String, dynamic> data;
+      if (response.data is String) {
+        try {
+          data = json.decode(response.data);
+        } catch (e) {
+          return {'success': false, 'error': response.data};
+        }
+      } else {
+        data = response.data as Map<String, dynamic>;
+      }
+
+      final code = (data['code'] ?? '').toString();
+      final errorCode = (data['errorCode'] ?? '').toString();
+
+      if (code == '300' || errorCode == '300003') {
+        AppLogger.d("Server reported session expired, caught it manually.");
+        return {
+          'success': false,
+          'code': 300003,
+          'msg': 'Session expired. Please login again.',
+        };
+      }
+
+      return data;
     } catch (e) {
       AppLogger.d('Verify OTP error: $e');
       return {'success': false, 'error': e.toString()};

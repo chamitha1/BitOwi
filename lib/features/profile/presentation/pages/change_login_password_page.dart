@@ -166,14 +166,14 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         builder: (context) => OtpBottomSheet(
           email: _email,
           otpLength: 6,
-          bizType: SmsBizType.forgetPwd,
+          bizType: SmsBizType.resetLoginPwd,
           onVerifyPin: (pin) async {
             // Local verify only - save OTP
             _verifiedOtp = pin;
             return await UserApi().verifyOtp(
               email: _email,
               otp: pin,
-              bizType: SmsBizType.forgetPwd,
+              bizType: SmsBizType.resetLoginPwd,
             );
           },
           onResend: () async {
