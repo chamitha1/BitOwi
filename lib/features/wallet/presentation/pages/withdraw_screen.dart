@@ -1,3 +1,4 @@
+import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
@@ -738,11 +739,12 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
           bizType: SmsBizType.withdraw,
 
           onVerifyPin: (pin) async {
-            final isValid = await controller.verifyOtp(pin);
-            if (isValid) {
-              _verifiedOtp = pin;
-            }
-            return isValid;
+            final result = await UserApi().verifyOtp(
+              email: email,
+              otp: pin,
+              bizType: SmsBizType.withdraw,
+            );
+            return result;
           },
 
           onResend: () async {

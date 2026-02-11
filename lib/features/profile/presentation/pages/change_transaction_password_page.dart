@@ -160,7 +160,12 @@ class _ChangeTransactionPasswordPageState
           onVerifyPin: (pin) async {
             // Local verify only - save OTP
             _verifiedOtp = pin;
-            return true;
+            return await UserApi().verifyOtp(
+              email: _email,
+              otp: pin,
+              bizType: SmsBizType.bindTradePwd,
+            );
+            ;
           },
           onResend: () async {
             return await _userApi.sendOtp(

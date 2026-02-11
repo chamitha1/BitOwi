@@ -139,8 +139,7 @@ class P2PApi {
   /// params: {adsId, tradeAmount, count}
   static Future<String> buyOrder(Map<String, dynamic> data) async {
     try {
-      debugPrint("buyOrder Request: $data");
-
+      debugPrint("buyOrder Request: $data");    
       final res = await ApiClient.dio.post(
         '/core/v1/trade_order/buy',
         data: data,

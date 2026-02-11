@@ -37,8 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _submitted = false;
 
   String _verifiedSmsCode = "";
-  String?
-  _verifiedEmail;
+  String? _verifiedEmail;
 
   static const List<String> _emailDomains = <String>[
     'gmail.com',
@@ -175,7 +174,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           bizType: SmsBizType.forgetPwd,
           onVerifyPin: (pin) async {
             _verifiedSmsCode = pin;
-            return true;
+            return await UserApi().verifyOtpPublic(
+              email: email,
+              otp: pin,
+              bizType: SmsBizType.forgetPwd,
+            );
           },
           onResend: () async {
             return await userApi.sendOtp(
@@ -187,7 +190,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             Navigator.pop(context);
             setState(() {
               _isEmailVerified = true;
-              _verifiedEmail = email; 
+              _verifiedEmail = email;
             });
             CustomSnackbar.showSuccess(
               title: "Success",

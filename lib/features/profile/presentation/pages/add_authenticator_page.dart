@@ -124,12 +124,9 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
                 secret: _secretKey,
                 smsCaptcha: pin,
               );
-              AppLogger.d("AddAuthenticatorPage: bindGoogleSecret success");
-              return true;
+              return {'code': 200, 'msg': 'Success'};
             } catch (e) {
-              AppLogger.d("AddAuthenticatorPage: bindGoogleSecret error: $e");
-              CustomSnackbar.showError(title: "Error", message: "$e");
-              return false;
+              return {'code': 500, 'msg': e.toString()};
             }
           },
           onResend: () async {

@@ -148,22 +148,109 @@ class UserApi {
   }
 
   // Verify OTP
-  Future<bool> verifyOtp({
+  /* 
+curl -i -X POST "BASE_URL/core/v1/otp/verify_public" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "sachi@gmail.com",
+    "bizType": "C_REG_EMAIL",
+    "otp": "000000"
+  }'
+
+for register and forgetPwd
+  */
+  Future<Map<String, dynamic>> verifyOtpPublic({
+    required String email,
+    required String otp,
+    SmsBizType bizType = SmsBizType.register,
+  }) async {
+    try {
+      String url =
+          '/core/v1/otp/permission_none/verify_public'; 
+      Options? options;
+      // Switch to public endpoint for Register and Forgot Password
+      if (bizType == SmsBizType.register || bizType == SmsBizType.forgetPwd) {
+        url = '/core/v1/otp/permission_none/verify_public';
+
+        // 🚀 CRITICAL FIX: Use a NEW Dio instance to BYPASS global ApiClient interceptors.
+        // The global interceptor logs out on code 300/300000, which this endpoint might return.
+        final publicDio = Dio(
+          BaseOptions(
+            baseUrl: ApiClient.dio.options.baseUrl,
+            headers: {'Content-Type': 'application/json'},
+            responseType: ResponseType
+                .plain, 
+            validateStatus: (status) =>
+                true, 
+          ),
+        );
+
+        final response = await publicDio.post(
+          url,
+          data: {'email': email, 'bizType': bizType.value, 'otp': otp},
+        );
+
+        AppLogger.d("URL :  $url");
+        // Manual parsing
+        Map<String, dynamic> data;
+        if (response.data is String) {
+          try {
+            data = json.decode(response.data) as Map<String, dynamic>;
+          } catch (e) {
+            data = {};
+          }
+        } else {
+          data = response.data as Map<String, dynamic>;
+        }
+        AppLogger.d("Verify OTP Public Response: $data");
+        return data;
+      }
+  
+      final response = await ApiClient.dio.post(
+        url,
+        data: {'email': email, 'bizType': bizType.value, 'otp': otp},
+      );
+      AppLogger.d("Verify OTP Response: ${response.data}"); 
+
+      return response.data as Map<String, dynamic>;
+      // return response.data;
+    } catch (e) {
+      AppLogger.d('Verify OTP error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /*curl -i -X POST "BASE_URL/core/v1/otp/verify" \
+  -H "Authorization: TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "sachi@gmail.com",
+    "bizType": "C_REG_EMAIL",
+    "otp": "000000"
+  }'
+
+for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw */
+
+  Future<Map<String, dynamic>> verifyOtp({
     required String email,
     required String otp,
     SmsBizType bizType = SmsBizType.register,
   }) async {
     try {
       final response = await ApiClient.dio.post(
-        '',
+        '/core/v1/otp/verify_public',
         data: {'email': email, 'otp': otp, 'bizType': bizType.value},
       );
 
+      AppLogger.d('VERIFY OTP RESPONSE ${response.data}');
       // Check if OTP is valid
-      return response.data;
+      AppLogger.d("Verify OTP Response: ${response.data}"); // Debug logging
+
+      return response.data as Map<String, dynamic>;
+      // return response.data;
     } catch (e) {
       AppLogger.d('Verify OTP error: $e');
-      return false;
+      return {'success': false, 'error': e.toString()};
     }
   }
 

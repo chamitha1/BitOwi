@@ -157,7 +157,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           onVerifyPin: (pin) async {
             // Local verify only - save OTP
             _oldEmailOtp = pin;
-            return true;
+            return await UserApi().verifyOtp(
+              email: _currentEmail,
+              otp: pin,
+              bizType: SmsBizType.register,
+            );
           },
           onResend: () async {
             return await _userApi.sendOtp(
@@ -241,7 +245,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           onVerifyPin: (pin) async {
             // Local verify only - save OTP
             _newEmailOtp = pin;
-            return true;
+            return await UserApi().verifyOtp(
+              email: newEmail,
+              otp: pin,
+              bizType: SmsBizType.register,
+            );
+            ;
           },
           onResend: () async {
             return await _userApi.sendOtp(

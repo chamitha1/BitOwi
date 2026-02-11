@@ -187,8 +187,12 @@ class _SignupScreenState extends State<SignupScreen> {
             // final ok = await userApi.verifyOtp(email: email, bizType: SmsBizType.register, smsCode: pin);
             // return ok;
 
-            _verifiedOtp = pin; // store OTP entered
-            return true;
+            _verifiedOtp = pin; 
+            return await UserApi().verifyOtpPublic(
+              email: email,
+              otp: pin,
+              bizType: SmsBizType.register,
+            );
           },
           onResend: () async {
             return await userApi.sendOtp(
@@ -266,7 +270,7 @@ class _SignupScreenState extends State<SignupScreen> {
         await UserController.to.loadUser();
 
         await UserController.to.initIMForCurrentUser();
-        
+
         await StorageService.saveUserName(_emailController!.text.trim());
 
         Get.offAllNamed(Routes.home);

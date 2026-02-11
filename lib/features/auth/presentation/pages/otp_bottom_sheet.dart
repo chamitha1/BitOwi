@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pinput.dart';
@@ -9,8 +10,7 @@ class OtpBottomSheet extends StatefulWidget {
   final String email;
   final int otpLength;
   final SmsBizType bizType;
-
-  final Future<bool> Function(String pin) onVerifyPin;
+  final Future<Map<String, dynamic>> Function(String pin) onVerifyPin;
   final VoidCallback onVerified;
   final Future<bool> Function()? onResend;
 
@@ -30,6 +30,7 @@ class OtpBottomSheet extends StatefulWidget {
 
 class _OtpBottomSheetState extends State<OtpBottomSheet> {
   final TextEditingController _pinController = TextEditingController();
+  final FocusNode _pinFocusNode = FocusNode();
 
   int _secondsRemaining = 35;
   Timer? _timer;
@@ -48,6 +49,8 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
   void dispose() {
     _timer?.cancel();
     _pinController.dispose();
+    _pinFocusNode.dispose();
+
     super.dispose();
   }
 
@@ -100,19 +103,28 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
     setState(() => _isVerifying = true);
 
     try {
-      final ok = await widget.onVerifyPin(pin);
+      final response = await widget.onVerifyPin(pin);
+
       if (!mounted) return;
 
-      if (ok) {
+      AppLogger.d("OTP Verification Response: $response");
+      if (response['code'] == 200 || response['code'] == '200') {
         widget.onVerified();
       } else {
+        _pinController.clear();
+        _pinFocusNode.requestFocus();
+
         CustomSnackbar.showError(
           title: "Error",
-          message: "Invalid OTP, please try again.",
+          message: response['msg'] ?? response['errorMsg'] ?? "Invalid OTP",
         );
       }
     } catch (e) {
       if (!mounted) return;
+
+      _pinController.clear();
+      _pinFocusNode.requestFocus();
+
       CustomSnackbar.showError(
         title: "Error",
         message: "OTP verification failed: $e",
@@ -261,7 +273,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
                   length: widget.otpLength,
                   controller: _pinController,
                   defaultPinTheme: defaultPinTheme,
-
+                  focusNode: _pinFocusNode,
                   focusedPinTheme: focusedPinTheme,
                   showCursor: true,
                   onCompleted: (_) => _verify(),
