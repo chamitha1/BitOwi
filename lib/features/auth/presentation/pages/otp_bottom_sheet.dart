@@ -281,43 +281,41 @@ class _OtpBottomSheetState extends State<OtpBottomSheet> {
 
                 const SizedBox(height: 24),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xff1D5DE5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: _isVerifying ? null : _verify,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: _isVerifying
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text(
-                              "Verify",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
+                // SizedBox(
+                //   width: double.infinity,
+                //   height: 50,
+                //   child: Container(
+                //     decoration: BoxDecoration(
+                //       color: const Color(0xff1D5DE5),
+                //       borderRadius: BorderRadius.circular(12),
+                //     ),
+                //     child: ElevatedButton(
+                //       onPressed: _isVerifying ? null : _verify,
+                //       style: ElevatedButton.styleFrom(
+                //         backgroundColor: Colors.transparent,
+                //         shadowColor: Colors.transparent,
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(12),
+                //         ),
+                //       ),
+                //       child: _isVerifying
+                //           ? const SizedBox(
+                //               height: 18,
+                //               width: 18,
+                //               child: CircularProgressIndicator(strokeWidth: 2),
+                //             )
+                //           : const Text(
+                //               "Verify",
+                //               style: TextStyle(
+                //                 fontSize: 16,
+                //                 fontWeight: FontWeight.w600,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

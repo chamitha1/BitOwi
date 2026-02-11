@@ -15,6 +15,7 @@ import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart'
 import 'package:BitOwi/models/withdraw_request.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/models/jour.dart';
+import 'package:dio/dio.dart';
 
 class WithdrawController extends GetxController {
   final TextEditingController addrController = TextEditingController();
@@ -334,13 +335,21 @@ class WithdrawController extends GetxController {
       );
 
       return true;
-    } catch (e) {
+    } on DioException catch (e) {
       AppLogger.d("Create withdrawal error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
+      return false;
+    } catch (e) {
+      AppLogger.d("Create withdrawal unexpected error: $e");
       String errorMsg = e.toString();
       if (errorMsg.startsWith("Exception: ")) {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        CustomSnackbar.showError(title: "Error", message: errorMsg);
+      } else {
+        CustomSnackbar.showError(title: "Error", message: 'Unexpected error occurred');
       }
-      CustomSnackbar.showError(title: "Error", message: errorMsg);
       return false;
     } finally {
       isLoading.value = false;
