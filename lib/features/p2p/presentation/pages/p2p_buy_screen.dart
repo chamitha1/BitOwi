@@ -1,3 +1,4 @@
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
@@ -69,8 +70,23 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
           adsDetail = res;
         });
       }
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
     } catch (e) {
-      //
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        CustomSnackbar.showError(title: "Error", message: errorMsg);
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Unexpected error occurred',
+        );
+      }
     }
   }
 

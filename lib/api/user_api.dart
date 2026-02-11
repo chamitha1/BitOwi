@@ -163,56 +163,46 @@ for register and forgetPwd
   Future<Map<String, dynamic>> verifyOtpPublic({
     required String email,
     required String otp,
-    SmsBizType bizType = SmsBizType.register,
+    required SmsBizType bizType,
   }) async {
     try {
-      String url = '/core/v1/otp/permission_none/verify_public';
-      Options? options;
-      // Switch to public endpoint for Register and Forgot Password
-      if (bizType == SmsBizType.register || bizType == SmsBizType.forgetPwd) {
-        url = '/core/v1/otp/verify_public';
+      // ✅ Correct URL for public verification
+      const String url = '/core/v1/otp/permission_none/verify_public';
 
-        // 🚀 CRITICAL FIX: Use a NEW Dio instance to BYPASS global ApiClient interceptors.
-        // The global interceptor logs out on code 300/300000, which this endpoint might return.
-        final publicDio = Dio(
-          BaseOptions(
-            baseUrl: ApiClient.dio.options.baseUrl,
-            headers: {'Content-Type': 'application/json', 'Authorization': ''},
-            responseType: ResponseType.plain,
-            validateStatus: (status) => true,
-          ),
-        );
-        final reqData = {'email': email, 'bizType': bizType.value, 'otp': otp};
-        final response = await publicDio.post(url, data: reqData);
+      // 🚀 CRITICAL FIX: Use a NEW Dio instance to BYPASS global ApiClient interceptors.
+      final publicDio = Dio(
+        BaseOptions(
+          baseUrl: ApiClient.dio.options.baseUrl,
+          headers: {'Content-Type': 'application/json', 'Authorization': ''},
+          responseType: ResponseType.plain,
+          validateStatus: (status) => true,
+        ),
+      );
 
-        AppLogger.d("URL :  $url");
-        AppLogger.d("Req Data :  $reqData");
+      final reqData = {'email': email, 'bizType': bizType.value, 'otp': otp};
 
-        // Manual parsing
-        Map<String, dynamic> data;
-        if (response.data is String) {
-          try {
-            data = json.decode(response.data) as Map<String, dynamic>;
-          } catch (e) {
-            data = {};
-          }
-        } else {
-          data = response.data as Map<String, dynamic>;
+      AppLogger.d("URL :  $url");
+      AppLogger.d("Req Data :  $reqData");
+      AppLogger.d("🔼 HEADERS: ${publicDio.options.headers}");
+
+      final response = await publicDio.post(url, data: reqData);
+
+      // Manual parsing
+      Map<String, dynamic> data;
+      if (response.data is String) {
+        try {
+          data = json.decode(response.data) as Map<String, dynamic>;
+        } catch (e) {
+          data = {};
         }
-        AppLogger.d("Verify OTP Public Response: $data");
-        return data;
+      } else {
+        data = response.data as Map<String, dynamic>;
       }
 
-      final response = await ApiClient.dio.post(
-        url,
-        data: {'email': email, 'bizType': bizType.value, 'otp': otp},
-      );
-      AppLogger.d("Verify OTP Response: ${response.data}");
-
-      return response.data as Map<String, dynamic>;
-      // return response.data;
+      AppLogger.d("✅ Verify OTP Public Response: $data");
+      return data;
     } catch (e) {
-      AppLogger.d('Verify OTP error: $e');
+      AppLogger.d('❌ Verify OTP Public error: $e');
       return {'success': false, 'error': e.toString()};
     }
   }

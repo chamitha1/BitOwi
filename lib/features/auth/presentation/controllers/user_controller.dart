@@ -8,6 +8,7 @@ import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_she
 import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/im_util.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -91,8 +92,23 @@ class UserController extends GetxController {
       if (fetchedUser.id != null) {
         getTradeInfo(fetchedUser.id!);
       }
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
     } catch (e) {
-      AppLogger.d('Error fetching user info: $e');
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        CustomSnackbar.showError(title: "Error", message: errorMsg);
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Unexpected error occurred',
+        );
+      }
     }
   }
 
@@ -181,16 +197,46 @@ class UserController extends GetxController {
 
       notificationCount.value = unreadCount;
       AppLogger.d("Notification count updated: ${notificationCount.value}");
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
     } catch (e) {
-      AppLogger.d("Error fetching notification count: $e");
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        CustomSnackbar.showError(title: "Error", message: errorMsg);
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Unexpected error occurred',
+        );
+      }
     }
   }
 
   Future<void> logout() async {
     try {
       await UserApi.logOff();
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
     } catch (e) {
-      AppLogger.d("Logout API failed: $e");
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        CustomSnackbar.showError(title: "Error", message: errorMsg);
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Unexpected error occurred',
+        );
+      }
     } finally {
       // Clear data regardless of API success
       await StorageService.removeToken();

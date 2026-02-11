@@ -3,6 +3,7 @@ import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/jour_front_detail.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
 import 'package:BitOwi/utils/app_logger.dart';
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
 class TransactionDetailController extends GetxController {
@@ -62,12 +63,23 @@ class TransactionDetailController extends GetxController {
           detail.value = res;
         }
       }
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
     } catch (e) {
-      AppLogger.d("Error fetching transaction detail: $e");
-      CustomSnackbar.showError(
-        title: "Error",
-        message: "Failed to load details",
-      );
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        CustomSnackbar.showError(title: "Error", message: errorMsg);
+      } else {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Unexpected error occurred',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
