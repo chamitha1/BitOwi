@@ -1,9 +1,12 @@
 import 'package:BitOwi/features/wallet/presentation/controllers/wallet_detail_controller.dart';
+import 'package:BitOwi/features/wallet/presentation/pages/transaction_detail_page.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/transaction_card.dart';
 import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
+import 'package:BitOwi/models/jour.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:intl/intl.dart';
@@ -52,7 +55,12 @@ class WalletDetailPage extends GetView<WalletDetailController> {
       body: Obx(() {
         if (controller.accountInfo.value == null &&
             controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+            ),
+          );
         }
 
         if (controller.accountInfo.value == null) {
@@ -100,35 +108,19 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                         ),
                       ),
                     ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 16.w),
+                        child: _buildFilterTabs(),
+                      ),
+                    ),
                     SliverPadding(
                       padding: EdgeInsets.symmetric(horizontal: 20.w),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           if (index < controller.transactionList.length) {
                             final item = controller.transactionList[index];
-                            final isDeposit =
-                                item.bizCategory?.toLowerCase() == 'deposit' ||
-                                item.bizCategory?.toLowerCase() ==
-                                    'charge'; // Adjust logic
-
-                            return TransactionCard(
-                              isDeposit: isDeposit,
-                              amount:
-                                  "${double.tryParse(item.transAmount?.toString() ?? '0')?.toStringAsFixed(2) ?? '0.00'} ${item.currency ?? ''}",
-                              date: item.createDatetime != null
-                                  ? DateFormat('yyyy-MM-dd HH:mm').format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                        item.createDatetime is int
-                                            ? item.createDatetime
-                                            : int.tryParse(
-                                                    item.createDatetime
-                                                        .toString(),
-                                                  ) ??
-                                                  0,
-                                      ),
-                                    )
-                                  : '-',
-                            );
+                            return _buildTransactionItem(item);
                           }
                           return null;
                         }, childCount: controller.transactionList.length),
@@ -362,6 +354,173 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                   ),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterTabs() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Row(
+        children: [
+          _buildTabButton(0, "All"),
+          SizedBox(width: 12.w),
+          _buildTabButton(1, "Deposits"),
+          SizedBox(width: 12.w),
+          _buildTabButton(2, "Withdrawals"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(int index, String text) {
+    return Obx(() {
+      final isSelected = controller.currentTab.value == index;
+      return GestureDetector(
+        onTap: () => controller.changeTab(index),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.w),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF1D5DE5)
+                : const Color(0xFFECEFF5),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF555555).withOpacity(0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 0),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+              fontSize: 14.sp,
+              color: isSelected ? Colors.white : const Color(0xFF717F9A),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildTransactionItem(Jour tx) {
+    double val =
+        double.tryParse(tx.transAmount?.replaceAll(',', '') ?? '0') ?? 0.0;
+    final isDeposit = tx.bizType == '1' || val > 0;
+    final amountColor = isDeposit
+        ? const Color(0xFF00C087)
+        : const Color(0xFFFF4D4F);
+    final iconBg = isDeposit
+        ? const Color(0xFFEAF9F0)
+        : const Color(0xFFFDECEB);
+    final iconColor = isDeposit
+        ? const Color(0xFF40A372)
+        : const Color(0xFFE74C3C);
+
+    final iconAsset = isDeposit
+        ? 'assets/icons/home/deposit.svg'
+        : 'assets/icons/home/withdraw.svg';
+    final amountPrefix = isDeposit ? "+" : "-";
+    if (val < 0) val = -val;
+    final amountStr = "$amountPrefix${val.toStringAsFixed(2)}";
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          Routes.transactionDetail,
+          parameters: {"id": tx.id ?? "", "type": tx.bizType ?? "1"},
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        margin: EdgeInsets.only(bottom: 12.w), //  for list spacing
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40.w,
+              height: 40.w,
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SvgPicture.asset(iconAsset, color: iconColor),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isDeposit ? "Deposit" : "Withdraw",
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14.sp,
+                      color: const Color(0xFF151E2F),
+                    ),
+                  ),
+                  SizedBox(height: 4.w),
+                  Text(
+                    tx.createDatetime != null
+                        ? DateFormat('yyyy-MM-dd HH:mm').format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                              tx.createDatetime is int
+                                  ? tx.createDatetime
+                                  : int.tryParse(
+                                          tx.createDatetime.toString(),
+                                        ) ??
+                                        0,
+                            ),
+                          )
+                        : '-',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12.sp,
+                      color: const Color(0xFF717F9A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  amountStr,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14.sp,
+                    color: amountColor,
+                  ),
+                ),
+                if (tx.remark != null && tx.remark!.trim().isNotEmpty) ...[
+                  SizedBox(height: 4.w),
+                  Text(
+                    tx.remark!,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12.sp,
+                      color: const Color(0xFF717F9A),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),
