@@ -173,7 +173,7 @@ for register and forgetPwd
       final publicDio = Dio(
         BaseOptions(
           baseUrl: ApiClient.dio.options.baseUrl,
-          headers: {'Content-Type': 'application/json', 'Authorization': ''},
+          headers: {'Content-Type': 'application/json', 'Authorization': '', 'Accept-Language': 'en_US'},
           responseType: ResponseType.plain,
           validateStatus: (status) => true,
         ),
