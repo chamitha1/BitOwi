@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_ume_kit_ui_plus/flutter_ume_kit_ui_plus.dart';
+import 'package:flutter_ume_plus/flutter_ume_plus.dart';
+
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,6 +34,18 @@ void main() async {
     // Disable debugPrint
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
+  if (kDebugMode) {
+    if (kDebugMode) {
+      PluginManager.instance
+        ..register(WidgetInfoInspector())
+        ..register(WidgetDetailInspector())
+        ..register(ColorSucker())
+        ..register(AlignRuler());
+
+      runApp(const UMEWidget(child: BitOwi()));
+    }
+  }
+
   runApp(const BitOwi());
 }
 

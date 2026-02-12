@@ -151,13 +151,36 @@ class BalanceHistoryController extends GetxController {
           double amt = double.tryParse(w.actualAmount) ?? 0;
           if (amt > 0) amt = -amt;
 
+          final rawTime = w.applyDatetime ?? w.createDatetime;
+
+          int timestamp = 0;
+          try {
+            if (rawTime != null) {
+              int? parsedInt = int.tryParse(rawTime);
+              if (parsedInt != null) {
+                if (parsedInt < 10000000000) {
+                  timestamp = parsedInt * 1000;
+                } else {
+                  timestamp = parsedInt;
+                }
+              } else {
+                DateTime? dt = DateTime.tryParse(rawTime);
+                if (dt != null) {
+                  timestamp = dt.millisecondsSinceEpoch;
+                }
+              }
+            }
+          } catch (_) {
+            AppLogger.d("Date parsing failed for: $rawTime");
+          }
+
           return Jour(
             id: w.id,
             userId: w.userId,
             bizType: '2',
             transAmount: amt.toString(),
             currency: w.currency,
-            createDatetime: w.createDatetime,
+            createDatetime: timestamp,
             remark: "Withdraw",
             status: w.status,
           );
