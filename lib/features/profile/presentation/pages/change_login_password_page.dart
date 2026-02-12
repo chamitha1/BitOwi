@@ -140,7 +140,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
     try {
       final success = await _userApi.sendOtp(
         email: _email,
-        bizType: SmsBizType.forgetPwd,
+        bizType: SmsBizType.resetLoginPwd,
       );
       AppLogger.d("ChangeLoginPasswordPage: sendOtp success: $success");
 

@@ -248,7 +248,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             return await UserApi().verifyOtp(
               email: newEmail,
               otp: pin,
-              bizType: SmsBizType.register,
+              bizType: SmsBizType.modifyEmail,
             );
             ;
           },
