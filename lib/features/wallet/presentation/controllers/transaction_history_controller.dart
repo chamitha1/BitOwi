@@ -156,10 +156,51 @@ class TransactionHistoryController extends GetxController {
       if (res.list.isEmpty) {
         isEnd.value = true;
       } else {
+        final processedList = res.list.map((item) {
+          final rawTime = item.applyDatetime ?? item.createDatetime;
+          String fixedTime = item.createDatetime; // Default fallback
+          try {
+            if (rawTime != null) {
+              // Check if numeric
+              int? parsedInt = int.tryParse(rawTime);
+              if (parsedInt != null) {
+                if (parsedInt < 10000000000) {
+                  // It's seconds, convert to Ms string
+                  fixedTime = (parsedInt * 1000).toString();
+                } else {
+                  fixedTime = parsedInt.toString();
+                }
+              } else {
+                // Check if Date String
+                DateTime? dt = DateTime.tryParse(rawTime);
+                if (dt != null) {
+                  fixedTime = dt.millisecondsSinceEpoch.toString();
+                }
+              }
+            }
+          } catch (_) {}
+          // Create new instance with fixed time (since fields are final)
+          return WithdrawPageRes(
+            id: item.id,
+            userId: item.userId,
+            amount: item.amount,
+            actualAmount: item.actualAmount,
+            fee: item.fee,
+            currency: item.currency,
+            status: item.status,
+            createDatetime:
+                fixedTime, // <-- Using fixed timestamp derived from applyDatetime
+            payDatetime: item.payDatetime,
+            applyDatetime: item.applyDatetime,
+            payCardNo: item.payCardNo,
+            payCardName: item.payCardName,
+            payBank: item.payBank,
+          );
+        }).toList();
         if (refresh) {
-          withdrawList.assignAll(res.list);
+          withdrawList.assignAll(processedList);
         } else {
-          withdrawList.addAll(res.list);
+          withdrawList.addAll(processedList);
         }
 
         if (res.list.length < pageSize) {
