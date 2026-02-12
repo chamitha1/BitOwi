@@ -41,6 +41,28 @@ class TransactionDetailController extends GetxController {
           final res = await AccountApi.getWithdrawDetail(id!);
           AppLogger.d("Withdraw Details fetched: ${res.toJson()}");
 
+          double totalAmount = double.tryParse(res.amount) ?? 0;
+          double actualAmount = double.tryParse(res.actualAmount) ?? 0;
+          double feeVal = (totalAmount - actualAmount).abs();
+
+          final rawTime = res.applyDatetime ?? res.createDatetime;
+          int timestamp = 0;
+          try {
+            if (rawTime.isNotEmpty) {
+              int? parsedInt = int.tryParse(rawTime);
+              if (parsedInt != null) {
+                if (parsedInt < 10000000000) {
+                  timestamp = parsedInt * 1000;
+                } else {
+                  timestamp = parsedInt;
+                }
+              } else {
+                DateTime? dt = DateTime.tryParse(rawTime);
+                if (dt != null) timestamp = dt.millisecondsSinceEpoch;
+              }
+            }
+          } catch (_) {}
+
           detail.value = JourFrontDetail(
             id: res.id,
             userId: res.userId,
@@ -48,13 +70,14 @@ class TransactionDetailController extends GetxController {
                 .toString(),
             currency: res.currency,
             status: res.status,
-            createDatetime: res.createDatetime,
+            createDatetime: timestamp,
             remark: res.remark ?? res.payBank ?? 'Withdrawal',
             accountNumber: res.payCardNo,
             refNo: res.id,
             bizType: '2',
             preAmount: '0',
             postAmount: '0',
+            fee: feeVal.toStringAsFixed(2),
           );
         }
       } else {

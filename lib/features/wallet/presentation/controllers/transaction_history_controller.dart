@@ -71,31 +71,21 @@ class TransactionHistoryController extends GetxController {
     isLoading.value = true;
     pageNum = 1;
     isEnd.value = false;
-
-    // Clear list for current tab to show loading or empty state
+    depositList.clear();
+    withdrawList.clear(); 
     if (isDeposit.value) {
-      depositList.clear();
-      await fetchDeposits(refresh: true);
+      await fetchTransactions(type: '1'); // Deposits
     } else {
-      withdrawList.clear();
-      await fetchWithdrawals(refresh: true);
+      await fetchTransactions(type: '2'); // Withdrawals
     }
-
     isLoading.value = false;
   }
 
   Future<void> loadMore() async {
     if (isEnd.value || isLoading.value) return;
-
     isLoading.value = true;
     pageNum++;
-
-    if (isDeposit.value) {
-      await fetchDeposits();
-    } else {
-      await fetchWithdrawals();
-    }
-
+    await fetchTransactions(type: isDeposit.value ? '1' : '2');
     isLoading.value = false;
   }
 
@@ -159,13 +149,21 @@ class TransactionHistoryController extends GetxController {
         final processedList = res.list.map((item) {
           final rawTime = item.applyDatetime ?? item.createDatetime;
           String fixedTime = item.createDatetime; // Default fallback
+          String calculatedFee = "0.00";
+
+          try {
+            double total = double.tryParse(item.amount) ?? 0;
+            double actual = double.tryParse(item.actualAmount) ?? 0;
+            double diff = (total - actual).abs();
+            calculatedFee = diff.toStringAsFixed(2);
+          } catch (_) {}
+
           try {
             if (rawTime != null) {
               // Check if numeric
               int? parsedInt = int.tryParse(rawTime);
               if (parsedInt != null) {
                 if (parsedInt < 10000000000) {
-                  // It's seconds, convert to Ms string
                   fixedTime = (parsedInt * 1000).toString();
                 } else {
                   fixedTime = parsedInt.toString();
@@ -179,17 +177,16 @@ class TransactionHistoryController extends GetxController {
               }
             }
           } catch (_) {}
-          // Create new instance with fixed time (since fields are final)
           return WithdrawPageRes(
             id: item.id,
             userId: item.userId,
             amount: item.amount,
             actualAmount: item.actualAmount,
-            fee: item.fee,
+            fee: calculatedFee,
             currency: item.currency,
             status: item.status,
             createDatetime:
-                fixedTime, // <-- Using fixed timestamp derived from applyDatetime
+                fixedTime, 
             payDatetime: item.payDatetime,
             applyDatetime: item.applyDatetime,
             payCardNo: item.payCardNo,
@@ -210,6 +207,50 @@ class TransactionHistoryController extends GetxController {
     } catch (e) {
       AppLogger.d("Fetch withdrawals error: $e");
       if (!refresh) pageNum--;
+    }
+  }
+
+  Future<void> fetchTransactions({required String type}) async {
+    try {
+      final Map<String, dynamic> params = {
+        "pageNum": pageNum,
+        "pageSize": pageSize,
+        "bizCategory": '',
+        "type": '0',
+      };
+      if (accountNumber != null) {
+        params['accountNumber'] = accountNumber;
+      }
+      final res = await AccountApi.getJourPageList(params);
+      List<Jour> filteredList = res.list;
+      if (type == '1') {
+        // Deposits (Positive Amount or BizType 1)
+        filteredList = filteredList.where((item) {
+          double amt = double.tryParse(item.transAmount ?? '0') ?? 0;
+          return item.bizType == '1' || amt > 0;
+        }).toList();
+      } else {
+        // Withdrawals (Negative Amount or BizType 2)
+        filteredList = filteredList.where((item) {
+          double amt = double.tryParse(item.transAmount ?? '0') ?? 0;
+          return item.bizType == '2' || amt < 0;
+        }).toList();
+      }
+      if (res.list.isEmpty && filteredList.isEmpty) {
+        isEnd.value = true;
+      } else {
+        if (pageNum == 1) {
+          depositList.assignAll(filteredList);
+        } else {
+          depositList.addAll(filteredList);
+        }
+        if (res.list.length < pageSize) {
+          isEnd.value = true;
+        }
+      }
+    } catch (e) {
+      AppLogger.d("Fetch error: $e");
+      if (pageNum > 1) pageNum--;
     }
   }
 }

@@ -154,7 +154,7 @@ class TransactionDetailPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildInfoRow(
                   label: "Fees",
-                  value: "0.00 ${detail.currency ?? ''}",
+                  value: "${detail.fee ?? '0.00'} ${detail.currency ?? ''}",
                   bgColor: cardBgColor,
                 ),
                 const SizedBox(height: 12),

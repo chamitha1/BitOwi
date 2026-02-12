@@ -91,7 +91,7 @@ class Jour {
       channelType: channelType ?? this.channelType,
     );
   }
-  
-  factory Jour.fromJson(Map<String,dynamic> json) => _$JourFromJson(json);
+
+  factory Jour.fromJson(Map<String, dynamic> json) => _$JourFromJson(json);
   Map<String, dynamic> toJson() => _$JourToJson(this);
 }

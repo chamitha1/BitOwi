@@ -12,6 +12,7 @@ class JourFrontDetail {
   final String transAmount;
   final String? preAmount;
   final String? postAmount;
+  final String? fee; 
   final String? prevJourCode;
   final String? status;
   final String? remark;
@@ -32,6 +33,7 @@ class JourFrontDetail {
     required this.transAmount,
     this.preAmount,
     this.postAmount,
+    this.fee, 
     this.prevJourCode,
     this.status,
     this.remark,
@@ -54,6 +56,7 @@ class JourFrontDetail {
       transAmount: json['transAmount']?.toString() ?? '0',
       preAmount: json['preAmount']?.toString(),
       postAmount: json['postAmount']?.toString(),
+      fee: json['fee']?.toString(), 
       prevJourCode: json['prevJourCode']?.toString(),
       status: json['status']?.toString(),
       remark: json['remark']?.toString(),
@@ -77,6 +80,7 @@ class JourFrontDetail {
       'transAmount': transAmount,
       'preAmount': preAmount,
       'postAmount': postAmount,
+      'fee': fee, 
       'prevJourCode': prevJourCode,
       'status': status,
       'remark': remark,

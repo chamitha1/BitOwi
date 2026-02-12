@@ -203,10 +203,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   );
                 }
 
-                final list = controller.isDeposit.value
-                    ? controller.depositList
-                    : controller.withdrawList;
-
+                final list = controller.depositList;
                 if (list.isEmpty) {
                   return Center(
                     child: Text(
@@ -342,8 +339,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Widget _buildWithdrawItem(dynamic item) {
-    final status = controller.statusEnum[item.status] ?? item.status;
-
+    // final status = controller.statusEnum[item.status] ?? item.status;
+    String rawStatus = controller.statusEnum[item.status] ?? item.status ?? '';
+    final status = rawStatus.toString().replaceAll('\n', ' ').trim();
     Color statusColor = const Color(0xff151E2F);
     Color statusBg = const Color(0xffF6F9FF);
 
@@ -366,7 +364,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           Routes.transactionDetail,
           parameters: {
             'id': item.id,
-            'type': '2', // Explicitly type 2 for withdrawals
+            'type': '1', // Explicitly type 2 for withdrawals
           },
         );
       },
@@ -385,7 +383,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "-${item.actualAmount} ${item.currency}",
+                  "${item.transAmount} ${item.currency}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -418,7 +416,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               children: [
                 Expanded(
                   child: Text(
-                    "To: ${item.payCardNo ?? 'Unknown'}",
+                    "To: ${item.accountNumber ?? 'Unknown'}",
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xff929EB8),
