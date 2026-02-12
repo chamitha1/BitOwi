@@ -193,7 +193,12 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         ),
       );
     } catch (e) {
-      if (mounted) CustomSnackbar.showError(title: "Error", message: "$e");
+      if (mounted) {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: e.toString().replaceAll("Exception: ", ""),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSendingOtp = false);
     }

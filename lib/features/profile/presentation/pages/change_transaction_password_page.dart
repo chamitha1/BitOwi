@@ -118,7 +118,10 @@ class _ChangeTransactionPasswordPageState
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        CustomSnackbar.showError(title: "Error", message: "$e");
+        CustomSnackbar.showError(
+          title: "Error",
+          message: e.toString().replaceAll("Exception: ", ""),
+        );
       }
     }
   }

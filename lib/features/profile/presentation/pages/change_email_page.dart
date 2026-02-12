@@ -180,7 +180,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         ),
       );
     } catch (e) {
-      if (mounted) CustomSnackbar.showError(title: "Error", message: "$e");
+      if (mounted) {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: e.toString().replaceAll("Exception: ", ""),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSendingOtpOld = false);
     }
