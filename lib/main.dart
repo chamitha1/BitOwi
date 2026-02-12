@@ -34,19 +34,18 @@ void main() async {
     // Disable debugPrint
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
+
   if (kDebugMode) {
-    if (kDebugMode) {
-      PluginManager.instance
-        ..register(WidgetInfoInspector())
-        ..register(WidgetDetailInspector())
-        ..register(ColorSucker())
-        ..register(AlignRuler());
-
-      runApp(const UMEWidget(child: BitOwi()));
-    }
+    PluginManager.instance
+      ..register(WidgetInfoInspector())
+      ..register(WidgetDetailInspector())
+      ..register(ColorSucker())
+      ..register(AlignRuler());
+    // Run with UME Overlay
+    runApp(const UMEWidget(child: BitOwi()));
+  } else {
+    runApp(const BitOwi());
   }
-
-  runApp(const BitOwi());
 }
 
 class BitOwi extends StatelessWidget {
