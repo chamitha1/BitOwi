@@ -89,7 +89,7 @@ class MerchantBanner extends StatelessWidget {
       case '4': // Decertification
         return _MerchantBannerConfig(
           title: "Become a merchant",
-          subtitle: "Apply to start accepting crypto payments",
+          subtitle: "Apply to start transacting cryptocurrency and access P2P features",
           iconPath: "assets/icons/home/merchant.svg",
           backgroundColor: Colors.white,
           borderColor: const Color(0xffD1DEF9),
@@ -103,8 +103,8 @@ class MerchantBanner extends StatelessWidget {
       case '0': // Under review
       case '3': // Decertification under review
         return _MerchantBannerConfig(
-          title: "In Review...",
-          subtitle: "Security and compliance checks in progress",
+          title: "Application Under Review",
+          subtitle: "Your account is undergoing security and compliance verification. You will be notified once it is approved.",
           iconPath: "assets/icons/home/timer.svg",
           backgroundColor: const Color(0xffFFF6EC),
           borderColor: const Color(0xffFFD9B0),
@@ -118,7 +118,7 @@ class MerchantBanner extends StatelessWidget {
       case '1': // Review passed
         return _MerchantBannerConfig(
           title: "Certified Merchant",
-          subtitle: "You're approved and ready to accept payments",
+          subtitle: "Your account has been approved. You can now post ads and access P2P features.",
           iconPath: "assets/icons/home/tick-circle.svg",
           backgroundColor: const Color(0xffEAF9F0),
           borderColor: const Color(0xffABEAC6),
@@ -131,7 +131,7 @@ class MerchantBanner extends StatelessWidget {
       default:
         return _MerchantBannerConfig(
           title: "Become a merchant",
-          subtitle: "Apply to start accepting crypto payments",
+          subtitle: "Submit your details to start posting ads and gain access to P2P features.",
           iconPath: "assets/icons/home/merchant.svg",
           backgroundColor: Colors.white,
           borderColor: const Color(0xffD1DEF9),
