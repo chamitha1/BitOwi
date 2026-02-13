@@ -228,7 +228,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
 
             const SizedBox(height: 16),
 
-            // Grey Container 
+            // Grey Container
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -263,19 +263,19 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
         Text(
           label,
           style: const TextStyle(
-             fontFamily: 'Inter',
-             fontWeight: FontWeight.w400,
-             fontSize: 14,
-             color: Color(0xFF717F9A), 
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+            color: Color(0xFF717F9A),
           ),
         ),
         Text(
           value,
           style: const TextStyle(
-             fontFamily: 'Inter',
-             fontWeight: FontWeight.w500,
-             fontSize: 16,
-             color: Color(0xFF151E2F),
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: Color(0xFF151E2F),
           ),
         ),
       ],
@@ -428,7 +428,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
       onTap: () {
         Get.toNamed(
           Routes.transactionDetail,
-          parameters: {"id": tx.id ?? '', "type": tx.bizType ?? '1'},
+          parameters: {"id": tx.id ?? '', "type": "1", "source": "ledger"},
         );
       },
       child: Container(
@@ -591,6 +591,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
       ),
     );
   }
+
   Widget _buildPlaceholderIcon(String coin) {
     return Container(
       width: 32,

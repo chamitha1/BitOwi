@@ -203,7 +203,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   );
                 }
 
-                final list = controller.depositList;
+                final list = controller.isDeposit.value
+                    ? controller.depositList
+                    : controller.withdrawList;
                 if (list.isEmpty) {
                   return Center(
                     child: Text(
@@ -359,6 +361,15 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       statusBg = const Color(0xffFFF3E0);
     }
 
+    String amountStr = "0";
+    try {
+      amountStr =
+          (item.toJson()['amount'] ?? item.toJson()['transAmount'] ?? '0')
+              .toString();
+    } catch (e) {
+      amountStr = "0";
+    }
+
     return GestureDetector(
       onTap: () {
         Get.toNamed(
@@ -385,7 +396,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${item.transAmount} ${item.currency}",
+                  "${amountStr} ${item.currency}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -418,7 +429,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               children: [
                 Expanded(
                   child: Text(
-                    "To: ${item.accountNumber ?? 'Unknown'}",
+                    "To: ${item.payCardNo ?? item.accountNumber ?? 'Unknown'}",
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xff929EB8),

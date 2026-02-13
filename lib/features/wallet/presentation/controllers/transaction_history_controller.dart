@@ -72,11 +72,11 @@ class TransactionHistoryController extends GetxController {
     pageNum = 1;
     isEnd.value = false;
     depositList.clear();
-    withdrawList.clear(); 
+    withdrawList.clear();
     if (isDeposit.value) {
-      await fetchTransactions(type: '1'); // Deposits
+      await fetchDeposits(refresh: true);
     } else {
-      await fetchTransactions(type: '2'); // Withdrawals
+      await fetchWithdrawals(refresh: true);
     }
     isLoading.value = false;
   }
@@ -85,7 +85,11 @@ class TransactionHistoryController extends GetxController {
     if (isEnd.value || isLoading.value) return;
     isLoading.value = true;
     pageNum++;
-    await fetchTransactions(type: isDeposit.value ? '1' : '2');
+    if (isDeposit.value) {
+      await fetchDeposits();
+    } else {
+      await fetchWithdrawals();
+    }
     isLoading.value = false;
   }
 

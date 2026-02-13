@@ -132,95 +132,44 @@ class BalanceHistoryController extends GetxController {
 
   Future<void> _fetchTransactions() async {
     try {
-      if (currentTab.value == 2) {
-        // Withdraw Tab
-        final Map<String, dynamic> params = {
-          "pageNum": pageNum,
-          "pageSize": pageSize,
-        };
-        if (accountNumber != null) {
-          params['accountNumber'] = accountNumber;
-        }
-        AppLogger.d("Fetching Withdrawals with params: $params");
+      // Use Journal API for ALL tabs
+      final Map<String, dynamic> params = {
+        "pageNum": pageNum,
+        "pageSize": pageSize,
+        "bizCategory": '',
+        "type": '0',
+      };
 
-        final PageInfo<WithdrawPageRes> res =
-            await AccountApi.getWithdrawPageList(params);
-        AppLogger.d("Withdrawals fetched. Count: ${res.list.length}");
-
-        final List<Jour> mappedList = res.list.map((w) {
-          double amt = double.tryParse(w.actualAmount) ?? 0;
-          if (amt > 0) amt = -amt;
-
-          final rawTime = w.applyDatetime ?? w.createDatetime;
-
-          int timestamp = 0;
-          try {
-            if (rawTime != null) {
-              int? parsedInt = int.tryParse(rawTime);
-              if (parsedInt != null) {
-                if (parsedInt < 10000000000) {
-                  timestamp = parsedInt * 1000;
-                } else {
-                  timestamp = parsedInt;
-                }
-              } else {
-                DateTime? dt = DateTime.tryParse(rawTime);
-                if (dt != null) {
-                  timestamp = dt.millisecondsSinceEpoch;
-                }
-              }
-            }
-          } catch (_) {
-            AppLogger.d("Date parsing failed for: $rawTime");
-          }
-
-          return Jour(
-            id: w.id,
-            userId: w.userId,
-            bizType: '2',
-            transAmount: amt.toString(),
-            currency: w.currency,
-            createDatetime: timestamp,
-            remark: "Withdraw",
-            status: w.status,
-          );
-        }).toList();
-
-        handleResponse(mappedList, res.isEnd);
-      } else {
-        // All (0) or Deposit (1)
-        final Map<String, dynamic> params = {
-          "pageNum": pageNum,
-          "pageSize": pageSize,
-          "bizCategory": '',
-          "type": '0',
-        };
-
-        if (accountNumber != null) {
-          params['accountNumber'] = accountNumber;
-        }
-
-        AppLogger.d(
-          "Fetching Transactions (Tab: ${currentTab.value}) with params: $params",
-        );
-
-        final PageInfo<Jour> res = await AccountApi.getJourPageList(params);
-        AppLogger.d("Jour fetched. Count: ${res.list.length}");
-
-        List<Jour> processedList = res.list.map((item) {
-          return item;
-        }).toList();
-
-        //Tab Filter
-        if (currentTab.value == 1) {
-          processedList = processedList.where((item) {
-            final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
-            return item.bizType == '1' || amount > 0;
-          }).toList();
-        }
-
-        handleResponse(processedList, res.isEnd);
+      if (accountNumber != null) {
+        params['accountNumber'] = accountNumber;
       }
+
+      AppLogger.d(
+        "Fetching Transactions (Tab: ${currentTab.value}) with params: $params",
+      );
+
+      final PageInfo<Jour> res = await AccountApi.getJourPageList(params);
+      AppLogger.d("Jour fetched. Count: ${res.list.length}");
+
+      List<Jour> processedList = res.list;
+
+      // Tab Filter:
+      // 0: All
+      // 1: Deposits (bizType '1' or amount > 0)
+      // 2: Withdrawals (bizType '2' or amount < 0)
+      if (currentTab.value == 1) {
+        processedList = processedList.where((item) {
+          final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
+          return item.bizType == '1' || amount > 0;
+        }).toList();
+      } else if (currentTab.value == 2) {
+        processedList = processedList.where((item) {
+          final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
+          return item.bizType == '2' || amount < 0; // Filter for withdrawals
+        }).toList();
+      }
+
+      handleResponse(processedList, res.isEnd);
     } catch (e) {
       AppLogger.d("Error fetching transactions: $e");
       rethrow;
