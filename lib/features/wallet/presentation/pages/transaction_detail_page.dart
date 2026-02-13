@@ -126,18 +126,6 @@ class TransactionDetailPage extends StatelessWidget {
 
                 // Fields
                 _buildInfoRow(
-                  label: "Previous Balance",
-                  value: "${detail.preAmount ?? '0'} ${detail.currency ?? ''}",
-                  bgColor: cardBgColor,
-                ),
-                const SizedBox(height: 12),
-                _buildInfoRow(
-                  label: "New Balance",
-                  value: "${detail.postAmount ?? '0'} ${detail.currency ?? ''}",
-                  bgColor: cardBgColor,
-                ),
-                const SizedBox(height: 12),
-                _buildInfoRow(
                   label: "Address",
                   value: detail.accountNumber ?? '',
                   allowCopy: true,
@@ -152,12 +140,37 @@ class TransactionDetailPage extends StatelessWidget {
                   bgColor: cardBgColor,
                 ),
                 const SizedBox(height: 12),
+                if (controller.showFee) ...[
+                  _buildInfoRow(
+                    label: "Fees",
+                    value: "${detail.fee ?? '0.00'} ${detail.currency ?? ''}",
+                    bgColor: cardBgColor,
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 _buildInfoRow(
-                  label: "Fees",
-                  value: "${detail.fee ?? '0.00'} ${detail.currency ?? ''}",
+                  label: "Status",
+                  value: controller.getStatusText(detail.status),
+                  // textColor: controller.getStatusColor(detail.status),
                   bgColor: cardBgColor,
                 ),
                 const SizedBox(height: 12),
+                if (controller.showBalances) ...[
+                  _buildInfoRow(
+                    label: "Previous Balance",
+                    value:
+                        "${detail.preAmount ?? '0'} ${detail.currency ?? ''}",
+                    bgColor: cardBgColor,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoRow(
+                    label: "New Balance",
+                    value:
+                        "${detail.postAmount ?? '0'} ${detail.currency ?? ''}",
+                    bgColor: cardBgColor,
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 _buildInfoRow(
                   label: "Transaction Time",
                   value: _formatDate(detail.createDatetime),
@@ -195,6 +208,7 @@ class TransactionDetailPage extends StatelessWidget {
     required String label,
     required String value,
     required Color bgColor,
+
     bool allowCopy = false,
     bool isUnderline = false,
   }) {

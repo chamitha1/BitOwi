@@ -436,7 +436,11 @@ class WalletDetailPage extends GetView<WalletDetailController> {
       onTap: () {
         Get.toNamed(
           Routes.transactionDetail,
-          parameters: {"id": tx.id ?? "", "type": tx.bizType ?? "1"},
+          parameters: {
+            "id": tx.id ?? "",
+            "type": tx.bizType ?? "1",
+            'source': 'ledger',
+          },
         );
       },
       child: Container(

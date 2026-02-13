@@ -607,6 +607,7 @@ class AccountApi {
   static Future<JourFrontDetail> getJourDetail(String id) async {
     try {
       final res = await ApiClient.dio.post('/core/v1/jour/detail_front/$id');
+      AppLogger.d("Jour Detail Response: ${res.data}");
       return JourFrontDetail.fromJson(res.data['data']);
     } catch (e) {
       AppLogger.d("getJourDetail error: $e");

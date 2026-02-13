@@ -255,6 +255,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           parameters: {
             'id': item.id,
             'type': '1', // Default type 1 for deposits/jour
+            'source': 'history',
           },
         );
       },
@@ -364,7 +365,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           Routes.transactionDetail,
           parameters: {
             'id': item.id,
-            'type': '1', // Explicitly type 2 for withdrawals
+            'type': '2', // Explicitly type 2 for withdrawals
+            'source': 'history',
           },
         );
       },

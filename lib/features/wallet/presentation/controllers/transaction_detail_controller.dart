@@ -1,5 +1,7 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/api/common_api.dart'; // Added
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:flutter/material.dart'; // Added for Color
 import 'package:BitOwi/models/jour_front_detail.dart';
 import 'package:BitOwi/models/withdraw_detail_res.dart';
 import 'package:BitOwi/utils/app_logger.dart';
@@ -11,18 +13,26 @@ class TransactionDetailController extends GetxController {
   final Rx<JourFrontDetail?> detail = Rx<JourFrontDetail?>(null);
   String? id;
   String? type; // '1': Deposit/Jour, '2': Withdraw
+  String? source; // 'ledger' State 1 | 'history' State 2
+
+  var statusEnum = <String, String>{}.obs;
+
+  bool get showFee => source == 'history';
+  bool get showBalances => source == 'ledger';
 
   @override
   void onInit() {
     super.onInit();
     id = Get.parameters['id'];
     type = Get.parameters['type'];
+    source = Get.parameters['source'] ?? 'ledger'; 
 
     if (id == null || id!.isEmpty) {
       final args = Get.arguments;
       if (args is Map) {
         id = args['id'];
         type = args['type'];
+        source = args['source'] ?? 'ledger';
       }
     }
 
@@ -30,6 +40,35 @@ class TransactionDetailController extends GetxController {
       fetchDetail();
     } else {
       isLoading.value = false;
+    }
+    fetchDict();
+  }
+
+  Future<void> fetchDict() async {
+    try {
+      final res = await CommonApi.getDictList(parentKey: 'withdraw.status');
+      for (var element in res) {
+        statusEnum[element.key] = element.value;
+      }
+    } catch (e) {
+      AppLogger.d("Error fetching dict: $e");
+    }
+  }
+
+  String getStatusText(String? status) {
+    if (status == null) return '';
+    return statusEnum[status] ?? status;
+  }
+
+  Color getStatusColor(String? status) {
+    if (status == '2' || status == '5') {
+       return const Color(0xffFF5252);
+    } else if (status == '6') {
+       // Completed
+       return const Color(0xff27AE60);
+    } else {
+       // Processing
+       return const Color(0xFFEBA102);
     }
   }
 
