@@ -47,6 +47,7 @@ class ApiClient {
               return handler.next(options);
             },
             onResponse: (response, handler) async {
+              print("❤️${response}");
               // Decode if plain string
               if (response.data is String) {
                 try {
@@ -101,22 +102,29 @@ class ApiClient {
                   await StorageService.removeToken();
                   await IMUtil.logoutIMUser();
 
+                  print('😎😎😎${Get.currentRoute != Routes.login}');
+
                   if (Get.currentRoute != Routes.login) {
                     Get.offAllNamed(Routes.login);
-                    Get.snackbar(
-                      'Session Expired',
-                      'You have been logged out because your account was used on another device.',
-                      snackPosition: SnackPosition.TOP,
-                    );
+                    if( code != '300'){
+                      Get.snackbar(
+                        'Session Expired',
+                        'You have been logged out because your account was used on another device.',
+                        snackPosition: SnackPosition.TOP,
+                      );
+                      return;
+                    }
                   }
 
                   return handler.reject(
+                    
                     DioException(
                       requestOptions: response.requestOptions,
                       error: "Session expired",
                       response: response,
                     ),
                   );
+                  
                 }
               }
 

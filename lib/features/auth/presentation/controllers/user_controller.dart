@@ -96,7 +96,8 @@ class UserController extends GetxController {
       AppLogger.d("API error: $e");
       final data = e.response?.data;
       final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
-      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');
+      if(data['code'] != '300'){
+      CustomSnackbar.showError(title: "Error", message: msg ?? 'Unknown error');}
     } catch (e) {
       AppLogger.d("Unexpected error: $e");
       String errorMsg = e.toString();
