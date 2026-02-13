@@ -508,10 +508,13 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                     color: amountColor,
                   ),
                 ),
+
                 if (tx.remark != null && tx.remark!.trim().isNotEmpty) ...[
                   SizedBox(height: 4.w),
                   Text(
-                    tx.remark!,
+                    _shortRemark(tx.remark!, 15),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
@@ -526,5 +529,11 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         ),
       ),
     );
+  }
+
+  String _shortRemark(String text, int max) {
+    final t = text.trim();
+    if (t.length <= max) return t;
+    return '${t.substring(0, max)}...';
   }
 }
