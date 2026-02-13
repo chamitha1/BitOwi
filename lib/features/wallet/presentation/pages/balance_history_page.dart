@@ -243,7 +243,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                     controller.valuationUsdt,
                   ),
                   _buildInfoColumn(
-                    "Valuation (USD)",
+                    "Valuation (${controller.fiatCurrency})",
                     controller.valuationOther,
                     crossAlign: CrossAxisAlignment.end,
                   ),

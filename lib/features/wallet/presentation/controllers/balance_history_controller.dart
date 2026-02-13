@@ -209,4 +209,11 @@ class BalanceHistoryController extends GetxController {
   String get valuationUsdt => _currentAssetItem?.amountUsdt ?? "0.00";
   String get valuationOther => _currentAssetItem?.totalAsset ?? "0.00";
   String get iconUrl => _currentAssetItem?.icon ?? "";
+
+  String get fiatCurrency {
+    if (Get.isRegistered<BalanceController>()) {
+      return Get.find<BalanceController>().selectedCurrency.value;
+    }
+    return "NGN";
+  }
 }
