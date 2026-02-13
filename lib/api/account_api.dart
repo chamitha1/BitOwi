@@ -260,6 +260,8 @@ class AccountApi {
         data: params,
       );
       // Assuming res.data is the JSON map
+
+      AppLogger.d("Raw Data: ${res.data.toString()}");
       return PageInfo<Jour>.fromJson(res.data, Jour.fromJson);
     } catch (e) {
       AppLogger.d("getJourPageList error: $e");

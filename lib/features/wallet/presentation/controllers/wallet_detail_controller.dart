@@ -75,82 +75,42 @@ class WalletDetailController extends GetxController {
     if (!isRefresh && isEnd.value) return;
     try {
       if (!isRefresh) isLoadMore.value = true;
-      if (currentTab.value == 2) {
-        final params = {
-          "pageNum": pageNum,
-          "pageSize": 10,
-          "accountNumber": accountNumber,
-        };
+      if (!isRefresh) isLoadMore.value = true;
 
-        final res = await AccountApi.getWithdrawPageList(params);
+      // Use Journal API for ALL tabs to ensure we get Journal IDs (for Balances)
+      final params = {
+        "accountNumber": accountNumber,
+        "pageNum": pageNum,
+        "pageSize": 10,
+        "bizCategory": '',
+        "type": "0", // Default All
+      };
 
-        // Map WithdrawPageRes to Jour model
-        final List<Jour> mappedList = res.list.map((w) {
-          double amt = double.tryParse(w.actualAmount) ?? 0;
-          if (amt > 0) amt = -amt;
+      final res = await AccountApi.getJourPageList(params);
+      List<Jour> processedList = res.list;
 
-          final rawTime = w.applyDatetime ?? w.createDatetime;
-          int timestamp = 0;
-          try {
-            if (rawTime != null) {
-              int? parsedInt = int.tryParse(rawTime);
-              if (parsedInt != null) {
-                if (parsedInt < 10000000000) {
-                  timestamp = parsedInt * 1000;
-                } else {
-                  timestamp = parsedInt;
-                }
-              } else {
-                DateTime? dt = DateTime.tryParse(rawTime);
-                if (dt != null) {
-                  timestamp = dt.millisecondsSinceEpoch;
-                }
-              }
-            }
-          } catch (_) {}
-
-          return Jour(
-            id: w.id,
-            userId: w.userId,
-            bizType: '2', // 2 = Withdraw
-            transAmount: amt.toString(),
-            currency: w.currency,
-            createDatetime: timestamp,
-            remark: "Withdraw",
-            status: w.status,
-          );
+      // Tab Filter:
+      // 0: All
+      // 1: Deposits (bizType '1' or amount > 0)
+      // 2: Withdrawals (bizType '2' or amount < 0)
+      if (currentTab.value == 1) {
+        processedList = processedList.where((item) {
+          final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
+          return item.bizType == '1' || amount > 0;
         }).toList();
-        if (isRefresh) {
-          transactionList.value = mappedList;
-        } else {
-          transactionList.addAll(mappedList);
-        }
-        isEnd.value = res.isEnd;
-      } else {
-        // All (0) or Deposits (1)
-        final params = {
-          "accountNumber": accountNumber,
-          "pageNum": pageNum,
-          "pageSize": 10,
-          "bizCategory": '',
-          "type": "0",
-        };
-        final res = await AccountApi.getJourPageList(params);
-        List<Jour> processedList = res.list;
-
-        if (currentTab.value == 1) {
-          processedList = processedList.where((item) {
-            final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
-            return item.bizType == '1' || amount > 0;
-          }).toList();
-        }
-        if (isRefresh) {
-          transactionList.value = processedList;
-        } else {
-          transactionList.addAll(processedList);
-        }
-        isEnd.value = res.isEnd;
+      } else if (currentTab.value == 2) {
+         processedList = processedList.where((item) {
+          final double amount = double.tryParse(item.transAmount ?? '0') ?? 0;
+          return item.bizType == '2' || amount < 0; // Filter for withdrawals
+        }).toList();
       }
+
+      if (isRefresh) {
+        transactionList.value = processedList;
+      } else {
+        transactionList.addAll(processedList);
+      }
+      isEnd.value = res.isEnd;
 
       if (!isEnd.value) pageNum++;
     } catch (e) {
