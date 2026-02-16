@@ -322,16 +322,16 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       );
 
       final reqData = {'newEmail': newEmail, 'otp': otp};
-      // Check if project convention uses /core/v1 prefix. Assuming so.
-      const String url = '/v1/otp/verify_new_email';
-
-      AppLogger.d("URL :  $url");
-      AppLogger.d("Req Data :  $reqData");
+      AppLogger.d("Verify New Email OTP Request: $reqData");
+      final response = await freshDio.post(
+        '/core/v1/otp/verify_new_email',
+        data: reqData,
+      );
+      AppLogger.d("Verify New Email OTP Raw Response: ${response.data}");
       AppLogger.d("🔼 HEADERS: ${freshDio.options.headers}");
 
       final response = await freshDio.post(url, data: reqData);
 
-      // Manual parsing
       Map<String, dynamic> data;
       if (response.data is String) {
         try {
@@ -345,7 +345,6 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
 
       AppLogger.d("✅ Verify New Email OTP Response: $data");
 
-      // Check for specific error codes if needed, mirroring existing patterns
       final code = (data['code'] ?? '').toString();
       final errorCode = (data['errorCode'] ?? '').toString();
 
