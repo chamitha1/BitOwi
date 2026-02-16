@@ -315,11 +315,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
         BaseOptions(
           baseUrl: ApiClient.dio.options.baseUrl,
           connectTimeout: const Duration(seconds: 5),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept-Language': 'en_US',
-            'Authorization': token,
-          },
+          headers: {'Content-Type': 'application/json', 'Authorization': token, 'Accept-Language': 'en_US'},
           responseType: ResponseType.plain,
           validateStatus: (status) => true,
         ),
