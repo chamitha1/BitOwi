@@ -250,10 +250,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           onVerifyPin: (pin) async {
             // Local verify only - save OTP
             _newEmailOtp = pin;
-            return await UserApi().verifyOtp(
-              email: newEmail,
+            return await UserApi().verifyNewEmailOtp(
+              newEmail: newEmail,
               otp: pin,
-              bizType: SmsBizType.modifyEmail,
             );
             ;
           },
@@ -274,7 +273,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         ),
       );
     } catch (e) {
-      if (mounted) CustomSnackbar.showError(title: "Error", message: "$e");
+      if (mounted) {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: e.toString().replaceAll("Exception: ", ""),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSendingOtpNew = false);
     }

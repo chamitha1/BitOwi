@@ -173,7 +173,11 @@ for register and forgetPwd
       final publicDio = Dio(
         BaseOptions(
           baseUrl: ApiClient.dio.options.baseUrl,
-          headers: {'Content-Type': 'application/json', 'Authorization': '', 'Accept-Language': 'en_US'},
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': '',
+            'Accept-Language': 'en_US',
+          },
           responseType: ResponseType.plain,
           validateStatus: (status) => true,
         ),
@@ -280,6 +284,72 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       return data;
     } catch (e) {
       AppLogger.d('Verify OTP error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /*
+1 curl -X POST \
+   2   http://localhost:8080/v1/otp/verify_new_email \
+   3   -H 'Content-Type: application/json' \
+   4   -H 'Authorization: YOUR_AUTH_TOKEN' \
+   5   -d '{
+   6     "newEmail": "new.email@example.com",
+   7     "otp": "123456"
+   8 }'
+*/
+  // Verify New Email OTP
+  Future<Map<String, dynamic>> verifyNewEmailOtp({
+    required String newEmail,
+    required String otp,
+  }) async {
+    try {
+      String? token = await StorageService.getToken();
+      if (token == null || token.isEmpty) {
+        return {'success': false, 'error': 'No auth token found'};
+      }
+      AppLogger.d("Manual Token for Verify New Email: $token");
+      final freshDio = Dio(
+        BaseOptions(
+          baseUrl: ApiClient.dio.options.baseUrl,
+          connectTimeout: const Duration(seconds: 5),
+          headers: {'Content-Type': 'application/json', 'Authorization': token},
+          responseType: ResponseType.plain,
+          validateStatus: (status) => true,
+        ),
+      );
+      final reqData = {'newEmail': newEmail, 'otp': otp};
+      AppLogger.d("Verify New Email OTP Request: $reqData");
+      final response = await freshDio.post(
+        '/v1/otp/verify_new_email',
+        data: reqData,
+      );
+      AppLogger.d("Verify New Email OTP Raw Response: ${response.data}");
+      AppLogger.d("🔼 HEADERS: ${freshDio.options.headers}");
+
+      Map<String, dynamic> data;
+      if (response.data is String) {
+        try {
+          data = json.decode(response.data);
+        } catch (e) {
+          return {'success': false, 'error': response.data};
+        }
+      } else {
+        data = response.data as Map<String, dynamic>;
+      }
+      final code = (data['code'] ?? '').toString();
+      final errorCode = (data['errorCode'] ?? '').toString();
+      if (code == '300' || errorCode == '300003') {
+        AppLogger.d("Server reported session expired, caught it manually.");
+        return {
+          'success': false,
+          'code': 300003,
+          'msg': 'Session expired. Please login again.',
+        };
+      }
+      return data;
+    } catch (e) {
+      AppLogger.d('Verify New Email OTP error: $e');
       return {'success': false, 'error': e.toString()};
     }
   }

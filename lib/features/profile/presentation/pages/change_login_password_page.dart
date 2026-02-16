@@ -5,6 +5,7 @@ import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
 import 'package:BitOwi/utils/app_logger.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -122,13 +123,34 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         title: "Success",
         message: "Login Password Changed Successfully!",
       );
-    } catch (e) {
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
       if (mounted) {
         setState(() => _isLoading = false);
         CustomSnackbar.showError(
           title: "Error",
-          message: e.toString().replaceAll("Exception: ", ""),
+          message: msg ?? 'Unknown error',
         );
+      }
+    } catch (e) {
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        if (mounted) {
+          setState(() => _isLoading = false);
+          CustomSnackbar.showError(title: "Error", message: errorMsg);
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          CustomSnackbar.showError(
+            title: "Error",
+            message: 'Unexpected error occurred',
+          );
+        }
       }
     }
   }
