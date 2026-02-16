@@ -305,22 +305,23 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
   }) async {
     try {
       String? token = await StorageService.getToken();
-
       if (token == null || token.isEmpty) {
         return {'success': false, 'error': 'No auth token found'};
       }
-
-      // 🚀 CRITICAL FIX: Use a NEW Dio instance to BYPASS global ApiClient interceptors.
+      AppLogger.d("Manual Token for Verify New Email: $token");
       final freshDio = Dio(
         BaseOptions(
           baseUrl: ApiClient.dio.options.baseUrl,
           connectTimeout: const Duration(seconds: 5),
-          headers: {'Content-Type': 'application/json', 'Authorization': token, 'Accept-Language': 'en_US'},
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+            'Accept-Language': 'en_US',
+          },
           responseType: ResponseType.plain,
           validateStatus: (status) => true,
         ),
       );
-
       final reqData = {'newEmail': newEmail, 'otp': otp};
       AppLogger.d("Verify New Email OTP Request: $reqData");
       final response = await freshDio.post(
@@ -330,24 +331,18 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       AppLogger.d("Verify New Email OTP Raw Response: ${response.data}");
       AppLogger.d("🔼 HEADERS: ${freshDio.options.headers}");
 
-      final response = await freshDio.post(url, data: reqData);
-
       Map<String, dynamic> data;
       if (response.data is String) {
         try {
-          data = json.decode(response.data) as Map<String, dynamic>;
+          data = json.decode(response.data);
         } catch (e) {
-          data = {};
+          return {'success': false, 'error': response.data};
         }
       } else {
         data = response.data as Map<String, dynamic>;
       }
-
-      AppLogger.d("✅ Verify New Email OTP Response: $data");
-
       final code = (data['code'] ?? '').toString();
       final errorCode = (data['errorCode'] ?? '').toString();
-
       if (code == '300' || errorCode == '300003') {
         AppLogger.d("Server reported session expired, caught it manually.");
         return {
@@ -356,10 +351,9 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
           'msg': 'Session expired. Please login again.',
         };
       }
-
       return data;
     } catch (e) {
-      AppLogger.d('❌ Verify New Email OTP error: $e');
+      AppLogger.d('Verify New Email OTP error: $e');
       return {'success': false, 'error': e.toString()};
     }
   }
