@@ -1,4 +1,6 @@
 import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
@@ -112,8 +114,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
               "Your login password has changed successfully. Please use the new password for future logins.",
           buttonText: "Done",
           onButtonTap: () {
-            Get.back(); // close dialog
-            Get.back(); // navigate back from Change Page
+            _handleLogout();
           },
         ),
         barrierDismissible: false,
@@ -153,6 +154,14 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
         }
       }
     }
+  }
+
+  Future<void> _handleLogout() async {
+    final token = await StorageService.getToken();
+    if (token != null && token.isNotEmpty) {
+      await StorageService.removeToken();
+    }
+    Get.offAllNamed(Routes.login);
   }
 
   Future<void> _verifyEmail() async {

@@ -1,4 +1,6 @@
 import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
@@ -292,12 +294,19 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             "Your email address has been changed. All future communications will be sent to your new email.",
         buttonText: "OK",
         onButtonTap: () {
-          Get.back(); // Close Dialog
-          Get.back(); // Close Change Email Page
+          _handleLogout();
         },
       ),
       barrierDismissible: false,
     );
+  }
+
+  Future<void> _handleLogout() async {
+    final token = await StorageService.getToken();
+    if (token != null && token.isNotEmpty) {
+      await StorageService.removeToken();
+    }
+    Get.offAllNamed(Routes.login);
   }
 
   @override
