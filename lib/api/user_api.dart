@@ -321,7 +321,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       final reqData = {'newEmail': newEmail, 'otp': otp};
       AppLogger.d("Verify New Email OTP Request: $reqData");
       final response = await freshDio.post(
-        '/v1/otp/verify_new_email',
+        '/core/v1/otp/verify_new_email',
         data: reqData,
       );
       AppLogger.d("Verify New Email OTP Raw Response: ${response.data}");
