@@ -21,6 +21,9 @@ class AddAuthenticatorPage extends StatefulWidget {
 class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
   final TextEditingController _codeController = TextEditingController();
   final UserApi _userApi = UserApi();
+  String _verifiedOtp = "";
+  bool _isEmailVerified = false;
+  bool _isSendingOtp = false;
 
   String _secretKey = "";
   bool _isLoading = false;
@@ -87,7 +90,13 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
       );
       return;
     }
-
+    if (!_isEmailVerified) {
+      CustomSnackbar.showError(
+        title: "Error",
+        message: "Please verify your email first",
+      );
+      return;
+    }
     if (_secretKey.isEmpty) {
       CustomSnackbar.showError(
         title: "Error",
@@ -95,116 +104,19 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
       );
       return;
     }
-
-    _openOtpSheet(googleCode);
-  }
-
-  Future<void> _openOtpSheet(String googleCode) async {
-    final userController = Get.find<UserController>();
-    final email =
-        userController.user.value?.loginName ??
-        userController.user.value?.email ??
-        "";
-
-    if (email.isEmpty) {
-      CustomSnackbar.showError(title: "Error", message: "User email not found");
-      return;
-    }
-
-    if (_isLoading) return;
-    setState(() => _isLoading = true);
-
     try {
-      // Send OTP
-      final success = await _userApi.sendOtp(
-        email: email,
-        bizType: SmsBizType.openGoogle,
+      await UserApi.bindGoogleSecret(
+        googleCaptcha: googleCode,
+        secret: _secretKey,
+        smsCaptcha: _verifiedOtp,
       );
-      AppLogger.d("AddAuthenticatorPage: sendOtp success: $success");
 
-      if (!mounted) return;
+      AppLogger.d("AddAuthenticatorPage: bindGoogleSecret success");
 
-      if (!success) {
-        CustomSnackbar.showError(
-          title: "Error",
-          message: "Failed to send OTP. Please try again.",
-        );
-        setState(() => _isLoading = false);
-        return;
-      }
+      await Get.find<UserController>().loadUser();
 
       setState(() => _isLoading = false);
-
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) => OtpBottomSheet(
-          email: email,
-          otpLength: 6,
-          bizType: SmsBizType.openGoogle,
-          onVerifyPin: (pin) async {
-            try {
-              await UserApi.bindGoogleSecret(
-                googleCaptcha: googleCode,
-                secret: _secretKey,
-                smsCaptcha: pin,
-              );
-              AppLogger.d("AddAuthenticatorPage: bindGoogleSecret success");
-              return {'code': 200, 'msg': 'Success'};
-            } on DioException catch (e) {
-              AppLogger.d("AddAuthenticatorPage: bindGoogleSecret error: $e");
-
-              AppLogger.d("API error: $e");
-              final data = e.response?.data;
-              final msg = (data is Map)
-                  ? (data['errorMsg'] ?? e.message)
-                  : e.message;
-              if (mounted) {
-                setState(() => _isLoading = false);
-                CustomSnackbar.showError(
-                  title: "Error",
-                  message: msg ?? 'Unknown error',
-                );
-              }
-            } catch (e) {
-              AppLogger.d("Unexpected error: $e");
-              String errorMsg = e.toString();
-              if (errorMsg.startsWith("Exception: ")) {
-                errorMsg = errorMsg.replaceFirst("Exception: ", "");
-                if (mounted) {
-                  setState(() => _isLoading = false);
-                  CustomSnackbar.showError(title: "Error", message: errorMsg);
-                }
-              } else {
-                if (mounted) {
-                  setState(() => _isLoading = false);
-                  CustomSnackbar.showError(
-                    title: "Error",
-                    message: 'Unexpected error occurred',
-                  );
-                }
-              }
-            }
-            return {'code': 500, 'msg': 'Error'};
-          },
-          onResend: () async {
-            final success = await _userApi.sendOtp(
-              email: email,
-              bizType: SmsBizType.openGoogle,
-            );
-            AppLogger.d(
-              "AddAuthenticatorPage: Resend sendOtp success: $success",
-            );
-            return success;
-          },
-          onVerified: () async {
-            Navigator.pop(context); // Close OTP Sheet
-            await Get.find<UserController>().loadUser();
-            _showSuccessDialog();
-          },
-        ),
-      );
+      _showSuccessDialog();
     } on DioException catch (e) {
       AppLogger.d("API error: $e");
       final data = e.response?.data;
@@ -251,6 +163,82 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
       ),
       barrierDismissible: false,
     );
+  }
+
+  Future<void> _verifyEmail() async {
+    if (_isSendingOtp || _isEmailVerified) return;
+
+    final userController = Get.find<UserController>();
+    final email =
+        userController.user.value?.loginName ??
+        userController.user.value?.email ??
+        "";
+
+    if (email.isEmpty) {
+      CustomSnackbar.showError(title: "Error", message: "User email not found");
+      return;
+    }
+
+    setState(() => _isSendingOtp = true);
+
+    try {
+      final success = await _userApi.sendOtp(
+        email: email,
+        bizType: SmsBizType.openGoogle, // Use OPEN_GOOGLE
+      );
+
+      if (!mounted) return;
+
+      if (!success) {
+        CustomSnackbar.showError(
+          title: "Error",
+          message: "Failed to send verification code",
+        );
+        return;
+      }
+
+      CustomSnackbar.showSuccess(
+        title: "Success",
+        message: "OTP sent to your email!",
+      );
+
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => OtpBottomSheet(
+          email: email,
+          otpLength: 6,
+          bizType: SmsBizType.openGoogle, // Use OPEN_GOOGLE
+          onVerifyPin: (pin) async {
+            _verifiedOtp = pin; // Store locally
+            return await UserApi().verifyOtp(
+              email: email,
+              otp: pin,
+              bizType: SmsBizType.openGoogle,
+            );
+          },
+          onResend: () async {
+            return await _userApi.sendOtp(
+              email: email,
+              bizType: SmsBizType.openGoogle,
+            );
+          },
+          onVerified: () {
+            Navigator.pop(context);
+            setState(() => _isEmailVerified = true);
+            CustomSnackbar.showSuccess(
+              title: "Verified",
+              message: "Email verified successfully!",
+            );
+          },
+        ),
+      );
+    } catch (e) {
+      if (mounted) CustomSnackbar.showError(title: "Error", message: "$e");
+    } finally {
+      if (mounted) setState(() => _isSendingOtp = false);
+    }
   }
 
   @override
@@ -391,6 +379,8 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
+
+                      // const SizedBox(height: 24),
                       const Text(
                         "Copy this key and add it to your authenticator app (Google Authenticator, Authy, etc.).",
                         style: TextStyle(
@@ -398,6 +388,97 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF717F9A),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        "Email Verification Code",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF2E3D5B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      TextFormField(
+                        initialValue:
+                            Get.find<UserController>().user.value?.loginName ??
+                            Get.find<UserController>().user.value?.email ??
+                            "",
+                        readOnly: true,
+                        style: const TextStyle(
+                          color: Color(0XFF717F9A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Inter',
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFECEFF5),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                          ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 10.0,
+                              top: 14.0,
+                              bottom: 14.0,
+                              right: 4.0,
+                            ),
+                            child: SvgPicture.asset(
+                              "assets/icons/sign_up/sms.svg",
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF717F9A),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 6,
+                              top: 6,
+                              bottom: 6,
+                            ),
+                            child: _verifyButton(
+                              text: _isEmailVerified
+                                  ? "Verified"
+                                  : (_isSendingOtp
+                                        ? "Sending..."
+                                        : "Get a Code"),
+                              onPressed: _verifyEmail,
+                              isEnabled: !_isSendingOtp && !_isEmailVerified,
+                              isVerified: _isEmailVerified,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -548,6 +629,77 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _verifyButton({
+    required String text,
+    required VoidCallback onPressed,
+    required bool isEnabled,
+    bool isVerified = false,
+  }) {
+    return SizedBox(
+      height: 32,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isVerified
+              ? const Color(0xffEAF9F0)
+              : (isEnabled ? const Color(0xFF1D5DE5) : const Color(0XFFB9C6E2)),
+          borderRadius: BorderRadius.circular(8),
+          border: isVerified
+              ? Border.all(color: const Color(0xFFABEAC6), width: 1.0)
+              : null,
+        ),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            disabledBackgroundColor: Colors.transparent,
+            disabledForegroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: isVerified ? 10 : 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: (isEnabled && !isVerified) ? onPressed : null,
+          child: isVerified
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/forgot_password/check_circle.svg",
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF40A372),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      text,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                        color: Color(0xFF40A372),
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Inter',
+                    color: Colors.white,
+                  ),
+                ),
         ),
       ),
     );

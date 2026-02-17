@@ -263,52 +263,6 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Authenticator Code Field
-                      const Text(
-                        "Authenticator Code",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF2E3D5B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _googleCodeController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: "Enter Authenticator code",
-                          hintStyle: const TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF717F9A),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFDAE0EE),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFDAE0EE),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF1D5DE5),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
                       // Verification Code Field
                       const Text(
                         "Email Verification Code",
@@ -381,6 +335,53 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 24),
+
+                      // Authenticator Code Field
+                      const Text(
+                        "Authenticator Code",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF2E3D5B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _googleCodeController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: "Enter Authenticator code",
+                          hintStyle: const TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF717F9A),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                        ),
+                      ),
+
                       const Spacer(),
 
                       // Disable Button
