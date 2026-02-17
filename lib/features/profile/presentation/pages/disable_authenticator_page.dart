@@ -4,6 +4,7 @@ import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:dio/dio.dart';
@@ -23,35 +24,23 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
   final TextEditingController _googleCodeController = TextEditingController();
   final TextEditingController _smsCodeController = TextEditingController();
   final UserApi _userApi = UserApi();
+  final userController = Get.find<UserController>();
 
   bool _isLoading = false;
-  int _countdown = 0;
-  Timer? _timer;
+  String _verifiedOtp = "";
+  bool _isVerified = false;
+  bool _isSendingOtp = false;
 
   @override
   void dispose() {
     _googleCodeController.dispose();
     _smsCodeController.dispose();
-    _timer?.cancel();
     super.dispose();
   }
 
-  void _startTimer() {
-    setState(() {
-      _countdown = 60;
-    });
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdown == 0) {
-        timer.cancel();
-      } else {
-        setState(() {
-          _countdown--;
-        });
-      }
-    });
-  }
-
   Future<void> _sendOtp() async {
+    if (_isSendingOtp || _isVerified) return;
+
     final userController = Get.find<UserController>();
     final email =
         userController.user.value?.loginName ??
@@ -63,24 +52,66 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
       return;
     }
 
+    setState(() => _isSendingOtp = true);
+
     try {
       final success = await _userApi.sendOtp(
         email: email,
         bizType: SmsBizType.closeGoogle,
       );
 
-      if (success) {
-        CustomSnackbar.showSuccess(
-          title: "Success",
-          message: "Verification code sent",
-        );
-        _startTimer();
-      } else {
+      if (!mounted) return;
+
+      if (!success) {
         CustomSnackbar.showError(
           title: "Error",
           message: "Failed to send verification code",
         );
+        return;
       }
+
+      CustomSnackbar.showSuccess(
+        title: "Success",
+        message: "Verification code sent",
+      );
+
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => OtpBottomSheet(
+          email: email,
+          otpLength: 6,
+          bizType: SmsBizType.closeGoogle,
+
+          //Verify OTP
+          onVerifyPin: (pin) async {
+            _verifiedOtp = pin; // Store locally
+            // verifyOtp  bizType: CLOSE_GOOGLE
+            return await UserApi().verifyOtp(
+              email: email,
+              otp: pin,
+              bizType: SmsBizType.closeGoogle,
+            );
+          },
+
+          onResend: () async {
+            return await _userApi.sendOtp(
+              email: email,
+              bizType: SmsBizType.closeGoogle,
+            );
+          },
+          // success
+          onVerified: () {
+            Navigator.pop(context); // Close sheet
+            setState(() => _isVerified = true); // Update UI state
+            CustomSnackbar.showSuccess(
+              title: "Verified",
+              message: "Email verified successfully!",
+            );
+          },
+        ),
+      );
     } on DioException catch (e) {
       AppLogger.d("API error: $e");
       final data = e.response?.data;
@@ -110,12 +141,14 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
           );
         }
       }
+    } finally {
+      if (mounted) setState(() => _isSendingOtp = false);
     }
   }
 
   Future<void> _onDisable() async {
     final googleCode = _googleCodeController.text.trim();
-    final smsCode = _smsCodeController.text.trim();
+    // final smsCode = _smsCodeController.text.trim();
 
     if (googleCode.isEmpty || googleCode.length != 6) {
       CustomSnackbar.showError(
@@ -125,21 +158,20 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
       return;
     }
 
-    if (smsCode.isEmpty) {
+    if (!_isVerified) {
       CustomSnackbar.showError(
         title: "Error",
-        message: "Please enter verification code",
+        message: "Please verify your email first",
       );
       return;
     }
-
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
     try {
       await UserApi.closeGoogleSecret(
         googleCaptcha: googleCode,
-        smsCaptcha: smsCode,
+        smsCaptcha: _verifiedOtp,
       );
 
       // Refresh
@@ -288,19 +320,23 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      TextField(
-                        controller: _smsCodeController,
-                        keyboardType: TextInputType.number,
+
+                      TextFormField(
+                        initialValue:
+                            userController.user.value?.loginName ??
+                            userController.user.value?.email ??
+                            "",
+                        readOnly: true,
+                        style: TextStyle(
+                          color: const Color(0xFF717F9A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Inter',
+                        ),
                         decoration: InputDecoration(
-                          hintText: "Enter code",
-                          hintStyle: const TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF717F9A),
-                          ),
+                          hintText: "Email unavailable", // Fallback
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: const Color(0xFFECEFF5), //
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
@@ -319,6 +355,13 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                               color: Color(0xFF1D5DE5),
                             ),
                           ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(
                               right: 6,
@@ -326,16 +369,18 @@ class _DisableAuthenticatorPageState extends State<DisableAuthenticatorPage> {
                               bottom: 6,
                             ),
                             child: _verifyButton(
-                              text: _countdown > 0
-                                  ? "${_countdown}s"
-                                  : "Get a code",
+                              text: _isVerified
+                                  ? "Verified"
+                                  : (_isSendingOtp
+                                        ? "Sending..."
+                                        : "Get a code"),
                               onPressed: _sendOtp,
-                              isEnabled: _countdown == 0,
+                              isEnabled: !_isSendingOtp && !_isVerified,
+                              isVerified: _isVerified,
                             ),
                           ),
                         ),
                       ),
-
                       const Spacer(),
 
                       // Disable Button
