@@ -5,6 +5,7 @@ import 'package:BitOwi/features/auth/presentation/controllers/user_controller.da
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/success_dialog.dart';
 import 'package:BitOwi/utils/app_logger.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -39,9 +40,34 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
           _secretKey = secret;
         });
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
       if (mounted) {
-        CustomSnackbar.showError(title: "Error", message: "$e");
+        setState(() => _isLoading = false);
+        CustomSnackbar.showError(
+          title: "Error",
+          message: msg ?? 'Unknown error',
+        );
+      }
+    } catch (e) {
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        if (mounted) {
+          setState(() => _isLoading = false);
+          CustomSnackbar.showError(title: "Error", message: errorMsg);
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          CustomSnackbar.showError(
+            title: "Error",
+            message: 'Unexpected error occurred',
+          );
+        }
       }
     }
   }
@@ -126,11 +152,41 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
               );
               AppLogger.d("AddAuthenticatorPage: bindGoogleSecret success");
               return {'code': 200, 'msg': 'Success'};
-            } catch (e) {
+            } on DioException catch (e) {
               AppLogger.d("AddAuthenticatorPage: bindGoogleSecret error: $e");
-              CustomSnackbar.showError(title: "Error", message: "$e");
-              return {'code': 500, 'msg': e.toString()};
+
+              AppLogger.d("API error: $e");
+              final data = e.response?.data;
+              final msg = (data is Map)
+                  ? (data['errorMsg'] ?? e.message)
+                  : e.message;
+              if (mounted) {
+                setState(() => _isLoading = false);
+                CustomSnackbar.showError(
+                  title: "Error",
+                  message: msg ?? 'Unknown error',
+                );
+              }
+            } catch (e) {
+              AppLogger.d("Unexpected error: $e");
+              String errorMsg = e.toString();
+              if (errorMsg.startsWith("Exception: ")) {
+                errorMsg = errorMsg.replaceFirst("Exception: ", "");
+                if (mounted) {
+                  setState(() => _isLoading = false);
+                  CustomSnackbar.showError(title: "Error", message: errorMsg);
+                }
+              } else {
+                if (mounted) {
+                  setState(() => _isLoading = false);
+                  CustomSnackbar.showError(
+                    title: "Error",
+                    message: 'Unexpected error occurred',
+                  );
+                }
+              }
             }
+            return {'code': 500, 'msg': 'Error'};
           },
           onResend: () async {
             final success = await _userApi.sendOtp(
@@ -149,10 +205,34 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
           },
         ),
       );
-    } catch (e) {
+    } on DioException catch (e) {
+      AppLogger.d("API error: $e");
+      final data = e.response?.data;
+      final msg = (data is Map) ? (data['errorMsg'] ?? e.message) : e.message;
       if (mounted) {
         setState(() => _isLoading = false);
-        CustomSnackbar.showError(title: "Error", message: "$e");
+        CustomSnackbar.showError(
+          title: "Error",
+          message: msg ?? 'Unknown error',
+        );
+      }
+    } catch (e) {
+      AppLogger.d("Unexpected error: $e");
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith("Exception: ")) {
+        errorMsg = errorMsg.replaceFirst("Exception: ", "");
+        if (mounted) {
+          setState(() => _isLoading = false);
+          CustomSnackbar.showError(title: "Error", message: errorMsg);
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          CustomSnackbar.showError(
+            title: "Error",
+            message: 'Unexpected error occurred',
+          );
+        }
       }
     }
   }
