@@ -8,11 +8,15 @@ import 'package:BitOwi/utils/custom_message/custom_message_element.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:tencent_cloud_chat_customer_service_plugin/tencent_cloud_chat_customer_service_plugin.dart';
+// import 'package:tencent_cloud_chat_customer_service_plugin/tencent_cloud_chat_customer_service_plugin.dart';
+import 'package:BitOwi/utils/tencent_chat_plugin_wrapper.dart';
+
 import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
-import 'package:tencent_cloud_chat_sdk/manager/v2_tim_manager.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+// import 'package:tencent_cloud_chat_sdk/manager/v2_tim_manager.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:BitOwi/utils/tencent_sdk_models_wrapper.dart';
+
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -63,7 +67,7 @@ class _ChatState extends State<Chat> {
   final stickerController = Get.find<CustomStickerPackageController>();
 
   String? backRemark;
-  final V2TIMManager sdkInstance = TIMUIKitCore.getSDKInstance();
+  final V2TIMManager sdkInstance = TencentImSDKPlugin.v2TIMManager;
   GlobalKey<dynamic> tuiChatField = GlobalKey();
   String? conversationName;
   bool canSendEvaluate = false;

@@ -1,6 +1,6 @@
 // ignore_for_file: unused_field, avoid_print, unused_import, depend_on_referenced_packages
 
-import 'dart:io';
+// import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +11,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tools/i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:BitOwi/utils/tencent_sdk_models_wrapper.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
@@ -28,6 +28,8 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+
+import 'package:universal_io/io.dart';
 
 // ignore: unnecessary_import
 import 'dart:typed_data';
@@ -272,50 +274,53 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
     AssetEntity asset,
     TUIChatSeparateViewModel model,
   ) async {
-    final plugin = FcNativeVideoThumbnail();
-    final originFile = await asset.originFile;
-    final size = await originFile!.length();
-    if (size >= 104857600) {
-      onTIMCallback(
-        TIMCallback(
-          type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("发送失败,视频不能大于100MB"),
-          infoCode: 6660405,
-        ),
+    if (!kIsWeb) {
+      final plugin = FcNativeVideoThumbnail();
+      final originFile = await asset.originFile;
+      final size = await originFile!.length();
+      if (size >= 104857600) {
+        onTIMCallback(
+          TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: TIM_t("发送失败,视频不能大于100MB"),
+            infoCode: 6660405,
+          ),
+        );
+        return;
+      }
+
+      final duration = asset.videoDuration.inSeconds;
+      final filePath = originFile.path;
+      final convID = widget.conversationID;
+      final convType = widget.conversationType;
+
+      // ignore: prefer_interpolation_to_compose_strings
+      String tempPath =
+          (await getTemporaryDirectory()).path +
+          p.basename(originFile.path) +
+          ".jpeg";
+
+      await plugin.getVideoThumbnail(
+        srcFile: originFile.path,
+        // keepAspectRatio: true, // todo ?
+        destFile: tempPath,
+        format: 'jpeg',
+        width: 128,
+        quality: 100,
+        height: 128,
       );
-      return;
+
+      MessageUtils.handleMessageError(
+        model.sendVideoMessage(
+          videoPath: filePath,
+          duration: duration,
+          snapshotPath: tempPath,
+          convID: convID,
+          convType: convType,
+        ),
+        context,
+      );
     }
-
-    final duration = asset.videoDuration.inSeconds;
-    final filePath = originFile.path;
-    final convID = widget.conversationID;
-    final convType = widget.conversationType;
-
-    // ignore: prefer_interpolation_to_compose_strings
-    String tempPath =
-        (await getTemporaryDirectory()).path +
-        p.basename(originFile.path) +
-        ".jpeg";
-
-    await plugin.getVideoThumbnail(
-      srcFile: originFile.path,
-      // keepAspectRatio: true, // todo ?
-      destFile: tempPath,
-      format: 'jpeg',
-      width: 128,
-      quality: 100,
-      height: 128,
-    );
-    MessageUtils.handleMessageError(
-      model.sendVideoMessage(
-        videoPath: filePath,
-        duration: duration,
-        snapshotPath: tempPath,
-        convID: convID,
-        convType: convType,
-      ),
-      context,
-    );
   }
 
   Future<void> _sendImageMessage(
@@ -515,7 +520,8 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       final imageContent = await pickedFile!.readAsBytes();
       fileName = pickedFile.name;
-      tempFile = File(pickedFile.path);
+      // tempFile = File(pickedFile.path);
+      tempFile = null;
       fileContent = imageContent;
 
       html.Node? inputElem;
@@ -527,7 +533,8 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
       MessageUtils.handleMessageError(
         model.sendImageMessage(
           inputElement: inputElem,
-          imagePath: tempFile?.path,
+          // imagePath: tempFile?.path,
+          imagePath: null,
           convID: convID,
           convType: convType,
         ),
@@ -543,7 +550,9 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
       final pickedFile = await _picker.pickVideo(source: ImageSource.gallery);
       final videoContent = await pickedFile!.readAsBytes();
       fileName = pickedFile.name;
+      // tempFile = File(pickedFile.path);
       tempFile = File(pickedFile.path);
+      tempFile = null;
       fileContent = videoContent;
 
       if (fileName!.split(".")[fileName!.split(".").length - 1] != "mp4") {
@@ -566,7 +575,8 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
       MessageUtils.handleMessageError(
         model.sendVideoMessage(
           inputElement: inputElem,
-          videoPath: tempFile?.path,
+          // videoPath: tempFile?.path,
+          videoPath: null,
           convID: convID,
           convType: convType,
         ),

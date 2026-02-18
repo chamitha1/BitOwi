@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_custom_elem.dart';
+import 'package:BitOwi/utils/tencent_sdk_models_wrapper.dart';
 
 class WebLinkMessage {
   String? title;

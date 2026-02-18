@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  basics:
+    dependency: transitive
+    description:
+      name: basics
+      sha256: "41ff8aded84ae174d1df5cce0bcac3ab9070caac9f7da35fd2cc638dfee6163f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.0"
   better_player_plus:
     dependency: transitive
     description:
@@ -626,10 +634,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_launcher_icons
-      sha256: "10f13781741a2e3972126fae08393d3c4e01fa4cd7473326b94b72cf594195e7"
+      sha256: "526faf84284b86a4cb36d20a5e45147747b7563d921373d4ee0559c54fcdbcea"
       url: "https://pub.dev"
     source: hosted
-    version: "0.14.4"
+    version: "0.13.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -704,6 +712,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_ume_kit_ui_plus:
+    dependency: "direct main"
+    description:
+      name: flutter_ume_kit_ui_plus
+      sha256: c9697579fe3165e654e845598f697dda333ff11a282fab8c741416b6e49bd9ff
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
+  flutter_ume_plus:
+    dependency: "direct main"
+    description:
+      name: flutter_ume_plus
+      sha256: fb8864a459c72b7966714a2b43ff7618c1769da2541b8d945815ff29bd32706f
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -1493,6 +1517,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.2"
   rxdart:
     dependency: transitive
     description:
@@ -1842,6 +1874,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  touch_indicator:
+    dependency: transitive
+    description:
+      name: touch_indicator
+      sha256: c7582fc10f433b795a0057036f7c74f050d32f7c317479cb9469ab849c7321c3
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   transparent_image:
     dependency: transitive
     description:
@@ -1875,7 +1915,7 @@ packages:
     source: hosted
     version: "2.2.4"
   universal_io:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: universal_io
       sha256: f63cbc48103236abf48e345e07a03ce5757ea86285ed313a6a032596ed9301e2
@@ -1986,6 +2026,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  vibration:
+    dependency: transitive
+    description:
+      name: vibration
+      sha256: "3cbdf4c93b469ec27b212c8dd0c720f85acc1186a68d08b56087f4e32b4c8e20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.6"
+  vibration_platform_interface:
+    dependency: transitive
+    description:
+      name: vibration_platform_interface
+      sha256: "4134fbfcd427b59a7a91f8733292e4e9b29a7f1e8224ff0d80f5745fbf0743c6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   video_player:
     dependency: transitive
     description:

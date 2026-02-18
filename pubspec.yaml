@@ -77,7 +77,8 @@
     provider: ^6.0.5
     flutter_ume_plus: ^5.0.0
     flutter_ume_kit_ui_plus: ^5.0.0
-  
+    universal_io: ^2.2.2
+    
   dependency_overrides:
     # Required for tencent_cloud_chat_uikit compatibility
     image_picker: 1.2.1

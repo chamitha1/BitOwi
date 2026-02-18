@@ -9,12 +9,14 @@ import 'package:provider/single_child_widget.dart';
 // ignore: depend_on_referenced_packages
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_chat_i18n_tool/tools/i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:BitOwi/utils/tencent_sdk_models_wrapper.dart';
+// import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
+
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';

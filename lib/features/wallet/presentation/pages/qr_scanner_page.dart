@@ -1,8 +1,9 @@
-import 'dart:io';
+// import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
+import 'package:universal_io/io.dart';
 
 class QrScannerPage extends StatefulWidget {
   const QrScannerPage({super.key});
@@ -70,7 +71,11 @@ class _QrScannerPageState extends State<QrScannerPage> {
     await _controller!.flipCamera();
   }
 
-  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool granted) {
+  void _onPermissionSet(
+    BuildContext context,
+    QRViewController ctrl,
+    bool granted,
+  ) {
     if (!granted) {
       Get.snackbar(
         "Camera Permission",
@@ -97,7 +102,8 @@ class _QrScannerPageState extends State<QrScannerPage> {
           QRView(
             key: qrKey,
             onQRViewCreated: _onQRViewCreated,
-            onPermissionSet: (ctrl, granted) => _onPermissionSet(context, ctrl, granted),
+            onPermissionSet: (ctrl, granted) =>
+                _onPermissionSet(context, ctrl, granted),
             overlay: QrScannerOverlayShape(
               borderRadius: 10,
               borderWidth: 4,

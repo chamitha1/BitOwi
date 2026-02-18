@@ -7,7 +7,7 @@ import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
+// import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
 import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 // import 'package:provider/provider.dart';
@@ -22,13 +22,14 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/emoji.dart';
 // import 'package:wallet/utils/local_util.dart';
 // import 'package:wallet/utils/toast_util.dart';
 // import 'package:tencent_cloud_chat_sdk/tencent_cloud_chat_sdk.dart';
-import 'package:tencent_cloud_chat_sdk/manager/v2_tim_manager.dart';
+// import 'package:tencent_cloud_chat_sdk/manager/v2_tim_manager.dart';
+import 'package:BitOwi/utils/tencent_sdk_models_wrapper.dart';
 
 import 'constant.dart';
 import 'unicode_emoji.dart';
 
 class IMUtil {
-  static final V2TIMManager _sdkInstance = TIMUIKitCore.getSDKInstance();
+  static final V2TIMManager _sdkInstance = TencentImSDKPlugin.v2TIMManager;
   static final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
 
   static V2TIMManager get sdkInstance => _sdkInstance;
