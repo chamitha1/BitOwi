@@ -82,6 +82,8 @@
   dependency_overrides:
     # Required for tencent_cloud_chat_uikit compatibility
     image_picker: 1.2.1
+    tencent_cloud_chat_sdk:
+      path: packages/tencent_cloud_chat_sdk
     
   dev_dependencies:
     flutter_test:

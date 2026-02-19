@@ -1797,10 +1797,9 @@ packages:
   tencent_cloud_chat_sdk:
     dependency: "direct main"
     description:
-      name: tencent_cloud_chat_sdk
-      sha256: "7aab647ac4243dd07a416534305f716787dc04309840ed2b1f98d738d53aca7e"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/tencent_cloud_chat_sdk"
+      relative: true
+    source: path
     version: "8.8.7373+1"
   tencent_cloud_chat_uikit:
     dependency: "direct main"
