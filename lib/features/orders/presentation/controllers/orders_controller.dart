@@ -4,9 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/trade_order_page_res.dart';
-import 'package:tencent_cloud_chat_sdk/enum/V2TimAdvancedMsgListener.dart';
-import 'package:tencent_cloud_chat_sdk/enum/V2TimConversationListener.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+//! Platform-specific Tencent IM imports.
+// - Mobile: real Tencent Cloud Chat SDK
+// - Web: stub implementations from im_util_web.dart
+// import 'package:tencent_cloud_chat_sdk/enum/V2TimAdvancedMsgListener.dart';
+// import 'package:tencent_cloud_chat_sdk/enum/V2TimConversationListener.dart';
+// import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimAdvancedMsgListener.dart'
+    if (dart.library.html) 'package:BitOwi/utils/im_util_web.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimConversationListener.dart'
+    if (dart.library.html) 'package:BitOwi/utils/im_util_web.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:BitOwi/utils/im_util_web.dart';
 
 class OrdersController extends GetxController {
   final RxInt currentTabIndex = 0.obs;

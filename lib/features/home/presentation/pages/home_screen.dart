@@ -2,6 +2,7 @@ import 'package:BitOwi/features/home/presentation/controllers/balance_controller
 import 'package:BitOwi/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -154,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             if (index == 2) {
               // Order index
+              if (kIsWeb) return;
               Get.find<OrdersController>().orderItemUnreadConvoLoad();
             }
           },

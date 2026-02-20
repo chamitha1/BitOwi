@@ -1,6 +1,6 @@
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
-import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
+import 'package:BitOwi/features/profile/presentation/pages/chat/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/im_util.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +19,6 @@ import 'package:BitOwi/features/orders/presentation/widgets/rate_experience_bott
 import 'package:BitOwi/features/orders/utils/order_helper.dart';
 import 'package:BitOwi/models/trade_order_detail_res.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final String orderId;
@@ -324,21 +323,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () async {
-            if (!kIsWeb ) {
+            if (!kIsWeb) {
               // 🔹 Build group conversation ID
               final String groupId = 'group_${widget.orderId}';
-debugPrint("🚀🚀🚀🚀 groupId 🚀🚀🚀🚀 ${groupId}");
               // 🔹 Fetch conversation from IM SDK
               final res = await IMUtil.sdkInstance
                   .getConversationManager()
                   .getConversation(conversationID: groupId);
-debugPrint("🚀🚀🚀🚀 res 🚀🚀🚀🚀 ${res.toJson().toString()}");
 
               if (res.code == 0) {
                 final conversation = res.data;
                 if (conversation != null && context.mounted) {
-debugPrint("🚀🚀🚀🚀 conversation 🚀🚀🚀🚀 ${conversation.toJson().toString()}");
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -713,9 +708,7 @@ debugPrint("🚀🚀🚀🚀 conversation 🚀🚀🚀🚀 ${conversation.toJson
           hasAvatar: true,
           avatarPath:
               counterpartyPhoto ?? 'assets/images/avatar_placeholder.png',
-          targetUserId: isSeller
-              ? orderDetail?.buyUser
-              : orderDetail?.sellUser,
+          targetUserId: isSeller ? orderDetail?.buyUser : orderDetail?.sellUser,
         ),
         const SizedBox(height: 12),
         _buildDetailRow('Order No', orderDetail?.id ?? 'N/A', hasCopy: true),

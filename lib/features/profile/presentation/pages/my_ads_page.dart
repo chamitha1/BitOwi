@@ -19,7 +19,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 class MyAdsPage extends StatefulWidget {
   const MyAdsPage({super.key});

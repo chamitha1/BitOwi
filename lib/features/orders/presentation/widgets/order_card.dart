@@ -1,12 +1,11 @@
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
 import 'package:get/get.dart';
-import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
+import 'package:BitOwi/features/profile/presentation/pages/chat/chat.dart';
 import 'package:BitOwi/utils/im_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 enum OrderStatus {
   pending,
