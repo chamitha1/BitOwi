@@ -11,6 +11,7 @@ import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/qr_scanner_page.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/coin_selector_card.dart';
@@ -90,21 +91,47 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     super.dispose();
   }
 
+  // bool _isWithdrawEnabled() {
+  //   final amount = double.tryParse(controller.amountController.text) ?? 0.0;
+  //   final minAmount =
+  //       double.tryParse(controller.ruleInfo.value?.minAmount ?? '1') ?? 0.0;
+
+  //   final isGoogleEnabled = controller.googleStatus.value == '1';
+  //   final isGoogleCodeEntered =
+  //       !isGoogleEnabled || _authenticatorCodeController.text.isNotEmpty;
+
+  //   return controller.addrController.text.isNotEmpty &&
+  //       amount >= minAmount &&
+  //       controller.tradeController.text.isNotEmpty &&
+  //       _isVerified &&
+  //       isGoogleCodeEntered;
+  // }
+
   bool _isWithdrawEnabled() {
-    final amount = double.tryParse(controller.amountController.text) ?? 0.0;
+    final text = controller.amountController.text.trim();
+
+    if (text.isEmpty) return false;
+
+    final amount = double.tryParse(text);
+    if (amount == null) return false;
+    if (amount <= 0) return false;
+
     final minAmount =
-        double.tryParse(controller.ruleInfo.value?.minAmount ?? '1') ?? 0.0;
+        double.tryParse(controller.ruleInfo.value?.minAmount ?? '0') ?? 0.0;
+
+    final isMinValid = minAmount <= 0 ? true : amount >= minAmount;
 
     final isGoogleEnabled = controller.googleStatus.value == '1';
     final isGoogleCodeEntered =
         !isGoogleEnabled || _authenticatorCodeController.text.isNotEmpty;
 
     return controller.addrController.text.isNotEmpty &&
-        amount >= minAmount &&
+        isMinValid &&
         controller.tradeController.text.isNotEmpty &&
         _isVerified &&
         isGoogleCodeEntered;
   }
+
 
   void _handleWithdraw() async {
     if (!_isWithdrawEnabled()) return;
@@ -304,9 +331,16 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: controller.amountController,
+                      // keyboardType: const TextInputType.numberWithOptions(
+                      //   decimal: true,
+                      // ),
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
+                        signed: false,
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,8}')),
+                      ],
                       onChanged: (val) {
                         setState(() {});
                       },
