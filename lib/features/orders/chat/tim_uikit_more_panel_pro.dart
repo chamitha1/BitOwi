@@ -171,24 +171,32 @@ class _MorePanelProState extends TIMUIKitState<MorePanelPro> {
         ),
       MorePanelItem(
         id: "file",
-        title: TIM_t("文件"),
+        // title: TIM_t("文件"),
+        title:"Upload",
         onTap: (c) {
           _onFeatureTap("file", c, model, theme);
         },
         icon: Container(
           height: 64,
           width: 64,
+          padding: EdgeInsets.all(12),
           margin: const EdgeInsets.only(bottom: 4),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(5)),
           ),
           child: SvgPicture.asset(
-            "images/file.svg",
-            package: 'tencent_cloud_chat_uikit',
-            height: 64,
-            width: 64,
+            //  "images/file.svg",
+            "assets/icons/chat/upload.svg",
+            // package: 'tencent_cloud_chat_uikit',
+            // height: 32,
+            // width: 32,
           ),
+            // child: Image.asset(
+            //   'assets/icons/chat/photo.png',
+            //   width: 28,
+            //   height: 28,
+            // ),
         ),
       ),
       if (isInstallCallkit && !kIsWeb)

@@ -327,15 +327,18 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             if (!kIsWeb ) {
               // 🔹 Build group conversation ID
               final String groupId = 'group_${widget.orderId}';
-
+debugPrint("🚀🚀🚀🚀 groupId 🚀🚀🚀🚀 ${groupId}");
               // 🔹 Fetch conversation from IM SDK
               final res = await IMUtil.sdkInstance
                   .getConversationManager()
                   .getConversation(conversationID: groupId);
+debugPrint("🚀🚀🚀🚀 res 🚀🚀🚀🚀 ${res.toJson().toString()}");
 
               if (res.code == 0) {
                 final conversation = res.data;
                 if (conversation != null && context.mounted) {
+debugPrint("🚀🚀🚀🚀 conversation 🚀🚀🚀🚀 ${conversation.toJson().toString()}");
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(

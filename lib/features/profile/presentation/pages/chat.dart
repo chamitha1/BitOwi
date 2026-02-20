@@ -481,7 +481,9 @@ class _ChatState extends State<Chat> {
         },
       ),
       morePanelConfig: MorePanelConfig(
-        showFilePickAction: false,
+        showFilePickAction: true,
+        showCameraAction: false,
+        showGalleryPickAction: false,
         extraAction: [],
       ),
       appBarConfig: AppBar(
