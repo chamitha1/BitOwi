@@ -923,7 +923,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
                             (index) => DropdownMenuItem(
                               value: index,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
                                 child: Text(
                                   coinList[index].symbol ?? '',
                                   style: const TextStyle(
@@ -1011,7 +1014,10 @@ class _PostAdsPageState extends State<PostAdsPage> {
                             (index) => DropdownMenuItem(
                               value: index,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
                                 child: Text(
                                   currencyList[index].value,
                                   style: const TextStyle(

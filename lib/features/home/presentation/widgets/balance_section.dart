@@ -66,13 +66,15 @@ class _BalanceSectionState extends State<BalanceSection> {
 
                             onChanged: (v) =>
                                 setState(() => _hideSmallAssets = v),
-                            activeColor: const Color(0xff2ECC71),
-                            activeTrackColor: const Color(
-                              0xFF2ECC71,
-                            ).withOpacity(0.2),
+                            // activeColor: const Color(0xff2ECC71),
+                            activeTrackColor: const Color(0xFF2ECC71),
+                            inactiveTrackColor: Color(0xffB9C6E2),
+                            // .withOpacity(0.2),
                             trackOutlineColor: MaterialStateProperty.all(
                               Colors.transparent,
                             ),
+                            inactiveThumbColor: Colors.white,
+                            activeThumbColor: Colors.white,
                           ),
                         ),
                       ),
