@@ -302,9 +302,11 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
                       ),
                       const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 6,
+                          top: 6,
+                          bottom: 6,
                         ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFECEFF5),
@@ -418,8 +420,11 @@ class _AddAuthenticatorPageState extends State<AddAuthenticatorPage> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: const Color(0xFFECEFF5),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 15,
+                          contentPadding: const EdgeInsets.only(
+                            top: 15,
+                            bottom: 15,
+                            left: 0,
+                            right: 0,
                           ),
                           prefixIcon: Padding(
                             padding: const EdgeInsets.only(
