@@ -5,7 +5,7 @@ import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
-import 'package:BitOwi/features/profile/presentation/pages/chat.dart';
+import 'package:BitOwi/features/profile/presentation/pages/chat/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/im_util.dart';
 import 'package:dio/dio.dart';
@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/models/ads_home_res.dart';
 import 'package:BitOwi/models/user_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 class UserController extends GetxController {
   static UserController get to => Get.find();
