@@ -54,7 +54,7 @@ class ImagePickerModal extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _PickerTile(
-            iconString: "assets/icons/merchant_details/camera.svg",
+            iconString: "assets/icons/profile_page/camera-plus.svg",
             title: 'Take a Picture',
             onTap: () => Navigator.of(context).pop(ImageSource.camera),
           ),

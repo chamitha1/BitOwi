@@ -63,12 +63,16 @@ class _BalanceSectionState extends State<BalanceSection> {
                           scale: 0.7,
                           child: Switch(
                             value: _hideSmallAssets,
+
                             onChanged: (v) =>
                                 setState(() => _hideSmallAssets = v),
                             activeColor: const Color(0xff2ECC71),
                             activeTrackColor: const Color(
                               0xFF2ECC71,
                             ).withOpacity(0.2),
+                            trackOutlineColor: MaterialStateProperty.all(
+                              Colors.transparent,
+                            ),
                           ),
                         ),
                       ),

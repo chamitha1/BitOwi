@@ -6,6 +6,7 @@ import 'package:BitOwi/features/orders/utils/order_helper.dart';
 import 'package:BitOwi/models/trade_order_page_res.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class OrdersPage extends StatefulWidget {
@@ -96,14 +97,41 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
                   }
 
                   if (controller.ordersList.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No orders found',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF717F9A),
-                          fontFamily: 'Inter',
-                        ),
+                    return Align(
+                      alignment: const Alignment(0.0, -0.4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 200,
+                                height: 200,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFE8EFFF),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              SvgPicture.asset(
+                                'assets/icons/p2p/empty-icon.svg',
+                                fit: BoxFit.contain,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            "No Orders Available",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Color(0xFF151E2F),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     );
                   }
