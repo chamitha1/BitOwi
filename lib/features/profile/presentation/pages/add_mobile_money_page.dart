@@ -208,7 +208,7 @@ class _AddMobileMoneyPageState extends State<AddMobileMoneyPage> {
                 item.bankName,
                 style: const TextStyle(
                   fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   fontSize: 16,
                   color: Color(0xff151E2F),
                 ),

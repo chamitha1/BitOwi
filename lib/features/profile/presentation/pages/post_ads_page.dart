@@ -647,7 +647,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
         }
         // EventBusUtil.fireAdsEdit();
       }
-      await Future.delayed(const Duration(seconds: 1)); 
+      await Future.delayed(const Duration(seconds: 1));
 
       Get.back(result: true, closeOverlays: true);
     } catch (e) {
@@ -887,37 +887,77 @@ class _PostAdsPageState extends State<PostAdsPage> {
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
                     child: DropdownButtonHideUnderline(
-                      child: DropdownButtonFormField<int>(
-                        value: coinIndex,
-                        isExpanded: true,
-                        hint: AppText.p2Regular(
-                          'Select Coin',
-                          color: const Color(0xFF717F9A),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          shadowColor: const Color(0x331D5DE5),
+                          hoverColor: Colors.transparent,
+                          focusColor: const Color(0XFFF6F9FF),
+                          highlightColor: Colors.transparent,
+                          splashColor: Colors.transparent,
                         ),
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: const Color(0xFF2E3D5B),
-                          size: 20,
-                        ),
-                        items: List.generate(
-                          coinList.length,
-                          (index) => DropdownMenuItem(
-                            value: index,
-                            child: AppText.p2Regular(
-                              coinList[index].symbol ?? '',
-                              color: Color(0xFF151E2F),
+                        child: DropdownButtonFormField<int>(
+                          value: coinIndex,
+                          isExpanded: true,
+                          dropdownColor: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          elevation: 8,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Color(0xFF151E2F),
+                          ),
+                          hint: AppText.p2Regular(
+                            'Select Coin',
+                            color: const Color(0xFF717F9A),
+                          ),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Color(0xFF2E3D5B),
+                            size: 20,
+                          ),
+                          items: List.generate(
+                            coinList.length,
+                            (index) => DropdownMenuItem(
+                              value: index,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                                child: Text(
+                                  coinList[index].symbol ?? '',
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16,
+                                    color: Color(0xff151E2F),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        onChanged: (index) {
-                          if (index == null) return;
-                          setState(() {
-                            coinIndex = index;
-                          });
-                          debounceGetPrice();
-                        },
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
+                          selectedItemBuilder: (BuildContext context) {
+                            return List.generate(coinList.length, (index) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: AppText.p2Regular(
+                                  coinList[index].symbol ?? '',
+                                  color: const Color(0xFF151E2F),
+                                ),
+                              );
+                            });
+                          },
+                          onChanged: (index) {
+                            if (index == null) return;
+                            setState(() {
+                              coinIndex = index;
+                            });
+                            debounceGetPrice();
+                          },
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
                     ),
@@ -939,37 +979,77 @@ class _PostAdsPageState extends State<PostAdsPage> {
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
                     child: DropdownButtonHideUnderline(
-                      child: DropdownButtonFormField<int>(
-                        value: currencyIndex,
-                        isExpanded: true,
-                        hint: AppText.p2Regular(
-                          'Select Currency',
-                          color: const Color(0xFF717F9A),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          shadowColor: const Color(0x331D5DE5),
+                          hoverColor: Colors.transparent,
+                          focusColor: const Color(0XFFF6F9FF),
+                          highlightColor: Colors.transparent,
+                          splashColor: Colors.transparent,
                         ),
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: const Color(0xFF2E3D5B),
-                          size: 20,
-                        ),
-                        items: List.generate(
-                          currencyList.length,
-                          (index) => DropdownMenuItem(
-                            value: index,
-                            child: AppText.p2Regular(
-                              currencyList[index].value,
-                              color: Color(0xFF151E2F),
+                        child: DropdownButtonFormField<int>(
+                          value: currencyIndex,
+                          isExpanded: true,
+                          dropdownColor: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          elevation: 8,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Color(0xFF151E2F),
+                          ),
+                          hint: AppText.p2Regular(
+                            'Select Currency',
+                            color: const Color(0xFF717F9A),
+                          ),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Color(0xFF2E3D5B),
+                            size: 20,
+                          ),
+                          items: List.generate(
+                            currencyList.length,
+                            (index) => DropdownMenuItem(
+                              value: index,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                                child: Text(
+                                  currencyList[index].value,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16,
+                                    color: Color(0xff151E2F),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        onChanged: (index) {
-                          if (index == null) return;
-                          setState(() {
-                            currencyIndex = index;
-                          });
-                          debounceGetPrice();
-                        },
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
+                          selectedItemBuilder: (BuildContext context) {
+                            return List.generate(currencyList.length, (index) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: AppText.p2Regular(
+                                  currencyList[index].value,
+                                  color: const Color(0xFF151E2F),
+                                ),
+                              );
+                            });
+                          },
+                          onChanged: (index) {
+                            if (index == null) return;
+                            setState(() {
+                              currencyIndex = index;
+                            });
+                            debounceGetPrice();
+                          },
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
                     ),
