@@ -9,7 +9,7 @@ class WithdrawRuleDetailRes {
   // final String? minAmount;
   // final String? maxAmount;
 
-  @JsonKey(name: 'withdraw_rule')
+  @JsonKey(name: 'withdrawRule')
   final String? withdrawRule;
 
   @JsonKey(name: 'withdraw_fee')

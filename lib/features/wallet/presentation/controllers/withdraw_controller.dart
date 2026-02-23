@@ -140,7 +140,8 @@ class WithdrawController extends GetxController {
       final accountRes = await AccountApi.getDetailAccount(symbol.value);
 
       accountNumber.value = accountRes.accountNumber ?? '';
-      note.value = ruleRes.withdrawRule ?? '';
+      // note.value = ruleRes.withdrawRule ?? '';
+      note.value = (ruleRes.withdrawRule ?? '').trim();
 
       availableAmount.value = accountRes.usableAmount?.toString() ?? '0.00';
       if (accountRes.user != null) {

@@ -49,6 +49,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   String _verifiedOtp = "";
   String _userEmail = "";
 
+  String? _amountError;
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +85,27 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     });
   }
 
+  String? _validateAmount(String raw) {
+    final text = raw.trim();
+
+    if (text.isEmpty) return null;
+    final okFormat = RegExp(r'^\d+(\.\d{0,2})?$').hasMatch(text);
+    if (!okFormat) {
+      return "Only 2 decimals allowed";
+    }
+
+    final amount = double.tryParse(text);
+    if (amount == null || amount <= 0) return "Enter a valid amount";
+    final minAmount =
+        double.tryParse(controller.ruleInfo.value?.minAmount ?? '') ?? 0.0;
+
+    if (minAmount > 0 && amount < minAmount) {
+      return "Minimum withdrawal amount is $minAmount";
+    }
+
+    return null;
+  }
+
   // final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -107,26 +130,44 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   //       isGoogleCodeEntered;
   // }
 
+  // bool _isWithdrawEnabled() {
+  //   final text = controller.amountController.text.trim();
+
+  //   if (text.isEmpty) return false;
+
+  //   final amount = double.tryParse(text);
+  //   if (amount == null) return false;
+  //   if (amount <= 0) return false;
+
+  //   final minAmount =
+  //       double.tryParse(controller.ruleInfo.value?.minAmount ?? '0') ?? 0.0;
+
+  //   final isMinValid = minAmount <= 0 ? true : amount >= minAmount;
+
+  //   final isGoogleEnabled = controller.googleStatus.value == '1';
+  //   final isGoogleCodeEntered =
+  //       !isGoogleEnabled || _authenticatorCodeController.text.isNotEmpty;
+
+  //   return controller.addrController.text.isNotEmpty &&
+  //       isMinValid &&
+  //       controller.tradeController.text.isNotEmpty &&
+  //       _isVerified &&
+  //       isGoogleCodeEntered;
+  // }
+
   bool _isWithdrawEnabled() {
-    final text = controller.amountController.text.trim();
+    final amountText = controller.amountController.text.trim();
+    final err = _validateAmount(amountText);
+    if (err != null) return false;
 
-    if (text.isEmpty) return false;
-
-    final amount = double.tryParse(text);
-    if (amount == null) return false;
+    final amount = double.tryParse(amountText) ?? 0.0;
     if (amount <= 0) return false;
-
-    final minAmount =
-        double.tryParse(controller.ruleInfo.value?.minAmount ?? '0') ?? 0.0;
-
-    final isMinValid = minAmount <= 0 ? true : amount >= minAmount;
 
     final isGoogleEnabled = controller.googleStatus.value == '1';
     final isGoogleCodeEntered =
         !isGoogleEnabled || _authenticatorCodeController.text.isNotEmpty;
 
     return controller.addrController.text.isNotEmpty &&
-        isMinValid &&
         controller.tradeController.text.isNotEmpty &&
         _isVerified &&
         isGoogleCodeEntered;
@@ -329,55 +370,111 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
+                    // TextField(
+                    //   controller: controller.amountController,
+                    //   // keyboardType: const TextInputType.numberWithOptions(
+                    //   //   decimal: true,
+                    //   // ),
+                    //   keyboardType: const TextInputType.numberWithOptions(
+                    //     decimal: true,
+                    //     signed: false,
+                    //   ),
+                    //   inputFormatters: [
+                    //     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,8}')),
+                    //   ],
+                    //   onChanged: (val) {
+                    //     setState(() {});
+                    //   },
+                    //   decoration: InputDecoration(
+                    //     filled: true,
+                    //     fillColor: Colors.white,
+                    //     hintText: "0.00",
+                    //     hintStyle: const TextStyle(
+                    //       color: Color(0xFF717F9A),
+                    //       fontFamily: 'Inter',
+                    //       fontWeight: FontWeight.w400,
+                    //       fontSize: 16,
+                    //     ),
+                    //     contentPadding: const EdgeInsets.only(
+                    //       left: 10,
+                    //       right: 16,
+                    //     ),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: const BorderSide(
+                    //         color: Color(0xFFDAE0EE),
+                    //       ),
+                    //     ),
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: const BorderSide(
+                    //         color: Color(0xFFDAE0EE),
+                    //       ),
+                    //     ),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: const BorderSide(
+                    //         color: Color(0xFF1D5DE5),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     TextField(
                       controller: controller.amountController,
-                      // keyboardType: const TextInputType.numberWithOptions(
-                      //   decimal: true,
-                      // ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                        signed: false,
-                      ),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,8}')),
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        TextInputFormatter.withFunction((oldValue, newValue) {
+                          final text = newValue.text;
+
+                          if ('.'.allMatches(text).length > 1) {
+                            return oldValue;
+                          }
+
+                          // limit to 2 decimal places
+                          if (text.contains('.')) {
+                            final parts = text.split('.');
+                            if (parts.length > 1 && parts[1].length > 2) {
+                              return oldValue; 
+                            }
+                          }
+
+                          return newValue;
+                        }),
                       ],
+
                       onChanged: (val) {
-                        setState(() {});
+                        setState(() {
+                          _amountError = _validateAmount(val);
+                        });
                       },
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
                         hintText: "0.00",
+                        errorText: _amountError,
                         hintStyle: const TextStyle(
                           color: Color(0xFF717F9A),
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                         ),
-                        contentPadding: const EdgeInsets.only(
-                          left: 10,
-                          right: 16,
-                        ),
+                        contentPadding: const EdgeInsets.only(left: 10, right: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
+                          borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
+                          borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1D5DE5),
-                          ),
+                          borderSide: const BorderSide(color: Color(0xFF1D5DE5)),
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -595,19 +692,34 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Obx(
-                                  () => Text(
-                                    controller.note.value.isNotEmpty
-                                        ? controller.note.value
-                                        : "Minimum withdrawal amount: ${controller.ruleInfo.value?.minAmount ?? '10'} ${controller.symbol.value}",
+                                // Obx(
+                                //   () => Text(
+                                //     controller.note.value.isNotEmpty
+                                //         ? controller.note.value
+                                //         : "Minimum withdrawal amount: ${controller.ruleInfo.value?.minAmount ?? '10'} ${controller.symbol.value}",
+                                //     style: const TextStyle(
+                                //       fontFamily: 'Inter',
+                                //       fontWeight: FontWeight.w400,
+                                //       fontSize: 14,
+                                //       color: Color(0xFF40A372),
+                                //     ),
+                                //   ),
+                                // ),
+                                Obx(() {
+                                  final rule = controller.ruleInfo.value?.withdrawRule;
+
+                                  return Text(
+                                    (rule != null && rule.trim().isNotEmpty)
+                                        ? rule
+                                        : "Withdrawal rules not available",
                                     style: const TextStyle(
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w400,
                                       fontSize: 14,
                                       color: Color(0xFF40A372),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                }),
                               ],
                             ),
                           ),
@@ -744,8 +856,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     if (_isSendingOtp || _isVerified) return;
 
     setState(() => _isSendingOtp = true);
-
-    //OTP Send
     final success = await controller.sendOtp(type: SmsBizType.withdraw);
 
     if (!success) {
