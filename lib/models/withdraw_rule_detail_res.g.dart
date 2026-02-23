@@ -9,7 +9,7 @@ part of 'withdraw_rule_detail_res.dart';
 WithdrawRuleDetailRes _$WithdrawRuleDetailResFromJson(
   Map<String, dynamic> json,
 ) => WithdrawRuleDetailRes(
-  withdrawRule: json['withdraw_rule'] as String?,
+  withdrawRule: json['withdrawRule'] as String?,
   withdrawFee: json['withdraw_fee'] as String?,
   minAmount: json['withdrawMin'] as String?,
   maxAmount: json['withdrawLimit'] as String?,
@@ -18,7 +18,7 @@ WithdrawRuleDetailRes _$WithdrawRuleDetailResFromJson(
 Map<String, dynamic> _$WithdrawRuleDetailResToJson(
   WithdrawRuleDetailRes instance,
 ) => <String, dynamic>{
-  'withdraw_rule': instance.withdrawRule,
+  'withdrawRule': instance.withdrawRule,
   'withdraw_fee': instance.withdrawFee,
   'withdrawMin': instance.minAmount,
   'withdrawLimit': instance.maxAmount,
