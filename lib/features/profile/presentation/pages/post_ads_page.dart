@@ -881,10 +881,11 @@ class _PostAdsPageState extends State<PostAdsPage> {
                   _buildLabel("Trading Coin"),
                   Container(
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: Theme(
@@ -895,7 +896,8 @@ class _PostAdsPageState extends State<PostAdsPage> {
                           highlightColor: Colors.transparent,
                           splashColor: Colors.transparent,
                         ),
-                        child: DropdownButtonFormField<int>(
+                        child: DropdownButton<int>(
+                          isDense: true,
                           value: coinIndex,
                           isExpanded: true,
                           dropdownColor: Colors.white,
@@ -921,15 +923,12 @@ class _PostAdsPageState extends State<PostAdsPage> {
                             (index) => DropdownMenuItem(
                               value: index,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 8,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 child: Text(
                                   coinList[index].symbol ?? '',
                                   style: const TextStyle(
                                     fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                     color: Color(0xff151E2F),
                                   ),
@@ -955,9 +954,6 @@ class _PostAdsPageState extends State<PostAdsPage> {
                             });
                             debounceGetPrice();
                           },
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                          ),
                         ),
                       ),
                     ),
@@ -973,10 +969,11 @@ class _PostAdsPageState extends State<PostAdsPage> {
                   _buildLabel("Currency"),
                   Container(
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: Theme(
@@ -987,7 +984,8 @@ class _PostAdsPageState extends State<PostAdsPage> {
                           highlightColor: Colors.transparent,
                           splashColor: Colors.transparent,
                         ),
-                        child: DropdownButtonFormField<int>(
+                        child: DropdownButton<int>(
+                          isDense: true,
                           value: currencyIndex,
                           isExpanded: true,
                           dropdownColor: Colors.white,
@@ -1013,15 +1011,12 @@ class _PostAdsPageState extends State<PostAdsPage> {
                             (index) => DropdownMenuItem(
                               value: index,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 8,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 child: Text(
                                   currencyList[index].value,
                                   style: const TextStyle(
                                     fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
+                                    fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                     color: Color(0xff151E2F),
                                   ),
@@ -1047,9 +1042,6 @@ class _PostAdsPageState extends State<PostAdsPage> {
                             });
                             debounceGetPrice();
                           },
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                          ),
                         ),
                       ),
                     ),

@@ -138,7 +138,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
                               InputTitleLable("Opening Bank"),
                               buildBankTextInput(), // 🧩
 
-                              InputTitleLable("Coin"),
+                              InputTitleLable("Currency"),
                               buildCoinDropdownSelection(), // 🧩
                             ],
                           ),
@@ -212,29 +212,75 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
   }
 
   Widget buildCoinDropdownSelection() {
-    return DropdownButtonFormField<String>(
-      value: _selectedCoin,
-      style: AppTextStyles.p2Regular,
-      hint: AppText.p2Regular('Select Currency', color: Color(0xFF717F9A)),
-      decoration: AppInputDecorations.textField(),
-      items: coinList.map((Dict coin) {
-        return DropdownMenuItem<String>(
-          value: coin.key,
-          child: AppText.p2Regular(coin.value),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedCoin = value;
-        });
-      },
-      icon: const Icon(
-        Icons.keyboard_arrow_down_rounded,
-        color: Color(0xFF2E3D5B),
-        size: 20,
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFDAE0EE)),
       ),
-      validator: (value) =>
-          (value == null || value.isEmpty) ? "Please select a currency" : null,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          shadowColor: const Color(0x331D5DE5),
+          hoverColor: Colors.transparent,
+          focusColor: const Color(0XFFF6F9FF),
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            isDense: true,
+            value: _selectedCoin,
+            hint: AppText.p2Regular(
+              'Select Currency',
+              color: const Color(0xFF717F9A),
+            ),
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Color(0xFF2E3D5B),
+              size: 20,
+            ),
+            items: coinList.map((Dict coin) {
+              return DropdownMenuItem<String>(
+                value: coin.key,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    coin.value,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Color(0xff151E2F),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+            selectedItemBuilder: (BuildContext context) {
+              return coinList.map<Widget>((Dict coin) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: AppText.p2Regular(coin.value),
+                );
+              }).toList();
+            },
+            onChanged: (value) {
+              setState(() {
+                _selectedCoin = value;
+              });
+            },
+          ),
+        ),
+      ),
     );
   }
 

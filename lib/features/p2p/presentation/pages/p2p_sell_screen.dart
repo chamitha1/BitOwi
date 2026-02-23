@@ -477,6 +477,7 @@ class _P2PSellScreenState extends State<P2PSellScreen> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   side: const BorderSide(color: Color(0xFFDAE0EE)),
+                  activeColor: Color(0xFF1D5DE5),
                 ),
               ),
               const SizedBox(width: 8),

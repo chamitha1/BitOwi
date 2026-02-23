@@ -175,57 +175,72 @@ class _AddMobileMoneyPageState extends State<AddMobileMoneyPage> {
   }
 
   Widget buildProviderDropdown() {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        shadowColor: const Color(0x331D5DE5),
-        hoverColor: Colors.transparent,
-        focusColor: const Color(0XFFF6F9FF),
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
-      ),
-      child: DropdownButtonFormField<String>(
-        value: _selectedProvider,
-        style: AppTextStyles.p2Regular,
-        hint: AppText.p2Regular(
-          'Select Provider',
-          color: const Color(0xFF717F9A),
-        ),
-        decoration: AppInputDecorations.textField(),
-        dropdownColor: Colors.white,
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        elevation: 8,
-        icon: const Icon(
-          Icons.keyboard_arrow_down_rounded,
-          color: Color(0xFF2E3D5B),
-          size: 20,
+        border: Border.all(
+          color: const Color(0xFFE2E8F0),
+        ), // Original textfield border
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          shadowColor: const Color(0x331D5DE5),
+          hoverColor: Colors.transparent,
+          focusColor: const Color(0XFFF6F9FF),
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
         ),
-        items: providerList.map((BankcardChannelListRes item) {
-          return DropdownMenuItem<String>(
-            value: item.id,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: Text(
-                item.bankName,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  color: Color(0xff151E2F),
-                ),
-              ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            isDense: true,
+            value: _selectedProvider,
+            hint: AppText.p2Regular(
+              'Select Provider',
+              color: const Color(0xFF717F9A),
             ),
-          );
-        }).toList(),
-        selectedItemBuilder: (BuildContext context) {
-          return providerList.map<Widget>((BankcardChannelListRes item) {
-            return Align(
-              alignment: Alignment.centerLeft,
-              child: AppText.p2Regular(item.bankName),
-            );
-          }).toList();
-        },
-        onChanged: (value) => setState(() => _selectedProvider = value),
-        validator: (value) => value == null ? "Please select a provider" : null,
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Color(0xFF2E3D5B),
+              size: 20,
+            ),
+            items: providerList.map((BankcardChannelListRes item) {
+              return DropdownMenuItem<String>(
+                value: item.id,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    item.bankName,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: Color(0xff151E2F),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+            selectedItemBuilder: (BuildContext context) {
+              return providerList.map<Widget>((BankcardChannelListRes item) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: AppText.p2Regular(item.bankName),
+                );
+              }).toList();
+            },
+            onChanged: (value) => setState(() => _selectedProvider = value),
+          ),
+        ),
       ),
     );
   }
