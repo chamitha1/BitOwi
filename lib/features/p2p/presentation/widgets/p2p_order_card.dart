@@ -271,15 +271,16 @@ class P2POrderCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            // Text(
-            //   "Per ${adItem?.tradeCoin ?? 'USDT'}",
-            //   style: const TextStyle(
-            //     fontFamily: 'Inter',
-            //     fontWeight: FontWeight.w400,
-            //     fontSize: 12,
-            //     color: Color(0xFF717F9A),
-            //   ),
-            // ),
+            if (isMerchantProfile)
+              Text(
+                "Per ${adItem?.tradeCoin ?? 'USDT'}",
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                  color: Color(0xFF717F9A),
+                ),
+              ),
           ],
         ),
       ],
