@@ -185,18 +185,23 @@ class P2POrderCard extends StatelessWidget {
                           text: TextSpan(
                             style: const TextStyle(
                               fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
                               fontSize: 12,
                               color: Color(0xFF717F9A),
                             ),
                             children: [
                               const TextSpan(text: "Trust "),
+
+                              const WidgetSpan(child: SizedBox(width: 6)),
+
                               TextSpan(
                                 text: "${stats?.confidenceCount ?? 0}",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF151E2F),
+                                  color: Color(0xff717F9A),
                                 ),
                               ),
+                              const WidgetSpan(child: SizedBox(width: 6)),
                             ],
                           ),
                         ),
@@ -213,14 +218,18 @@ class P2POrderCard extends StatelessWidget {
                               fontFamily: 'Inter',
                               fontSize: 12,
                               color: Color(0xFF717F9A),
+                              fontWeight: FontWeight.w400,
                             ),
                             children: [
+                              const WidgetSpan(child: SizedBox(width: 6)),
                               const TextSpan(text: "Trade "),
+
+                              const WidgetSpan(child: SizedBox(width: 6)),
                               TextSpan(
                                 text: "$orderCount / $finishRate%",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF151E2F),
+                                  color: Color(0xff717F9A),
                                 ),
                               ),
                             ],
@@ -262,15 +271,15 @@ class P2POrderCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              "Per ${adItem?.tradeCoin ?? 'USDT'}",
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 12,
-                color: Color(0xFF717F9A),
-              ),
-            ),
+            // Text(
+            //   "Per ${adItem?.tradeCoin ?? 'USDT'}",
+            //   style: const TextStyle(
+            //     fontFamily: 'Inter',
+            //     fontWeight: FontWeight.w400,
+            //     fontSize: 12,
+            //     color: Color(0xFF717F9A),
+            //   ),
+            // ),
           ],
         ),
       ],
@@ -291,13 +300,13 @@ class P2POrderCard extends StatelessWidget {
                 children: [
                   // Total Row
                   _buildInfoRow(
-                    "Total",
+                    "Total:",
                     "${adItem?.leftCount ?? '0'} ${adItem?.tradeCoin ?? ''}",
                   ),
                   const SizedBox(height: 8),
                   // Limit Row
                   _buildInfoRow(
-                    "Limit",
+                    "Limit:",
                     "${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.minTrade ?? '0'} - ${_getCurrencySymbol(adItem?.tradeCurrency)}${adItem?.maxTrade ?? '0'}",
                   ),
                 ],
@@ -479,15 +488,15 @@ class P2POrderCard extends StatelessWidget {
             ),
           ),
         ),
-        const Text(
-          " : ",
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-            color: Color(0xFF929EB8),
-          ),
-        ),
+        // const Text(
+        //   ": ",
+        //   style: TextStyle(
+        //     fontFamily: 'Inter',
+        //     fontWeight: FontWeight.w400,
+        //     fontSize: 14,
+        //     color: Color(0xFF929EB8),
+        //   ),
+        // ),
         Expanded(
           child: Text(
             value,
