@@ -254,7 +254,7 @@ class _ChatState extends State<Chat> {
                 text: adsInfo!.tradeType == '0' ? 'Sell' : 'Buy',
                 enabled: true,
                 onPressed: () {
-                  debugPrint("🚀 Routes buyAd");
+                  // debugPrint("🚀 Routes buyAd");
                   // if (widget.goBackOnBuy) {
                   //   Navigator.pop(context);
                   // } else {

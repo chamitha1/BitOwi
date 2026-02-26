@@ -348,10 +348,13 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     Color statusColor = const Color(0xff151E2F);
     Color statusBg = const Color(0xffF6F9FF);
 
-    if (item.status == '2' || item.status == '5') {
+    if (status.toLowerCase().contains('fail') ||
+        item.status == '2' ||
+        item.status == '5') {
       statusColor = const Color(0xffFF5252);
       statusBg = const Color(0xffFFEBEE);
-    } else if (item.status == '6') {
+    } else if (status.toLowerCase().contains('complete') ||
+        item.status == '6') {
       // Completed
       statusColor = const Color(0xff27AE60);
       statusBg = const Color(0xffE8F5E9);

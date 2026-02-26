@@ -66,8 +66,9 @@ class TradeOrderItem {
 
   final List<dynamic>? statusList;
 
-  @JsonKey(fromJson: _dynamicToInt)
-  final int? id;
+  // @JsonKey(fromJson: _dynamicToInt)
+  // final int? id;
+  final String? id;
 
   final String? type;
   final String? tradeCurrency;

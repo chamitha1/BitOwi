@@ -47,7 +47,7 @@ class ApiClient {
               return handler.next(options);
             },
             onResponse: (response, handler) async {
-              print("❤️${response}");
+              print("RESPONSE --> ${response}");
               // Decode if plain string
               if (response.data is String) {
                 try {
@@ -106,7 +106,7 @@ class ApiClient {
 
                   if (Get.currentRoute != Routes.login) {
                     Get.offAllNamed(Routes.login);
-                    if( code != '300'){
+                    if (code != '300') {
                       Get.snackbar(
                         'Session Expired',
                         'You have been logged out because your account was used on another device.',
@@ -117,14 +117,12 @@ class ApiClient {
                   }
 
                   return handler.reject(
-                    
                     DioException(
                       requestOptions: response.requestOptions,
                       error: "Session expired",
                       response: response,
                     ),
                   );
-                  
                 }
               }
 
