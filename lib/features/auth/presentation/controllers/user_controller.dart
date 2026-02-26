@@ -288,7 +288,7 @@ class UserController extends GetxController {
     }
 
     if (customerServiceUserID.isEmpty) {
-      debugPrint('❌ customerServiceUserID still empty');
+      debugPrint(' customerServiceUserID still empty');
       CustomSnackbar.showError(
         title: "Error",
         message: "Customer Service Not Found",
@@ -301,7 +301,7 @@ class UserController extends GetxController {
       final res = await IMUtil.sdkInstance
           .getConversationManager()
           .getConversation(conversationID: conversationID);
-      debugPrint(' 💬 Conversation data Fetched ');
+      debugPrint(' Conversation data Fetched ');
       if (res.code == 0) {
         final conversation = res.data;
         if (conversation != null) {

@@ -14,10 +14,10 @@ class AppLogger {
     StackTrace? stackTrace,
   }) {
     if (!kReleaseMode) {
-      debugPrint('⛔ [ERROR] $error');
+      debugPrint('[ERROR] $error');
 
       if (stackTrace != null) {
-        debugPrint('📌 StackTrace:\n$stackTrace');
+        debugPrint(' StackTrace:\n$stackTrace');
       }
     }
   }
