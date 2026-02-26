@@ -5,7 +5,6 @@ import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
 import 'package:BitOwi/models/jour.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/config/routes.dart';
@@ -29,7 +28,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: Container(
-            margin: EdgeInsets.all(5),
+            margin: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(12),
@@ -42,13 +41,13 @@ class WalletDetailPage extends GetView<WalletDetailController> {
             ),
           ),
         ),
-        title: Text(
+        title: const Text(
           "Balances",
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
-            fontSize: 18.sp,
-            color: const Color(0xFF151E2F),
+            fontSize: 18,
+            color: Color(0xFF151E2F),
           ),
         ),
       ),
@@ -90,32 +89,32 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                   slivers: [
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: _buildTopBox(info),
                       ),
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(20.w, 24.w, 20.w, 12.w),
-                        child: Text(
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                        child: const Text(
                           "Transaction History",
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
-                            fontSize: 16.sp,
-                            color: const Color(0xFF151E2F),
+                            fontSize: 16,
+                            color: Color(0xFF151E2F),
                           ),
                         ),
                       ),
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.only(bottom: 16.w),
+                        padding: const EdgeInsets.only(bottom: 16),
                         child: _buildFilterTabs(),
                       ),
                     ),
                     SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           if (index < controller.transactionList.length) {
@@ -127,7 +126,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                       ),
                     ),
                     if (controller.transactionList.isEmpty)
-                      SliverToBoxAdapter(
+                      const SliverToBoxAdapter(
                         child: SizedBox(
                           height: 200,
                           child: Center(
@@ -135,13 +134,13 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                               "No transactions found",
                               style: TextStyle(
                                 color: Colors.grey,
-                                fontSize: 14.sp,
+                                fontSize: 14,
                               ),
                             ),
                           ),
                         ),
                       ),
-                    SliverToBoxAdapter(child: SizedBox(height: 20.w)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   ],
                 ),
               ),
@@ -157,8 +156,8 @@ class WalletDetailPage extends GetView<WalletDetailController> {
     return Stack(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 30.w),
-          padding: EdgeInsets.fromLTRB(20.w, 40.w, 20.w, 20.w),
+          margin: const EdgeInsets.only(top: 30),
+          padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -174,14 +173,14 @@ class WalletDetailPage extends GetView<WalletDetailController> {
             children: [
               Text(
                 info.currency ?? '',
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,
-                  fontSize: 18.sp,
-                  color: const Color(0xFF151E2F),
+                  fontSize: 18,
+                  color: Color(0xFF151E2F),
                 ),
               ),
-              SizedBox(height: 20.w),
+              const SizedBox(height: 20),
               _buildRow(
                 "Total Amount",
                 double.tryParse(info.totalAmount ?? '0')?.toStringAsFixed(2) ??
@@ -197,7 +196,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                 double.tryParse(info.frozenAmount ?? '0')?.toStringAsFixed(2) ??
                     '0.00',
               ),
-              Divider(height: 24.w, color: const Color(0xFFF3F4F6)),
+              const Divider(height: 24, color: Color(0xFFF3F4F6)),
               _buildRow(
                 "Valuation (USDT)",
                 " ${double.tryParse(info.totalAmountUsdt ?? '0')?.toStringAsFixed(2) ?? '0.00'}",
@@ -215,8 +214,8 @@ class WalletDetailPage extends GetView<WalletDetailController> {
           right: 0,
           child: Center(
             child: Container(
-              width: 60.w,
-              height: 60.w,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
@@ -248,26 +247,26 @@ class WalletDetailPage extends GetView<WalletDetailController> {
 
   Widget _buildRow(String label, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.w),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w400,
-              fontSize: 14.sp,
-              color: const Color(0xFF717F9A),
+              fontSize: 14,
+              color: Color(0xFF717F9A),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
-              fontSize: 16.sp,
-              color: const Color(0xFF151E2F),
+              fontSize: 16,
+              color: Color(0xFF151E2F),
             ),
           ),
         ],
@@ -277,7 +276,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
 
   Widget _buildBottomBar(AccountDetailAccountAndJourRes info) {
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -294,10 +293,9 @@ class WalletDetailPage extends GetView<WalletDetailController> {
           children: [
             Expanded(
               child: SizedBox(
-                height: 48.w,
+                height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Deposit
                     Get.toNamed(
                       Routes.deposit,
                       parameters: {'symbol': info.currency ?? ''},
@@ -310,25 +308,24 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                     ),
                     elevation: 0,
                   ),
-                  child: Text(
+                  child: const Text(
                     "Deposit",
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w600,
-                      fontSize: 16.sp,
+                      fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: 16.w),
+            const SizedBox(width: 16),
             Expanded(
               child: SizedBox(
-                height: 48.w,
+                height: 48,
                 child: OutlinedButton(
                   onPressed: () {
-                    // Withdraw
                     Get.toNamed(
                       Routes.withdrawal,
                       parameters: {
@@ -343,13 +340,13 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     "Withdraw",
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w600,
-                      fontSize: 16.sp,
-                      color: const Color(0xFF1D5DE5),
+                      fontSize: 16,
+                      color: Color(0xFF1D5DE5),
                     ),
                   ),
                 ),
@@ -363,13 +360,13 @@ class WalletDetailPage extends GetView<WalletDetailController> {
 
   Widget _buildFilterTabs() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           _buildTabButton(0, "All"),
-          SizedBox(width: 12.w),
+          const SizedBox(width: 12),
           _buildTabButton(1, "Deposits"),
-          SizedBox(width: 12.w),
+          const SizedBox(width: 12),
           _buildTabButton(2, "Withdrawals"),
         ],
       ),
@@ -382,7 +379,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
       return GestureDetector(
         onTap: () => controller.changeTab(index),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.w),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
                 ? const Color(0xFF1D5DE5)
@@ -403,7 +400,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w500,
-              fontSize: 14.sp,
+              fontSize: 14,
               color: isSelected ? Colors.white : const Color(0xFF717F9A),
             ),
           ),
@@ -440,8 +437,8 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(16.w),
-        margin: EdgeInsets.only(bottom: 12.w), //  for list spacing
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -449,30 +446,30 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         child: Row(
           children: [
             Container(
-              width: 40.w,
-              height: 40.w,
-              padding: EdgeInsets.all(10.w),
+              width: 40,
+              height: 40,
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: iconBg,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SvgPicture.asset(iconAsset, color: iconColor),
             ),
-            SizedBox(width: 12.w),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     isDeposit ? "Deposit" : "Withdraw",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
-                      fontSize: 14.sp,
-                      color: const Color(0xFF151E2F),
+                      fontSize: 14,
+                      color: Color(0xFF151E2F),
                     ),
                   ),
-                  SizedBox(height: 4.w),
+                  const SizedBox(height: 4),
                   Text(
                     tx.createDatetime != null
                         ? DateFormat('yyyy-MM-dd HH:mm').format(
@@ -486,11 +483,11 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                             ),
                           )
                         : '-',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
-                      fontSize: 12.sp,
-                      color: const Color(0xFF717F9A),
+                      fontSize: 12,
+                      color: Color(0xFF717F9A),
                     ),
                   ),
                 ],
@@ -504,22 +501,21 @@ class WalletDetailPage extends GetView<WalletDetailController> {
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w500,
-                    fontSize: 14.sp,
+                    fontSize: 14,
                     color: amountColor,
                   ),
                 ),
-
                 if (tx.remark != null && tx.remark!.trim().isNotEmpty) ...[
-                  SizedBox(height: 4.w),
+                  const SizedBox(height: 4),
                   Text(
                     _shortRemark(tx.remark!, 15),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
-                      fontSize: 12.sp,
-                      color: const Color(0xFF717F9A),
+                      fontSize: 12,
+                      color: Color(0xFF717F9A),
                     ),
                   ),
                 ],
