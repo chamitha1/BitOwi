@@ -238,7 +238,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       final freshDio = Dio(
         BaseOptions(
           baseUrl: ApiClient.dio.options.baseUrl,
-          connectTimeout: const Duration(seconds: 5),
+          connectTimeout: const Duration(seconds: 50),
           headers: {
             'Content-Type': 'application/json',
             'Accept-Language': 'en_US',
@@ -312,7 +312,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       final freshDio = Dio(
         BaseOptions(
           baseUrl: ApiClient.dio.options.baseUrl,
-          connectTimeout: const Duration(seconds: 5),
+          connectTimeout: const Duration(seconds: 50),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token,
