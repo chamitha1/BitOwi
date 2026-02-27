@@ -3,6 +3,7 @@ import 'package:BitOwi/features/p2p/presentation/pages/p2p_sell_screen.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/trade_type_badge.dart';
 
 import 'package:BitOwi/models/ads_page_res.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -539,7 +540,7 @@ class P2POrderCard extends StatelessWidget {
             onRefresh!();
           }
         } catch (e) {
-          debugPrint("Off ad error: $e");
+          AppLogger.d("Off ad error: $e");
           CustomSnackbar.showError(
             title: "Error",
             message: "Something went wrong",
@@ -547,7 +548,7 @@ class P2POrderCard extends StatelessWidget {
         }
       },
       onSecondary: () {
-        debugPrint("User cancelled off ad");
+        AppLogger.d("User cancelled off ad");
       },
     );
   }

@@ -308,7 +308,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
             message: "Payment method deleted successfully",
           );
         } catch (e) {
-          debugPrint("Payment method deleted error: $e");
+          AppLogger.d("Payment method deleted error: $e");
 
           CustomSnackbar.showError(
             title: "Error",
@@ -323,7 +323,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
         }
       },
       onSecondary: () {
-        debugPrint("User cancelled payment method delete");
+        AppLogger.d("User cancelled payment method delete");
       },
     );
   }

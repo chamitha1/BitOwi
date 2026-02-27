@@ -1,3 +1,4 @@
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/models/dict.dart';
@@ -85,7 +86,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         _currencyList = filtered;
         _selectedCurrency = selected;
         _loadingCurrencies = false;
-        debugPrint(
+        AppLogger.d(
           "FilterBottomSheet: initKey=$initKey, selected=${selected?.key}, list=${filtered.map((e) => e.key).toList()}",
         );
       });
@@ -100,7 +101,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         _loadingCurrencies = false;
       });
 
-      debugPrint("Error fetching currencies: $e");
+      AppLogger.d("Error fetching currencies: $e");
     }
   }
 

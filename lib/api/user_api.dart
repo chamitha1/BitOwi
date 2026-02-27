@@ -25,7 +25,7 @@ class UserApi {
       );
       return response.data;
     } catch (e) {
-      e.printError();
+      AppLogger.d("Login Error : $e");
       rethrow;
     }
   }
@@ -54,7 +54,7 @@ class UserApi {
       );
       return response.data as Map<String, dynamic>;
     } catch (e) {
-      AppLogger.e(e);
+      AppLogger.e("Signup error : $e");
       rethrow;
     }
   }
@@ -391,7 +391,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       }
       throw Exception(responseData['errorMsg'] ?? 'Unknown error');
     } catch (e) {
-      e.printError();
+      AppLogger.d("Get User Info error : $e");
       rethrow;
     }
   }
@@ -410,7 +410,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
         throw Exception(resData['errorMsg'] ?? 'Update failed');
       }
     } catch (e) {
-      e.printError();
+      AppLogger.d("Modify User error: $e");
       rethrow;
     }
   }
@@ -421,7 +421,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       final response = await ApiClient.dio.get("/core/v1/cuser/logOut");
       AppLogger.d("Logout Response: ${response.data}");
     } catch (e) {
-      e.printError();
+      AppLogger.d("LogOut error: $e");
       rethrow;
     }
   }
@@ -477,7 +477,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
           .toList();
       return list;
     } catch (e) {
-      e.printError();
+      AppLogger.d("Get Identify Order List: $e");
       rethrow;
     }
   }
@@ -487,7 +487,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
     try {
       await ApiClient.dio.post("/core/v1/merchant_record/create");
     } catch (e) {
-      e.printError();
+      AppLogger.d("Create Merchant Record: $e");
       rethrow;
     }
   }
@@ -545,7 +545,7 @@ for resetLoginPwd, bindTradePwd, modifyEmail, openGoogle, closeGoogle, withdraw 
       );
       AppLogger.d("Forget Login Password Response: ${res.data}");
     } catch (e) {
-      e.printError();
+      AppLogger.d("Forget Login Pass: $e");
       rethrow;
     }
   }

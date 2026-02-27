@@ -288,7 +288,7 @@ class UserController extends GetxController {
     }
 
     if (customerServiceUserID.isEmpty) {
-      debugPrint(' customerServiceUserID still empty');
+      AppLogger.d(' customerServiceUserID still empty');
       CustomSnackbar.showError(
         title: "Error",
         message: "Customer Service Not Found",
@@ -301,7 +301,7 @@ class UserController extends GetxController {
       final res = await IMUtil.sdkInstance
           .getConversationManager()
           .getConversation(conversationID: conversationID);
-      debugPrint(' Conversation data Fetched ');
+      AppLogger.d(' Conversation data Fetched ');
       if (res.code == 0) {
         final conversation = res.data;
         if (conversation != null) {
@@ -315,10 +315,10 @@ class UserController extends GetxController {
             ),
           );
         } else {
-          debugPrint('Conversation is null');
+          AppLogger.d('Conversation is null');
         }
       } else {
-        debugPrint('Failed to fetch conversation');
+        AppLogger.d('Failed to fetch conversation');
       }
     } else {
       // DownloadModal.showModal(context);

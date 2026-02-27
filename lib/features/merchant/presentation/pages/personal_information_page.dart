@@ -11,6 +11,7 @@ import 'package:BitOwi/core/widgets/input_title_label.dart';
 import 'package:BitOwi/features/merchant/presentation/widgets/personal_information_status_page.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -170,7 +171,7 @@ class KycPersonalInformationPage extends StatelessWidget {
         controller.countryIndex.value = result;
       }
     } catch (e) {
-      debugPrint('areaTapNationality error: $e');
+      AppLogger.d('areaTapNationality error: $e');
     }
   }
 
@@ -392,7 +393,7 @@ class KycPersonalInformationPage extends StatelessWidget {
         controller.idTypeIndex.value = result;
       }
     } catch (e) {
-      debugPrint('areaTapIdType error: $e');
+      AppLogger.d('areaTapIdType error: $e');
     }
   }
 

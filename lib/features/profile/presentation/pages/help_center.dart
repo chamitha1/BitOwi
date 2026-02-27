@@ -5,6 +5,7 @@ import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/models/article_type.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -336,7 +337,7 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
                             return null;
                           },
                           onTapUrl: (url) async {
-                            debugPrint('Tapped link: $url');
+                            AppLogger.d('Tapped link: $url');
 
                             if (url.startsWith('mailto:')) {
                               // Optional: open email app

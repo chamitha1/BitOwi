@@ -47,7 +47,7 @@ class ApiClient {
               return handler.next(options);
             },
             onResponse: (response, handler) async {
-              print("RESPONSE --> ${response}");
+              AppLogger.d("RESPONSE --> ${response}");
               // Decode if plain string
               if (response.data is String) {
                 try {
@@ -102,7 +102,7 @@ class ApiClient {
                   await StorageService.removeToken();
                   await IMUtil.logoutIMUser();
 
-                  print('😎😎😎${Get.currentRoute != Routes.login}');
+                  AppLogger.d('😎😎😎${Get.currentRoute != Routes.login}');
 
                   if (Get.currentRoute != Routes.login) {
                     Get.offAllNamed(Routes.login);

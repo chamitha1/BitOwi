@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/material.dart';
 
@@ -100,7 +101,7 @@ class _RichTextConfigState extends State<RichTextConfig> {
         future: configText.future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            debugPrint("Rendered HTML: ${snapshot.data}");
+            AppLogger.d("Rendered HTML: ${snapshot.data}");
             return SingleChildScrollView(
               padding: EdgeInsets.all(20),
               child: HtmlWidget(

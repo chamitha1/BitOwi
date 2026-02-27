@@ -75,7 +75,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
       // Fetch first page of ads
       await getAdsList(isRefresh: true);
     } catch (e) {
-      debugPrint("getInitData Error: $e");
+      AppLogger.d("getInitData Error: $e");
     } finally {
       if (mounted) {
         setState(() {
@@ -107,7 +107,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         }
       }
     } catch (e) {
-      debugPrint("Trust action failed: $e");
+      AppLogger.d("Trust action failed: $e");
       //  Get.snackbar("Error", "Failed to update trust status");
     }
   }
@@ -134,7 +134,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         }
       }
     } catch (e) {
-      debugPrint("Blacklist action failed: $e");
+      AppLogger.d("Blacklist action failed: $e");
     }
   }
 
@@ -147,7 +147,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         });
       }
     } catch (e) {
-      debugPrint("getCoins Error: $e");
+      AppLogger.d("getCoins Error: $e");
     }
   }
 
@@ -181,7 +181,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
       _refreshController.finishRefresh();
       _refreshController.finishLoad();
     } catch (e) {
-      debugPrint("getAdsList Error: $e");
+      AppLogger.d("getAdsList Error: $e");
       _refreshController.finishRefresh();
       _refreshController.finishLoad();
     }

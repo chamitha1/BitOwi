@@ -1,6 +1,7 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/config/config.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,7 +44,7 @@ class _DownloadAppBottomSheetState extends State<DownloadAppBottomSheet> {
         );
       }
     } catch (e) {
-      debugPrint("Download error: $e");
+      AppLogger.d("Download error: $e");
       CustomSnackbar.showError(
         title: "Error",
         message: "Failed to get download information",

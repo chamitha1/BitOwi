@@ -313,7 +313,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
                         //   Routes.paymentMethodsPage,
                         //   parameters: {"userId": info.userId},
                         // );
-                        debugPrint(" Navigate to userCenter merchant ads");
+                        AppLogger.d(" Navigate to userCenter merchant ads");
                       },
 
                       child: GestureDetector(
@@ -680,7 +680,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
               message: "Ad posted successfully",
             );
           } catch (e) {
-            debugPrint("Post ad error: $e");
+            AppLogger.d("Post ad error: $e");
 
             CustomSnackbar.showError(
               title: "Error",
@@ -695,7 +695,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
           }
         },
         onSecondary: () {
-          debugPrint("User cancelled post ad");
+          AppLogger.d("User cancelled post ad");
         },
       );
     }
@@ -736,7 +736,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
               message: "Ad turned off successfully",
             );
           } catch (e) {
-            debugPrint("Off ad error: $e");
+            AppLogger.d("Off ad error: $e");
             CustomSnackbar.showError(
               title: "Error",
               message: "Something went wrong",
@@ -750,7 +750,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
           }
         },
         onSecondary: () {
-          debugPrint("User cancelled off ad");
+          AppLogger.d("User cancelled off ad");
         },
       );
     }

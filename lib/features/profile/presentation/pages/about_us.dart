@@ -5,6 +5,7 @@ import 'package:BitOwi/features/profile/presentation/pages/contact_us.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/profile_widgets.dart';
 import 'package:BitOwi/features/rich_text_config.dart';
 import 'package:BitOwi/models/article.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -68,14 +69,14 @@ class _AboutUsState extends State<AboutUs> {
         final article =
             articleList[0]; // Change this if you need to access another index within articleList
 
-        debugPrint('Not Empty--> 131 $article');
+        AppLogger.d('Not Empty--> 131 $article');
         //!tempory alternative path
         if (article.contentType == '3') {
           Get.to(
             () => ContactUs(articleDetailList: article.articleDetailList ?? []),
           );
         } else {
-          debugPrint('else--> 112 ${article.content}');
+          AppLogger.d('else--> 112 ${article.content}');
           Get.to(
             () => RichTextConfig.content(
               title: article.title,
@@ -87,10 +88,10 @@ class _AboutUsState extends State<AboutUs> {
           // );
         }
       } else {
-        debugPrint('Article list is empty for this type.');
+        AppLogger.d('Article list is empty for this type.');
       }
     } else {
-      debugPrint('Invalid article type index.');
+      AppLogger.d('Invalid article type index.');
     }
   }
 

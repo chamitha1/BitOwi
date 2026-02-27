@@ -2,6 +2,7 @@ import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
+import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -85,7 +86,7 @@ class _P2PPageState extends State<P2PPage> {
 
       await _fetchAds(isRefresh: true);
     } catch (e) {
-      debugPrint("Error fetching coins: $e");
+      AppLogger.d("Error fetching coins: $e");
 
       await _fetchAds(isRefresh: true);
     }
@@ -117,7 +118,7 @@ class _P2PPageState extends State<P2PPage> {
         params['tradeCurrency'] = _selectedCurrency!.key;
       }
 
-      debugPrint("P2PPage: Fetching ads with params: $params");
+      AppLogger.d("P2PPage: Fetching ads with params: $params");
 
       final res = await P2PApi.getAdsPageList(params);
 
@@ -149,7 +150,7 @@ class _P2PPageState extends State<P2PPage> {
         );
       }
     } catch (e) {
-      debugPrint("Error fetching ads: $e");
+      AppLogger.d("Error fetching ads: $e");
 
       if (isRefresh) {
         _refreshController.finishRefresh(IndicatorResult.fail);
@@ -609,7 +610,7 @@ class _P2PPageState extends State<P2PPage> {
               final amount = (result['amount'] ?? '').toString();
               final currency = result['currency'] as Dict?;
 
-              debugPrint(
+              AppLogger.d(
                 "P2PPage: Filter result received. Amount=$amount, Currency=${currency?.key}",
               );
 

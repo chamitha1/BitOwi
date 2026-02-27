@@ -122,15 +122,15 @@ class P2PApi {
         data: {"id": id, "tradeAmount": tradeAmount, "count": count},
       );
 
-      debugPrint(
+      AppLogger.d(
         "getAdsInfo Request: id=$id, tradeAmount=$tradeAmount, count=$count",
       );
-      debugPrint("getAdsInfo Response: ${res.data}");
+      AppLogger.d("getAdsInfo Response: ${res.data}");
 
       final responseData = res.data['data'];
       return AdsDetailRes.fromJson(responseData);
     } catch (e) {
-      debugPrint("getAdsInfo Error: $e");
+      AppLogger.d("getAdsInfo Error: $e");
       rethrow;
     }
   }
@@ -139,17 +139,17 @@ class P2PApi {
   /// params: {adsId, tradeAmount, count}
   static Future<String> buyOrder(Map<String, dynamic> data) async {
     try {
-      debugPrint("buyOrder Request: $data");    
+      AppLogger.d("buyOrder Request: $data");
       final res = await ApiClient.dio.post(
         '/core/v1/trade_order/buy',
         data: data,
       );
 
-      debugPrint("buyOrder Response: ${res.data}");
+      AppLogger.d("buyOrder Response: ${res.data}");
 
       return res.data['data']['id'].toString();
     } catch (e) {
-      debugPrint("buyOrder Error: $e");
+      AppLogger.d("buyOrder Error: $e");
       rethrow;
     }
   }
@@ -158,18 +158,18 @@ class P2PApi {
   /// params: {adsId, bankcardId, tradeAmount, count}
   static Future<String> sellOrder(Map<String, dynamic> data) async {
     try {
-      debugPrint("sellOrder Request: $data");
+      AppLogger.d("sellOrder Request: $data");
 
       final res = await ApiClient.dio.post(
         '/core/v1/trade_order/sell',
         data: data,
       );
 
-      debugPrint("sellOrder Response: ${res.data}");
+      AppLogger.d("sellOrder Response: ${res.data}");
 
       return res.data['data']['id'].toString();
     } catch (e) {
-      debugPrint("sellOrder Error: $e");
+      AppLogger.d("sellOrder Error: $e");
       rethrow;
     }
   }
@@ -178,18 +178,18 @@ class P2PApi {
   /// params: {master: userId}
   static Future<UserStatistics> getMerchantHome(String userId) async {
     try {
-      debugPrint("getMerchantHome Request: userId=$userId");
+      AppLogger.d("getMerchantHome Request: userId=$userId");
 
       final res = await ApiClient.dio.post(
         '/core/v1/ads/public/home',
         data: {"master": userId},
       );
 
-      debugPrint("getMerchantHome Response: ${res.data}");
+      AppLogger.d("getMerchantHome Response: ${res.data}");
 
       return UserStatistics.fromJson(res.data['data']);
     } catch (e) {
-      debugPrint("getMerchantHome Error: $e");
+      AppLogger.d("getMerchantHome Error: $e");
       rethrow;
     }
   }
@@ -200,18 +200,18 @@ class P2PApi {
     Map<String, dynamic> data,
   ) async {
     try {
-      debugPrint("getMerchantAdsList Request: $data");
+      AppLogger.d("getMerchantAdsList Request: $data");
 
       final res = await ApiClient.dio.post(
         '/core/v1/ads/public/page_other',
         data: data,
       );
 
-      debugPrint("getMerchantAdsList Response: ${res.data}");
+      AppLogger.d("getMerchantAdsList Response: ${res.data}");
 
       return AdsPageRes.fromJson(res.data['data']);
     } catch (e) {
-      debugPrint("getMerchantAdsList Error: $e");
+      AppLogger.d("getMerchantAdsList Error: $e");
       rethrow;
     }
   }
