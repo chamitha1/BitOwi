@@ -173,7 +173,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
         isGoogleCodeEntered;
   }
 
-
   void _handleWithdraw() async {
     if (!_isWithdrawEnabled()) return;
 
@@ -421,7 +420,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     // ),
                     TextField(
                       controller: controller.amountController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                        signed: false,
+                      ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                         TextInputFormatter.withFunction((oldValue, newValue) {
@@ -435,7 +437,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                           if (text.contains('.')) {
                             final parts = text.split('.');
                             if (parts.length > 1 && parts[1].length > 2) {
-                              return oldValue; 
+                              return oldValue;
                             }
                           }
 
@@ -459,18 +461,27 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                         ),
-                        contentPadding: const EdgeInsets.only(left: 10, right: 16),
+                        contentPadding: const EdgeInsets.only(
+                          left: 10,
+                          right: 16,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDAE0EE),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFDAE0EE)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDAE0EE),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF1D5DE5)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D5DE5),
+                          ),
                         ),
                       ),
                     ),
@@ -706,7 +717,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                 //   ),
                                 // ),
                                 Obx(() {
-                                  final rule = controller.ruleInfo.value?.withdrawRule;
+                                  final rule =
+                                      controller.ruleInfo.value?.withdrawRule;
 
                                   return Text(
                                     (rule != null && rule.trim().isNotEmpty)
@@ -883,6 +895,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
           bizType: SmsBizType.withdraw,
 
           onVerifyPin: (pin) async {
+            _verifiedOtp = pin;
             final result = await UserApi().verifyOtp(
               email: email,
               otp: pin,

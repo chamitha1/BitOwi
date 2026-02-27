@@ -13,8 +13,8 @@ class ApiClient {
       Dio(
           BaseOptions(
             baseUrl: AppConfig.apiUrl,
-            connectTimeout: const Duration(seconds: 5),
-            receiveTimeout: const Duration(seconds: 3),
+            connectTimeout: const Duration(seconds: 50),
+            receiveTimeout: const Duration(seconds: 30),
             headers: {'Content-Type': 'application/json'},
             responseType: ResponseType.plain,
           ),
