@@ -431,6 +431,73 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     //     ),
                     //   ),
                     // ),
+                    // TextField(
+                    //   controller: controller.amountController,
+                    //   keyboardType: const TextInputType.numberWithOptions(
+                    //     decimal: true,
+                    //     signed: false,
+                    //   ),
+                    //   inputFormatters: [
+                    //     FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    //     TextInputFormatter.withFunction((oldValue, newValue) {
+                    //       final text = newValue.text;
+
+                    //       if ('.'.allMatches(text).length > 1) {
+                    //         return oldValue;
+                    //       }
+
+                    //       // limit to 2 decimal places
+                    //       if (text.contains('.')) {
+                    //         final parts = text.split('.');
+                    //         if (parts.length > 1 && parts[1].length > 2) {
+                    //           return oldValue;
+                    //         }
+                    //       }
+
+                    //       return newValue;
+                    //     }),
+                    //   ],
+
+                    //   onChanged: (val) {
+                    //     setState(() {
+                    //       _amountError = _validateAmount(val);
+                    //     });
+                    //   },
+                    //   decoration: InputDecoration(
+                    //     filled: true,
+                    //     fillColor: Colors.white,
+                    //     hintText: "0.00",
+                    //     errorText: _amountError,
+                    //     hintStyle: const TextStyle(
+                    //       color: Color(0xFF717F9A),
+                    //       fontFamily: 'Inter',
+                    //       fontWeight: FontWeight.w400,
+                    //       fontSize: 16,
+                    //     ),
+                    //     contentPadding: const EdgeInsets.only(
+                    //       left: 10,
+                    //       right: 16,
+                    //     ),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: const BorderSide(
+                    //         color: Color(0xFFDAE0EE),
+                    //       ),
+                    //     ),
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: const BorderSide(
+                    //         color: Color(0xFFDAE0EE),
+                    //       ),
+                    //     ),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       borderSide: const BorderSide(
+                    //         color: Color(0xFF1D5DE5),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     TextField(
                       controller: controller.amountController,
                       enabled: !_isWithdrawAll,
@@ -447,7 +514,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                             return oldValue;
                           }
 
-                          // limit to 2 decimal places
                           if (text.contains('.')) {
                             final parts = text.split('.');
                             if (parts.length > 1 && parts[1].length > 2) {
@@ -458,11 +524,13 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                           return newValue;
                         }),
                       ],
-
                       onChanged: (val) {
                         setState(() {
                           _amountError = _validateAmount(val);
                         });
+
+                        /// 🔹 This line updates withdraw fee
+                        controller.calculateFee(val);
                       },
                       decoration: InputDecoration(
                         filled: true,
@@ -499,7 +567,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -542,19 +609,17 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                             ),
                           ],
                         ),
-                        Obx(() {
-                          final rawFeeString =
-                              controller.ruleInfo.value?.withdrawFee ?? "0";
-                          return Text(
-                            "Fee : $rawFeeString ${controller.symbol.value}",
+                        Obx(
+                          () => Text(
+                            "Fee : ${controller.fee.value.toStringAsFixed(4)} ${controller.symbol.value}",
                             style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w500,
                               fontSize: 12,
                               color: Color(0xFF2E3D5B),
                             ),
-                          );
-                        }),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 30),
