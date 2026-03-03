@@ -75,11 +75,24 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
             ) ??
             0.0;
 
-        controller.amountController.text = maxAmount.toString();
+        double ruleFee =
+            double.tryParse(controller.ruleInfo.value?.withdrawFee ?? '0') ??
+            0.0;
 
-        controller.calculateFee(maxAmount.toString());
+        double finalAmount = maxAmount - ruleFee;
+        if (finalAmount < 0) finalAmount = 0.0;
+
+        final maxAmountStr = finalAmount
+            .toStringAsFixed(8)
+            .replaceAll(RegExp(r'0*$'), '')
+            .replaceAll(RegExp(r'\.$'), '');
+
+        controller.amountController.text = maxAmountStr;
+        _amountError = _validateAmount(maxAmountStr);
+        controller.calculateFee(maxAmountStr);
       } else {
         controller.amountController.clear();
+        _amountError = _validateAmount('');
         controller.calculateFee('');
       }
     });
@@ -420,6 +433,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     // ),
                     TextField(
                       controller: controller.amountController,
+                      enabled: !_isWithdrawAll,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                         signed: false,
@@ -528,17 +542,19 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                             ),
                           ],
                         ),
-                        Obx(
-                          () => Text(
-                            "Fee : ${controller.fee.value.toStringAsFixed(double.tryParse(controller.fee.value.toString()) == 0 ? 0 : 4)} ${controller.symbol.value}",
+                        Obx(() {
+                          final rawFeeString =
+                              controller.ruleInfo.value?.withdrawFee ?? "0";
+                          return Text(
+                            "Fee : $rawFeeString ${controller.symbol.value}",
                             style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w500,
                               fontSize: 12,
                               color: Color(0xFF2E3D5B),
                             ),
-                          ),
-                        ),
+                          );
+                        }),
                       ],
                     ),
                     const SizedBox(height: 30),
