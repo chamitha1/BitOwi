@@ -555,7 +555,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
     return Column(
       children: adsList.map((ad) {
-        final isBuy = ad.tradeType == '0'; // 0 = buy, 1 = sell
+        final isBuy = ad.tradeType == '1'; // 1 = buy, 0 = sell
         // Find icon
         final coin = coinList.firstWhereOrNull(
           (element) => element.symbol == ad.tradeCoin,
