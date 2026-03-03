@@ -1,9 +1,11 @@
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_buy_screen.dart';
 import 'package:BitOwi/features/p2p/presentation/pages/p2p_sell_screen.dart';
+import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/trade_type_badge.dart';
 
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:BitOwi/utils/app_logger.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -406,23 +408,32 @@ class P2POrderCard extends StatelessWidget {
         }
 
         return ElevatedButton(
-          onPressed: () {
-            if (isBuy) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      P2PBuyScreen(adItem: adItem!, coinIcon: coinIcon),
-                ),
+          onPressed: () async {
+            if (kIsWeb) {
+              await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                builder: (_) => const DownloadAppBottomSheet(),
               );
             } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      P2PSellScreen(adItem: adItem!, coinIcon: coinIcon),
-                ),
-              );
+              if (isBuy) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        P2PBuyScreen(adItem: adItem!, coinIcon: coinIcon),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        P2PSellScreen(adItem: adItem!, coinIcon: coinIcon),
+                  ),
+                );
+              }
             }
           },
           style: ElevatedButton.styleFrom(
