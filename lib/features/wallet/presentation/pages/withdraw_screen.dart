@@ -101,12 +101,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   String? _validateAmount(String raw) {
     final text = raw.trim();
 
-    if (text.isEmpty) return null;
-    final okFormat = RegExp(r'^\d+(\.\d{0,2})?$').hasMatch(text);
-    if (!okFormat) {
-      return "Only 2 decimals allowed";
-    }
-
     final amount = double.tryParse(text);
     if (amount == null || amount <= 0) return "Enter a valid amount";
     final minAmount =
@@ -114,6 +108,19 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
     if (minAmount > 0 && amount < minAmount) {
       return "Minimum withdrawal amount is $minAmount";
+    }
+
+    final availableBalStr = controller.availableAmount.value.replaceAll(
+      ',',
+      '',
+    );
+    final availableAmount = double.tryParse(availableBalStr) ?? 0.0;
+
+    final ruleFee =
+        double.tryParse(controller.ruleInfo.value?.withdrawFee ?? '0') ?? 0.0;
+
+    if ((amount + ruleFee) > availableAmount) {
+      return "Entered amount exceeds the available amount";
     }
 
     return null;
@@ -500,7 +507,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     // ),
                     TextField(
                       controller: controller.amountController,
-                      enabled: !_isWithdrawAll,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                         signed: false,
@@ -516,7 +522,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
                           if (text.contains('.')) {
                             final parts = text.split('.');
-                            if (parts.length > 1 && parts[1].length > 2) {
+                            if (parts.length > 1 && parts[1].length > 8) {
                               return oldValue;
                             }
                           }
@@ -526,6 +532,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                       ],
                       onChanged: (val) {
                         setState(() {
+                          if (_isWithdrawAll) {
+                            _isWithdrawAll = false;
+                          }
                           _amountError = _validateAmount(val);
                         });
 
