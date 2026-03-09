@@ -10,14 +10,28 @@ import 'package:flutter_ume_plus/flutter_ume_plus.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+
+import 'package:BitOwi/core/services/app_update_service.dart';
+
 import 'features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'l10n/translations.dart';
 import 'config/routes.dart';
 import 'features/auth/presentation/controllers/user_controller.dart';
 
+FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  /// 🔥 Initialize Firebase
+  await Firebase.initializeApp();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp
+  ]);
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -28,10 +42,10 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
+
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   if (kReleaseMode) {
-    // Disable debugPrint
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
 
@@ -41,15 +55,31 @@ void main() async {
       ..register(WidgetDetailInspector())
       ..register(ColorSucker())
       ..register(AlignRuler());
-    // Run with UME Overlay
+
     runApp(const UMEWidget(child: BitOwi()));
   } else {
     runApp(const BitOwi());
   }
 }
 
-class BitOwi extends StatelessWidget {
+class BitOwi extends StatefulWidget {
   const BitOwi({super.key});
+
+  @override
+  State<BitOwi> createState() => _BitOwiState();
+}
+
+class _BitOwiState extends State<BitOwi> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// 🔥 Check version after UI loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppVersionService.checkVersion(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +90,11 @@ class BitOwi extends StatelessWidget {
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
+
+          /// 📊 Automatic screen tracking
+          navigatorObservers: [
+            FirebaseAnalyticsObserver(analytics: analytics),
+          ],
 
           builder: EasyLoading.init(
             builder: (context, widget) {
@@ -75,6 +110,7 @@ class BitOwi extends StatelessWidget {
           fallbackLocale: AppTranslations.fallbackLocale,
 
           supportedLocales: AppTranslations.supportedLocales,
+
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
@@ -86,7 +122,7 @@ class BitOwi extends StatelessWidget {
             Get.put(SettingsController(), permanent: true);
             Get.put(CustomStickerPackageController(), permanent: true);
           }),
-          // home: null,
+
           initialRoute: Routes.splash,
           getPages: AppPages.routes,
         );
@@ -95,10 +131,12 @@ class BitOwi extends StatelessWidget {
   }
 }
 
-/// Click on another area of ​​the screen to hide the keyboard
+/// Hide keyboard when tapping outside
 void hideKeyboard(BuildContext context) {
   FocusScopeNode currentFocus = FocusScope.of(context);
-  if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+
+  if (!currentFocus.hasPrimaryFocus &&
+      currentFocus.focusedChild != null) {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 }
