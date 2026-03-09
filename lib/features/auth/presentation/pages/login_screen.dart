@@ -14,6 +14,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:BitOwi/core/services/analytics_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,6 +46,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final RegExp _emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 
+  @override
+  void initState() {
+    super.initState();
+
+    AnalyticsService.trackScreen("login_screen");
+  }
   @override
   void dispose() {
     _passwordController.dispose();
@@ -111,6 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         await UserController.to.initIMForCurrentUser();
 
+        await AnalyticsService.login("email");
+        await AnalyticsService.setUserType("standard");
+
         Get.offAllNamed(Routes.home);
       } else {
         throw 'Login failed: ${data['errorMsg'] ?? 'Unknown'}';
@@ -118,7 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       AppLogger.d('Login error: $e');
       final msg = _extractBackendError(e);
+      // CustomSnackbar.showError(title: 'Login Failed', message: msg);
+      await AnalyticsService.errorEvent(msg);
       CustomSnackbar.showError(title: 'Login Failed', message: msg);
+
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -236,7 +249,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             const Spacer(),
 
                             GestureDetector(
+                              // onTap: () {
+                              //   Get.to(() => const ForgotPasswordScreen());
+                              // },
                               onTap: () {
+                                AnalyticsService.buttonClick("forgot_password");
                                 Get.to(() => const ForgotPasswordScreen());
                               },
                               child: Text(
@@ -267,7 +284,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _onLogin,
+                            // onPressed: _isLoading ? null : _onLogin,
+                            onPressed: _isLoading
+                            ? null
+                            : () {
+                                AnalyticsService.buttonClick("login_button");
+                                _onLogin();
+                              },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -322,6 +345,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
+                                      AnalyticsService.buttonClick("signup_redirect");
                                       Get.offNamed(Routes.signup);
                                     },
                                 ),
@@ -342,6 +366,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
+                                        AnalyticsService.buttonClick("terms_conditions");
                                         Get.to(
                                           () => RichTextConfig(
                                             title: "Terms & Condition",
@@ -371,6 +396,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
+                                        AnalyticsService.buttonClick("privacy_policy");
                                         Get.to(
                                           () => RichTextConfig(
                                             title: "Privacy Policy",

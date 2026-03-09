@@ -11,6 +11,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:BitOwi/core/services/analytics_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -59,11 +60,40 @@ class _SignupScreenState extends State<SignupScreen> {
   final RegExp _emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 
   @override
+  // void initState() {
+  //   super.initState();
+
+  //   _termsRec = TapGestureRecognizer()
+  //     ..onTap = () {
+  //       Get.to(
+  //         () => const RichTextConfig(
+  //           title: "Terms & Condition",
+  //           configKey: "registered_agreement_textarea",
+  //           configType: "system",
+  //         ),
+  //       );
+  //     };
+
+  //   _privacyRec = TapGestureRecognizer()
+  //     ..onTap = () {
+  //       Get.to(
+  //         () => const RichTextConfig(
+  //           title: "Privacy Policy",
+  //           configKey: "privacy_agreement_textarea",
+  //           configType: "system",
+  //         ),
+  //       );
+  //     };
+  // }
+  @override
   void initState() {
     super.initState();
 
+    AnalyticsService.trackScreen("signup_screen");
+
     _termsRec = TapGestureRecognizer()
       ..onTap = () {
+        AnalyticsService.buttonClick("terms_conditions");
         Get.to(
           () => const RichTextConfig(
             title: "Terms & Condition",
@@ -75,6 +105,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     _privacyRec = TapGestureRecognizer()
       ..onTap = () {
+        AnalyticsService.buttonClick("privacy_policy");
         Get.to(
           () => const RichTextConfig(
             title: "Privacy Policy",
@@ -157,6 +188,12 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _sendingOtp = true);
 
     try {
+      // final result = await userApi.sendSignInOtp(
+      //   email: email,
+      //   bizType: SmsBizType.register,
+      // );
+      await AnalyticsService.buttonClick("send_signup_otp");
+
       final result = await userApi.sendSignInOtp(
         email: email,
         bizType: SmsBizType.register,
@@ -201,6 +238,8 @@ class _SignupScreenState extends State<SignupScreen> {
             );
           },
           onVerified: () {
+            AnalyticsService.buttonClick("otp_verified");
+
             Navigator.pop(context);
             setState(() => _isEmailVerified = true);
             CustomSnackbar.showSuccess(
@@ -219,6 +258,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _onSignup() async {
+    await AnalyticsService.buttonClick("signup_button");
     if (_signingUp) return;
 
     FocusScope.of(context).unfocus();
@@ -261,6 +301,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
       final code = resData['code'];
       if (code == 200 || code == '200') {
+
+        await AnalyticsService.signUp("email");
+        await AnalyticsService.setUserType("standard");
+
         final tokenData = (resData['data'] as Map<String, dynamic>? ?? {});
         final token = tokenData['token'] as String? ?? '';
 
@@ -282,7 +326,9 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      await AnalyticsService.errorEvent(_extractBackendMsg(e));
       _showTopError(_extractBackendMsg(e));
+      // _showTopError(_extractBackendMsg(e));
     } finally {
       if (mounted) setState(() => _signingUp = false);
     }
@@ -530,8 +576,12 @@ class _SignupScreenState extends State<SignupScreen> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                     recognizer: TapGestureRecognizer()
-                                      ..onTap = () =>
-                                          Get.offNamed(Routes.login),
+                                      // ..onTap = () =>
+                                      //     Get.offNamed(Routes.login),
+                                      ..onTap = () {
+                                        AnalyticsService.buttonClick("signin_redirect");
+                                        Get.offNamed(Routes.login);
+                                    },
                                   ),
                                 ],
                               ),

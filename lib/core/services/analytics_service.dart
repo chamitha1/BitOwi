@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/foundation.dart';
 
 class AnalyticsService {
 
@@ -11,9 +11,26 @@ class AnalyticsService {
   static Future<Map<String, Object>> _defaultParams() async {
     final packageInfo = await PackageInfo.fromPlatform();
 
+    String platform;
+
+    if (kIsWeb) {
+      platform = "Web";
+    } else {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          platform = "Android";
+          break;
+        case TargetPlatform.iOS:
+          platform = "iOS";
+          break;
+        default:
+          platform = "Other";
+      }
+    }
+
     return {
       "app_version": packageInfo.version,
-      "platform": Platform.isAndroid ? "Android" : "iOS",
+      "platform": platform,
     };
   }
 
