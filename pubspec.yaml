@@ -83,6 +83,7 @@
     firebase_remote_config: ^6.2.0
     package_info_plus: ^8.3.1
     url_launcher: ^6.3.2
+    device_info_plus: ^10.1.2
   
   dependency_overrides:
     # Required for tencent_cloud_chat_uikit compatibility

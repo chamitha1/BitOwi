@@ -20,6 +20,7 @@ import 'features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'l10n/translations.dart';
 import 'config/routes.dart';
 import 'features/auth/presentation/controllers/user_controller.dart';
+import 'firebase_options.dart';
 
 FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
@@ -27,7 +28,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /// 🔥 Initialize Firebase
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp
