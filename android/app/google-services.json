@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "817994993109",
+    "project_id": "bitowi-analytics",
+    "storage_bucket": "bitowi-analytics.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:817994993109:android:df32b79f0d98236755c15c",
+        "android_client_info": {
+          "package_name": "com.bitowi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARkNaldI5I18nZRgyMCski8Nh7euPrpH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
