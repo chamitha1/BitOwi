@@ -28,9 +28,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /// 🔥 Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp
