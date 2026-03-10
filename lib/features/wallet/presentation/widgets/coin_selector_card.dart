@@ -1,4 +1,5 @@
 import 'package:BitOwi/models/chain_symbol_list_res.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -41,10 +42,7 @@ class CoinSelectorCard extends StatelessWidget {
             const SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-              ),
+              child: CustomLoader(width: 20, height: 20),
             )
           else
             _buildDropdown(context),

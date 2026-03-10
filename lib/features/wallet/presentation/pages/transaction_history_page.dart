@@ -1,4 +1,5 @@
 import 'package:BitOwi/config/routes.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/transaction_history_controller.dart';
 
@@ -197,9 +198,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                         ? controller.depositList.isEmpty
                         : controller.withdrawList.isEmpty)) {
                   return const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-                    ),
+                    child: CustomLoader(),
                   );
                 }
 
@@ -227,7 +226,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(8),
-                          child: CircularProgressIndicator(),
+                          child: CustomLoader(width: 30, height: 30),
                         ),
                       );
                     }

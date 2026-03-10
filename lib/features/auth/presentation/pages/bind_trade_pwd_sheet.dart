@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -332,10 +333,7 @@ class _BindTradePwdSheetState extends State<BindTradePwdSheet> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
+                        child: CustomLoader(width: 20, height: 20),
                       )
                     : const Text(
                         "Confirm",

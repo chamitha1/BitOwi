@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -231,10 +232,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
+                          child: CustomLoader(width: 20, height: 20),
                         )
                       : Text(
                           widget.editId != null ? "Confirm" : "Save Address",
@@ -349,10 +347,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-                        ),
+                        child: CustomLoader(width: 20, height: 20),
                       )
                     : Text(
                         _selectedCoin?.symbol ?? "Select Currency",

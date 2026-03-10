@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/address_book/data/models/address_item.dart';
 import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:BitOwi/features/address_book/presentation/widgets/address_card.dart';
@@ -161,10 +162,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
             Expanded(
               child: isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 4,
-                        valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-                      ),
+                      child: CustomLoader(),
                     )
                   : filteredAddresses.isEmpty
                   ? const Center(

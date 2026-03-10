@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/deposit_controller.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
@@ -162,11 +163,7 @@ class DepositScreen extends StatelessWidget {
                     Obx(() {
                       if (controller.isLoading.value) {
                         return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(
-                              Color(0xff1D5DE5),
-                            ),
-                          ),
+                          child: CustomLoader(),
                         );
                       }
                       return DepositAddressSection(

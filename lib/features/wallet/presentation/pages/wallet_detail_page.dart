@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/wallet/presentation/controllers/wallet_detail_controller.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/transaction_detail_page.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/transaction_card.dart';
 import 'package:BitOwi/models/account_detail_account_and_jour_res.dart';
@@ -55,10 +56,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         if (controller.accountInfo.value == null &&
             controller.isLoading.value) {
           return const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-            ),
+            child: CustomLoader(),
           );
         }
 

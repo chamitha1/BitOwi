@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
@@ -429,10 +430,7 @@ class _ChangeLoginPasswordPageState extends State<ChangeLoginPasswordPage> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
+                          child: CustomLoader(width: 20, height: 20),
                         )
                       : const Text(
                           "Change Login Password",

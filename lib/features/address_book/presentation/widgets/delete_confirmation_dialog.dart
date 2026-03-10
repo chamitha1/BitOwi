@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -76,10 +77,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
+                        child: CustomLoader(width: 20, height: 20),
                       )
                     : const Text(
                         "Confirm",

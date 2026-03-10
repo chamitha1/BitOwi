@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -224,10 +225,7 @@ class _RateExperienceBottomSheetState extends State<RateExperienceBottomSheet> {
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
+                                child: CustomLoader(width: 24, height: 24),
                               )
                             : const Text(
                                 "Submit Review",

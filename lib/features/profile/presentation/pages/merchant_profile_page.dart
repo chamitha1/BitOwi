@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/utils/app_logger.dart';
@@ -240,11 +241,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         elevation: 0,
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-              ),
-            )
+          ? const Center(child: CustomLoader())
           : EasyRefresh(
               controller: _refreshController,
               onRefresh: () async => await getAdsList(isRefresh: true),

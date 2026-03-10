@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/transaction_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,9 +36,7 @@ class TransactionDetailPage extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-            ),
+            child: CustomLoader(),
           );
         }
 

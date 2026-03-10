@@ -1,4 +1,5 @@
 import 'package:BitOwi/core/widgets/app_text.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
 import 'package:BitOwi/features/profile/presentation/pages/chat/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
@@ -184,7 +185,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   void _showLoadingDialog() {
     Get.dialog(
-      const Center(child: CircularProgressIndicator(color: Color(0xFF1D5DE5))),
+      const Center(child: CustomLoader()),
       barrierDismissible: false,
     );
   }
@@ -210,10 +211,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         backgroundColor: const Color(0xFFF6F9FF),
         appBar: _buildAppBar(),
         body: const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 4,
-            valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-          ),
+          child: CustomLoader(),
         ),
       );
     }

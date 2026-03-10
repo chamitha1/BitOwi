@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/orders/presentation/widgets/order_card.dart';
 import 'package:BitOwi/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
@@ -90,9 +91,7 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
                   if (controller.isLoading.value &&
                       controller.ordersList.isEmpty) {
                     return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-                      ),
+                      child: CustomLoader(),
                     );
                   }
 

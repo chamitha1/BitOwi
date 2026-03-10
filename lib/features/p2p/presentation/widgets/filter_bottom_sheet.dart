@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:BitOwi/api/common_api.dart';
@@ -341,10 +342,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           height: 18,
           width: 18,
           child: Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-            ),
+            child: CustomLoader(width: 18, height: 18),
           ),
         ),
       );

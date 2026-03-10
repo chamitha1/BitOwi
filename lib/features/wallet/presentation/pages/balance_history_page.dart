@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/balance_history_controller.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/jour.dart';
@@ -59,11 +60,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                       if (controller.isLoading.value &&
                           controller.transactions.isEmpty) {
                         return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(
-                              Color(0xff1D5DE5),
-                            ),
-                          ),
+                          child: CustomLoader(),
                         );
                       }
                       if (controller.transactions.isEmpty) {

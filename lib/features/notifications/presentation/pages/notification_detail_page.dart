@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/models/sms_model.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
       ),
       body: Obx(() {
         if (isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomLoader());
         }
 
         if (detail.value == null) {
