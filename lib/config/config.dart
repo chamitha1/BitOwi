@@ -14,5 +14,5 @@ class AppConfig {
 
   /// im appID
   static const int imAppId = 20033464; // test 20032678
-  // static const int imAppId = 20033668; // prod 20012299
+  // static const int imAppId = 20033668; // prod 20012299 20012299
 }
