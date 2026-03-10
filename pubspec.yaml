@@ -16,7 +16,7 @@
   # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
   # In Windows, build-name is used as the major, minor, and patch parts
   # of the product and file versions while build-number is used as the build suffix.
-  version: 1.0.5+10
+  version: 1.0.6+10
 
   environment:
     sdk: ^3.10.4
@@ -86,7 +86,7 @@
     url_launcher: ^6.3.2
     device_info_plus: ^10.1.2
     lottie: ^3.3.2
-    
+  
   dependency_overrides:
     # Required for tencent_cloud_chat_uikit compatibility
     image_picker: 1.2.1
@@ -158,6 +158,7 @@
       - assets/icons/orders/
       - assets/icons/post_ads/
       - assets/icons/chat/
+      - assets/animations/
 
 
     # An image asset can refer to one or more resolution-specific "variants", see
