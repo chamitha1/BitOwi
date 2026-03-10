@@ -136,6 +136,23 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
                   }
 
                   return EasyRefresh(
+                    header: BuilderHeader(
+                      position: IndicatorPosition.above,
+                      triggerOffset: 60,
+                      clamping: false,
+                      builder: (context, state) {
+                        if (state.offset == 0) return const SizedBox.shrink();
+                        return Container(
+                          height: state.offset,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          child: const CustomLoader(
+                            width: 50,
+                            height: 50,
+                          ),
+                        );
+                      },
+                    ),
                     onRefresh: () async {
                       await controller.refresh();
                     },

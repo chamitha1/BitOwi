@@ -81,6 +81,23 @@ class WalletDetailPage extends GetView<WalletDetailController> {
           children: [
             Expanded(
               child: EasyRefresh(
+                header: BuilderHeader(
+                  position: IndicatorPosition.above,
+                  triggerOffset: 60,
+                  clamping: false,
+                  builder: (context, state) {
+                    if (state.offset == 0) return const SizedBox.shrink();
+                    return Container(
+                      height: state.offset,
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: const CustomLoader(
+                        width: 50,
+                        height: 50,
+                      ),
+                    );
+                  },
+                ),
                 onRefresh: controller.refreshData,
                 onLoad: controller.loadMore,
                 child: CustomScrollView(

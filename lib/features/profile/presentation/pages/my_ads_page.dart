@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/c2c_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
@@ -141,6 +142,23 @@ class _MyAdsPageState extends State<MyAdsPage> {
           // List Content with Pull-to-Refresh
           Expanded(
             child: EasyRefresh(
+              header: BuilderHeader(
+                position: IndicatorPosition.above,
+                triggerOffset: 60,
+                clamping: false,
+                builder: (context, state) {
+                  if (state.offset == 0) return const SizedBox.shrink();
+                  return Container(
+                    height: state.offset,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: const CustomLoader(
+                      width: 50,
+                      height: 50,
+                    ),
+                  );
+                },
+              ),
               controller: _controller,
               onRefresh: onRefresh,
               refreshOnStart: true,

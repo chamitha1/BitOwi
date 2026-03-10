@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/orders/presentation/controllers/orders_controller.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -94,6 +95,20 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0XFFF6F9FF),
         body: SafeArea(
           child: EasyRefresh(
+            header: BuilderHeader(
+              position: IndicatorPosition.above,
+              triggerOffset: 60,
+              clamping: false,
+              builder: (context, state) {
+                if (state.offset == 0) return const SizedBox.shrink();
+                return Container(
+                  height: state.offset,
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: const CustomLoader(width: 50, height: 50),
+                );
+              },
+            ),
             controller: _refreshController,
             onRefresh: onRefresh,
             child: IndexedStack(

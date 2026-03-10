@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
@@ -29,6 +30,23 @@ class BecomeMerchantPage extends StatelessWidget {
       body: SafeArea(
         top: false,
         child: EasyRefresh(
+          header: BuilderHeader(
+            position: IndicatorPosition.above,
+            triggerOffset: 60,
+            clamping: false,
+            builder: (context, state) {
+              if (state.offset == 0) return const SizedBox.shrink();
+              return Container(
+                height: state.offset,
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: const CustomLoader(
+                  width: 50,
+                  height: 50,
+                ),
+              );
+            },
+          ),
           controller: controller.refreshController,
           onRefresh: () async {
             await controller.refreshPage(); // 🔁 moved to controller

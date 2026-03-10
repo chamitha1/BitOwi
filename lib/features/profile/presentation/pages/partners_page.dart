@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/partner_card.dart';
 import 'package:BitOwi/models/user_relation_page_res.dart';
@@ -187,7 +188,23 @@ class _PartnersPageState extends State<PartnersPage> {
               controller: _controller,
               onRefresh: _onRefresh,
               onLoad: _onLoad,
-              header: const ClassicHeader(),
+              header: BuilderHeader(
+                position: IndicatorPosition.above,
+                triggerOffset: 60,
+                clamping: false,
+                builder: (context, state) {
+                  if (state.offset == 0) return const SizedBox.shrink();
+                  return Container(
+                    height: state.offset,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: const CustomLoader(
+                      width: 50,
+                      height: 50,
+                    ),
+                  );
+                },
+              ),
               footer: const ClassicFooter(),
               child: _filteredList.isEmpty
                   ? SingleChildScrollView(

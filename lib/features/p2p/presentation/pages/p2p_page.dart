@@ -1,3 +1,4 @@
+import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
@@ -8,7 +9,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 
 import 'package:BitOwi/api/account_api.dart';
-import 'package:BitOwi/api/p2p_api.dart';
+import 'package:BitOwi/api/c2c_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/models/ads_page_res.dart';
 import 'package:BitOwi/models/dict.dart';
@@ -205,6 +207,20 @@ class _P2PPageState extends State<P2PPage> {
             ),
             Expanded(
               child: EasyRefresh(
+                header: BuilderHeader(
+                  position: IndicatorPosition.above,
+                  triggerOffset: 60,
+                  clamping: false,
+                  builder: (context, state) {
+                    if (state.offset == 0) return const SizedBox.shrink();
+                    return Container(
+                      height: state.offset,
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      child: const CustomLoader(width: 50, height: 50),
+                    );
+                  },
+                ),
                 controller: _refreshController,
                 onRefresh: () => _fetchAds(isRefresh: true),
                 onLoad: () => _fetchAds(),
