@@ -104,7 +104,7 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 100.0),
-                    child: SoftCircularLoader(),
+                    child: CustomLoader(),
                   ),
                 )
               else

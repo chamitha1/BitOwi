@@ -4,6 +4,7 @@ import 'package:BitOwi/core/theme/app_input_decorations.dart';
 import 'package:BitOwi/core/theme/app_text_styles.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/input_title_label.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
@@ -117,7 +118,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
             children: [
               Expanded(
                 child: isLoading
-                    ? SoftCircularLoader()
+                    ? CustomLoader()
                     : SingleChildScrollView(
                         child: Form(
                           key: _formKey,

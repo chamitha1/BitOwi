@@ -114,7 +114,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                   controller: _controller,
                   onRefresh: getBankCardList,
                   child: isLoading
-                      ? const SoftCircularLoader()
+                      ? const CustomLoader()
                       : isEmpty
                       ? CommonEmptyState(title: 'No Payment Methods Added')
                       : ListView.builder(

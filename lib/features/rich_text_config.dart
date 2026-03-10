@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:BitOwi/api/common_api.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -111,7 +112,7 @@ class _RichTextConfigState extends State<RichTextConfig> {
                       return SizedBox(
                         height: MediaQuery.of(context).size.height * 0.6,
                         child: const Center(
-                          child: SoftCircularLoader(),
+                          child:CustomLoader(),
                         ),
                       );
                     },

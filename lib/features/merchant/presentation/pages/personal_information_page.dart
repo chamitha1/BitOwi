@@ -1,6 +1,7 @@
 import 'package:BitOwi/core/theme/app_input_decorations.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
@@ -47,7 +48,7 @@ class KycPersonalInformationPage extends StatelessWidget {
         body: SafeArea(
           child: Obx(() {
             if (controller.isLoading.value) {
-              return const Center(child: SoftCircularLoader());
+              return const Center(child: CustomLoader());
             }
 
             return SingleChildScrollView(

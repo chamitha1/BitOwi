@@ -1,5 +1,6 @@
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/profile/presentation/controllers/settings_controller.dart';
@@ -29,7 +30,7 @@ class LocalCurrency extends StatelessWidget {
               Expanded(
                 child: Obx(() {
                   if (settingsController.currencyLoading.value) {
-                    return const Center(child: SoftCircularLoader());
+                    return const Center(child: CustomLoader());
                   }
 
                   if (settingsController.currencyList.isEmpty) {

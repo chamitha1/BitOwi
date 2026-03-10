@@ -1,6 +1,7 @@
 import 'package:BitOwi/core/theme/app_input_decorations.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/input_title_label.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
@@ -88,7 +89,7 @@ class ChangeNickname extends StatelessWidget {
         text: "Update",
         enabled: !isLoading,
         onPressed: settingsController.onSave,
-        child: isLoading ? const SoftCircularLoader(color: Colors.white) : null,
+        child: isLoading ? const CustomLoader() : null,
       );
     });
   }

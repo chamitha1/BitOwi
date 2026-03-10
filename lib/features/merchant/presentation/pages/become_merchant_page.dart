@@ -56,7 +56,7 @@ class BecomeMerchantPage extends StatelessWidget {
             if (controller.isLoading.value) {
               return SizedBox(
                 height: MediaQuery.of(context).size.height,
-                child: const Center(child: SoftCircularLoader()),
+                child: const Center(child: CustomLoader()),
               );
             }
 

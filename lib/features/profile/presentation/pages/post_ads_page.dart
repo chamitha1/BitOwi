@@ -7,6 +7,7 @@ import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_bottom_sheets.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/info_dialog.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
@@ -682,7 +683,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: isLoading
-              ? SoftCircularLoader()
+              ? CustomLoader()
               : Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

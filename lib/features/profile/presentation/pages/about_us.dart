@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/profile/presentation/pages/contact_us.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/profile_widgets.dart';
@@ -127,7 +128,7 @@ class _AboutUsState extends State<AboutUs> {
 
       body: SafeArea(
         child: isLoading
-            ? Center(child: SoftCircularLoader())
+            ? Center(child: CustomLoader())
             : SingleChildScrollView(
                 child: Column(
                   children: [

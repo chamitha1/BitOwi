@@ -152,10 +152,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
                     height: state.offset,
                     width: double.infinity,
                     alignment: Alignment.center,
-                    child: const CustomLoader(
-                      width: 50,
-                      height: 50,
-                    ),
+                    child: const CustomLoader(width: 50, height: 50),
                   );
                 },
               ),
@@ -164,7 +161,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
               refreshOnStart: true,
               onLoad: onLoad,
               child: isLoading
-                  ? SoftCircularLoader()
+                  ? CustomLoader()
                   : isEmpty
                   ? ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
