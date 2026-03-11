@@ -20,7 +20,7 @@ class CustomLoader extends StatelessWidget {
             borderRadius: BorderRadius.circular(40),
             child: Lottie.asset(
               'assets/animations/web_loading.json',
-              fit: BoxFit.fill,
+              fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return const CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
