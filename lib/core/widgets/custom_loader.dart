@@ -13,16 +13,21 @@ class CustomLoader extends StatelessWidget {
     if (kIsWeb) {
       return Align(
         alignment: Alignment.topCenter,
-        child: Lottie.asset(
-          'assets/animations/web_loading.json',
+        child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.9,
-          height: height + 1,
-          fit: BoxFit.fitWidth,
-          errorBuilder: (context, error, stackTrace) {
-            return const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
-            );
-          },
+          height: 80,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(40),
+            child: Lottie.asset(
+              'assets/animations/web_loading.json',
+              fit: BoxFit.fill,
+              errorBuilder: (context, error, stackTrace) {
+                return const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+                );
+              },
+            ),
+          ),
         ),
       );
     }

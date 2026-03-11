@@ -178,10 +178,10 @@ class _P2PPageState extends State<P2PPage> {
     });
   }
 
-  Widget _emptyScrollable() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      children: const [SizedBox(height: 60), P2PEmptyState()],
+  Widget _emptyState() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(children: [SizedBox(height: 60), P2PEmptyState()]),
     );
   }
 
@@ -190,62 +190,68 @@ class _P2PPageState extends State<P2PPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F9FF),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Column(
-                children: [
-                  SizedBox(height: 56, child: _buildHeader()),
-                  const SizedBox(height: 20),
-                  _buildTradeTypeToggle(),
-                  const SizedBox(height: 20),
-                  _buildFilterRow(),
-                  const SizedBox(height: 4),
-                ],
-              ),
-            ),
-            Expanded(
-              child: EasyRefresh(
-                header: BuilderHeader(
-                  position: IndicatorPosition.above,
-                  triggerOffset: 60,
-                  clamping: false,
-                  builder: (context, state) {
-                    if (state.offset == 0) return const SizedBox.shrink();
-                    return Container(
-                      height: state.offset,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      child: const CustomLoader(width: 50, height: 50),
-                    );
-                  },
+        child: EasyRefresh(
+          controller: _refreshController,
+          header: BuilderHeader(
+            position: IndicatorPosition.above,
+            triggerOffset: 60,
+            clamping: false,
+            builder: (context, state) {
+              if (state.offset == 0) return const SizedBox.shrink();
+              return Container(
+                height: state.offset,
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: const CustomLoader(width: 50, height: 50),
+              );
+            },
+          ),
+          onRefresh: () => _fetchAds(isRefresh: true),
+          onLoad: () => _fetchAds(),
+          child: CustomScrollView(
+            slivers: [
+              // The Header, Toggles, and Filters
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 56, child: _buildHeader()),
+                      const SizedBox(height: 20),
+                      _buildTradeTypeToggle(),
+                      const SizedBox(height: 20),
+                      _buildFilterRow(),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
                 ),
-                controller: _refreshController,
-                onRefresh: () => _fetchAds(isRefresh: true),
-                onLoad: () => _fetchAds(),
-                child: _filteredAds.isEmpty
-                    ? _emptyScrollable()
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        itemCount: _filteredAds.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
-                        itemBuilder: (_, index) {
-                          return P2POrderCard(
-                            isBuy: isBuySelected,
-                            adItem: _filteredAds[index],
-                            coinIcon: _selectedCoin?.icon,
-                            onRefresh: () => _fetchAds(isRefresh: true),
-                          );
-                        },
-                      ),
               ),
-            ),
-          ],
+
+              // The Ads List or Empty State
+              if (_filteredAds.isEmpty)
+                SliverToBoxAdapter(child: _emptyState())
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: _filteredAds.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (_, index) {
+                      return P2POrderCard(
+                        isBuy: isBuySelected,
+                        adItem: _filteredAds[index],
+                        coinIcon: _selectedCoin?.icon,
+                        onRefresh: () => _fetchAds(isRefresh: true),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

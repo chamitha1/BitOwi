@@ -57,7 +57,7 @@ class OrdersController extends GetxController {
     }).toList();
   }
 
-  Future<void> fetchOrders({bool isRefresh = false}) async {
+  Future<void> fetchOrders({bool isRefresh = false, bool showLoader = true}) async {
     if (isLoading.value) return;
     if (!hasInitialized) {
       hasInitialized = true;
@@ -71,7 +71,9 @@ class OrdersController extends GetxController {
         return;
       }
 
-      isLoading.value = true;
+      if (showLoader) {
+        isLoading.value = true;
+      }
 
       // Fetch both in-progress (0) and completed/cancelled (1) orders
       // ostatus: 0 = in progress (statuses -1,0,1,2,5)
@@ -107,16 +109,18 @@ class OrdersController extends GetxController {
     } catch (e) {
       AppLogger.d('Error fetching orders: $e');
     } finally {
-      isLoading.value = false;
+      if (showLoader) {
+        isLoading.value = false;
+      }
     }
   }
 
   Future<void> loadMore() async {
-    await fetchOrders();
+    await fetchOrders(showLoader: false);
   }
 
   Future<void> refresh() async {
-    await fetchOrders(isRefresh: true);
+    await fetchOrders(isRefresh: true, showLoader: false);
   }
 
   // order chat

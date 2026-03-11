@@ -51,129 +51,127 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
       isLoading: controller.isLoading,
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FF),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              // Header
-              const Text(
-                "Orders",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF151E2F),
-                  fontFamily: 'Inter',
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              //Tabs
-              Container(
-                width: double.infinity,
-                child: Obx(() {
-                  return Row(
-                    children: [
-                      _buildTabItem("Processing", 0),
-                      const SizedBox(width: 8),
-                      _buildTabItem("Completed", 1),
-                      const SizedBox(width: 8),
-                      _buildTabItem("Cancelled", 2),
-                    ],
+        body: SafeArea(
+          child: Obx(() {
+            return EasyRefresh(
+              header: BuilderHeader(
+                position: IndicatorPosition.above,
+                triggerOffset: 60,
+                clamping: false,
+                builder: (context, state) {
+                  if (state.offset == 0) return const SizedBox.shrink();
+                  return Container(
+                    height: state.offset,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: const CustomLoader(width: 50, height: 50),
                   );
-                }),
+                },
               ),
-
-              const SizedBox(height: 24),
-
-              // Order Cards with pagination
-              Expanded(
-                child: Obx(() {
-                  // Loading state handled by PageLoaderWrapper
-
-                  if (controller.ordersList.isEmpty) {
-                    return Align(
-                      alignment: const Alignment(0.0, -0.4),
+              onRefresh: () async => await controller.refresh(),
+              onLoad: controller.isEnd.value
+                  ? null
+                  : () async => await controller.loadMore(),
+              child: CustomScrollView(
+                slivers: [
+                  // The Header and Tabs
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    sliver: SliverToBoxAdapter(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Stack(
-                            alignment: Alignment.center,
+                          const SizedBox(height: 20),
+                          const Text(
+                            "Orders",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF151E2F),
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
                             children: [
-                              Container(
-                                width: 200,
-                                height: 200,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFE8EFFF),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/p2p/empty-icon.svg',
-                                fit: BoxFit.contain,
-                              ),
+                              _buildTabItem("Processing", 0),
+                              const SizedBox(width: 8),
+                              _buildTabItem("Completed", 1),
+                              const SizedBox(width: 8),
+                              _buildTabItem("Cancelled", 2),
                             ],
                           ),
                           const SizedBox(height: 24),
-                          const Text(
-                            "No Orders Available",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: Color(0xFF151E2F),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
                         ],
                       ),
-                    );
-                  }
+                    ),
+                  ),
 
-                  return EasyRefresh(
-                    header: BuilderHeader(
-                      position: IndicatorPosition.above,
-                      triggerOffset: 60,
-                      clamping: false,
-                      builder: (context, state) {
-                        if (state.offset == 0) return const SizedBox.shrink();
-                        return Container(
-                          height: state.offset,
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          child: const CustomLoader(
-                            width: 50,
-                            height: 50,
-                          ),
-                        );
-                      },
+                  // The Order Cards or Empty State
+                  if (controller.ordersList.isEmpty)
+                    SliverToBoxAdapter(child: _buildEmptyState())
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 20,
+                      ),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) =>
+                              _buildOrderCard(controller.ordersList[index]),
+                          childCount: controller.ordersList.length,
+                        ),
+                      ),
                     ),
-                    onRefresh: () async {
-                      await controller.refresh();
-                    },
-                    onLoad: controller.isEnd.value
-                        ? null
-                        : () async {
-                            await controller.loadMore();
-                          },
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      itemCount: controller.ordersList.length,
-                      itemBuilder: (context, index) {
-                        return _buildOrderCard(controller.ordersList[index]);
-                      },
-                    ),
-                  );
-                }),
+                ],
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Align(
+      alignment: const Alignment(0.0, -0.4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 200,
+                height: 200,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE8EFFF),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SvgPicture.asset(
+                'assets/icons/p2p/empty-icon.svg',
+                fit: BoxFit.contain,
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 24),
+          const Text(
+            "No Orders Available",
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              color: Color(0xFF151E2F),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
-    ));
+    );
   }
 
   Widget _buildOrderCard(TradeOrderItem orderItem) {
