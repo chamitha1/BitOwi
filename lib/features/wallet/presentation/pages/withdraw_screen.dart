@@ -1,6 +1,9 @@
 import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
+import 'package:BitOwi/core/widgets/common_appbar.dart';
+import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/withdraw_controller.dart';
@@ -230,647 +233,653 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildAppBar(context),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Coin Selector
-                    Obx(
-                      () => CoinSelectorCard(
-                        coinList: controller.coinList,
-                        selectedCoin: controller.selectedCoin.value,
-                        onCoinSelected: controller.onCoinSelected,
-                        isLoading: controller.isLoading.value,
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildAppBar(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Coin Selector
+                      Obx(
+                        () => CoinSelectorCard(
+                          coinList: controller.coinList,
+                          selectedCoin: controller.selectedCoin.value,
+                          onCoinSelected: controller.onCoinSelected,
+                          isLoading: controller.isLoading.value,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      "Withdraw Address",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                        color: Color(0xFF2E3D5B),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controller.addrController,
-                      onChanged: (_) => setState(() {}),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "Enter withdraw address or scan code",
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF717F9A),
+                      const SizedBox(height: 24),
+                      Text(
+                        "Withdraw Address",
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
-                          fontSize: 15,
-                        ),
-                        contentPadding: const EdgeInsets.only(
-                          left: 10,
-                          right: 16,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1D5DE5),
-                          ),
-                        ),
-                        suffixIcon: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: () async {
-                                final result = await Get.to(
-                                  () => const AddressBookPage(
-                                    isSelectionMode: true,
-                                  ),
-                                );
-                                if (result != null && result is String) {
-                                  controller.addrController.text = result;
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(4),
-                                child: SvgPicture.asset(
-                                  'assets/icons/withdrawal/book.svg',
-                                  width: 20,
-                                  height: 20,
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () async {
-                                var status = await Permission.camera.request();
-                                if (status.isGranted) {
-                                  final result = await Get.to(
-                                    () => const QrScannerPage(),
-                                  );
-                                  if (result != null && result is String) {
-                                    controller.updateAddressFromScan(result);
-                                  }
-                                } else if (status.isPermanentlyDenied) {
-                                  openAppSettings();
-                                } else {
-                                  CustomSnackbar.showError(
-                                    title: "Permission Denied",
-                                    message:
-                                        "Camera permission is required to scan QR codes.",
-                                  );
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  right: 12.0,
-                                  top: 10,
-                                  bottom: 10,
-                                  left: 4,
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/icons/withdrawal/scan.svg',
-                                  width: 20,
-                                  height: 20,
-                                ),
-                              ),
-                            ),
-                          ],
+                          fontSize: 14,
+                          color: Color(0xFF2E3D5B),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Withdraw Amount",
-                          style: const TextStyle(
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: controller.addrController,
+                        onChanged: (_) => setState(() {}),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Enter withdraw address or scan code",
+                          hintStyle: const TextStyle(
+                            color: Color(0xFF717F9A),
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            color: Color(0xFF2E3D5B),
+                            fontSize: 15,
+                          ),
+                          contentPadding: const EdgeInsets.only(
+                            left: 10,
+                            right: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                          suffixIcon: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  final result = await Get.to(
+                                    () => const AddressBookPage(
+                                      isSelectionMode: true,
+                                    ),
+                                  );
+                                  if (result != null && result is String) {
+                                    controller.addrController.text = result;
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/withdrawal/book.svg',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  var status = await Permission.camera
+                                      .request();
+                                  if (status.isGranted) {
+                                    final result = await Get.to(
+                                      () => const QrScannerPage(),
+                                    );
+                                    if (result != null && result is String) {
+                                      controller.updateAddressFromScan(result);
+                                    }
+                                  } else if (status.isPermanentlyDenied) {
+                                    openAppSettings();
+                                  } else {
+                                    CustomSnackbar.showError(
+                                      title: "Permission Denied",
+                                      message:
+                                          "Camera permission is required to scan QR codes.",
+                                    );
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 12.0,
+                                    top: 10,
+                                    bottom: 10,
+                                    left: 4,
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/withdrawal/scan.svg',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Obx(
-                          () => Text(
-                            "Available: ${controller.availableAmount.value} ${controller.symbol.value}",
-                            style: TextStyle(
+                      ),
+                      const SizedBox(height: 30),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Withdraw Amount",
+                            style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
                               fontSize: 14,
                               color: Color(0xFF2E3D5B),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // TextField(
-                    //   controller: controller.amountController,
-                    //   // keyboardType: const TextInputType.numberWithOptions(
-                    //   //   decimal: true,
-                    //   // ),
-                    //   keyboardType: const TextInputType.numberWithOptions(
-                    //     decimal: true,
-                    //     signed: false,
-                    //   ),
-                    //   inputFormatters: [
-                    //     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,8}')),
-                    //   ],
-                    //   onChanged: (val) {
-                    //     setState(() {});
-                    //   },
-                    //   decoration: InputDecoration(
-                    //     filled: true,
-                    //     fillColor: Colors.white,
-                    //     hintText: "0.00",
-                    //     hintStyle: const TextStyle(
-                    //       color: Color(0xFF717F9A),
-                    //       fontFamily: 'Inter',
-                    //       fontWeight: FontWeight.w400,
-                    //       fontSize: 16,
-                    //     ),
-                    //     contentPadding: const EdgeInsets.only(
-                    //       left: 10,
-                    //       right: 16,
-                    //     ),
-                    //     border: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       borderSide: const BorderSide(
-                    //         color: Color(0xFFDAE0EE),
-                    //       ),
-                    //     ),
-                    //     enabledBorder: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       borderSide: const BorderSide(
-                    //         color: Color(0xFFDAE0EE),
-                    //       ),
-                    //     ),
-                    //     focusedBorder: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       borderSide: const BorderSide(
-                    //         color: Color(0xFF1D5DE5),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    // TextField(
-                    //   controller: controller.amountController,
-                    //   keyboardType: const TextInputType.numberWithOptions(
-                    //     decimal: true,
-                    //     signed: false,
-                    //   ),
-                    //   inputFormatters: [
-                    //     FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                    //     TextInputFormatter.withFunction((oldValue, newValue) {
-                    //       final text = newValue.text;
-
-                    //       if ('.'.allMatches(text).length > 1) {
-                    //         return oldValue;
-                    //       }
-
-                    //       // limit to 2 decimal places
-                    //       if (text.contains('.')) {
-                    //         final parts = text.split('.');
-                    //         if (parts.length > 1 && parts[1].length > 2) {
-                    //           return oldValue;
-                    //         }
-                    //       }
-
-                    //       return newValue;
-                    //     }),
-                    //   ],
-
-                    //   onChanged: (val) {
-                    //     setState(() {
-                    //       _amountError = _validateAmount(val);
-                    //     });
-                    //   },
-                    //   decoration: InputDecoration(
-                    //     filled: true,
-                    //     fillColor: Colors.white,
-                    //     hintText: "0.00",
-                    //     errorText: _amountError,
-                    //     hintStyle: const TextStyle(
-                    //       color: Color(0xFF717F9A),
-                    //       fontFamily: 'Inter',
-                    //       fontWeight: FontWeight.w400,
-                    //       fontSize: 16,
-                    //     ),
-                    //     contentPadding: const EdgeInsets.only(
-                    //       left: 10,
-                    //       right: 16,
-                    //     ),
-                    //     border: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       borderSide: const BorderSide(
-                    //         color: Color(0xFFDAE0EE),
-                    //       ),
-                    //     ),
-                    //     enabledBorder: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       borderSide: const BorderSide(
-                    //         color: Color(0xFFDAE0EE),
-                    //       ),
-                    //     ),
-                    //     focusedBorder: OutlineInputBorder(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       borderSide: const BorderSide(
-                    //         color: Color(0xFF1D5DE5),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                    TextField(
-                      controller: controller.amountController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                        signed: false,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                        TextInputFormatter.withFunction((oldValue, newValue) {
-                          final text = newValue.text;
-
-                          if ('.'.allMatches(text).length > 1) {
-                            return oldValue;
-                          }
-
-                          if (text.contains('.')) {
-                            final parts = text.split('.');
-                            if (parts.length > 1 && parts[1].length > 8) {
-                              return oldValue;
-                            }
-                          }
-
-                          return newValue;
-                        }),
-                      ],
-                      onChanged: (val) {
-                        setState(() {
-                          if (_isWithdrawAll) {
-                            _isWithdrawAll = false;
-                          }
-                          _amountError = _validateAmount(val);
-                        });
-
-                        /// 🔹 This line updates withdraw fee
-                        controller.calculateFee(val);
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "0.00",
-                        errorText: _amountError,
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF717F9A),
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                        ),
-                        contentPadding: const EdgeInsets.only(
-                          left: 10,
-                          right: 16,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1D5DE5),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: _toggleWithdrawAll,
-                              child: Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: const Color(0xFFDAE0EE),
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4),
-                                  color: _isWithdrawAll
-                                      ? const Color(0xFF1D5DE5)
-                                      : Colors.transparent,
-                                ),
-                                child: _isWithdrawAll
-                                    ? const Icon(
-                                        Icons.check,
-                                        size: 12,
-                                        color: Colors.white,
-                                      )
-                                    : null,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Withdraw All",
-                              style: const TextStyle(
+                          Obx(
+                            () => Text(
+                              "Available: ${controller.availableAmount.value} ${controller.symbol.value}",
+                              style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Color(0xFF2E3D5B),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // TextField(
+                      //   controller: controller.amountController,
+                      //   // keyboardType: const TextInputType.numberWithOptions(
+                      //   //   decimal: true,
+                      //   // ),
+                      //   keyboardType: const TextInputType.numberWithOptions(
+                      //     decimal: true,
+                      //     signed: false,
+                      //   ),
+                      //   inputFormatters: [
+                      //     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,8}')),
+                      //   ],
+                      //   onChanged: (val) {
+                      //     setState(() {});
+                      //   },
+                      //   decoration: InputDecoration(
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //     hintText: "0.00",
+                      //     hintStyle: const TextStyle(
+                      //       color: Color(0xFF717F9A),
+                      //       fontFamily: 'Inter',
+                      //       fontWeight: FontWeight.w400,
+                      //       fontSize: 16,
+                      //     ),
+                      //     contentPadding: const EdgeInsets.only(
+                      //       left: 10,
+                      //       right: 16,
+                      //     ),
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: const BorderSide(
+                      //         color: Color(0xFFDAE0EE),
+                      //       ),
+                      //     ),
+                      //     enabledBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: const BorderSide(
+                      //         color: Color(0xFFDAE0EE),
+                      //       ),
+                      //     ),
+                      //     focusedBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: const BorderSide(
+                      //         color: Color(0xFF1D5DE5),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      // TextField(
+                      //   controller: controller.amountController,
+                      //   keyboardType: const TextInputType.numberWithOptions(
+                      //     decimal: true,
+                      //     signed: false,
+                      //   ),
+                      //   inputFormatters: [
+                      //     FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                      //     TextInputFormatter.withFunction((oldValue, newValue) {
+                      //       final text = newValue.text;
+
+                      //       if ('.'.allMatches(text).length > 1) {
+                      //         return oldValue;
+                      //       }
+
+                      //       // limit to 2 decimal places
+                      //       if (text.contains('.')) {
+                      //         final parts = text.split('.');
+                      //         if (parts.length > 1 && parts[1].length > 2) {
+                      //           return oldValue;
+                      //         }
+                      //       }
+
+                      //       return newValue;
+                      //     }),
+                      //   ],
+
+                      //   onChanged: (val) {
+                      //     setState(() {
+                      //       _amountError = _validateAmount(val);
+                      //     });
+                      //   },
+                      //   decoration: InputDecoration(
+                      //     filled: true,
+                      //     fillColor: Colors.white,
+                      //     hintText: "0.00",
+                      //     errorText: _amountError,
+                      //     hintStyle: const TextStyle(
+                      //       color: Color(0xFF717F9A),
+                      //       fontFamily: 'Inter',
+                      //       fontWeight: FontWeight.w400,
+                      //       fontSize: 16,
+                      //     ),
+                      //     contentPadding: const EdgeInsets.only(
+                      //       left: 10,
+                      //       right: 16,
+                      //     ),
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: const BorderSide(
+                      //         color: Color(0xFFDAE0EE),
+                      //       ),
+                      //     ),
+                      //     enabledBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: const BorderSide(
+                      //         color: Color(0xFFDAE0EE),
+                      //       ),
+                      //     ),
+                      //     focusedBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: const BorderSide(
+                      //         color: Color(0xFF1D5DE5),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      TextField(
+                        controller: controller.amountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: false,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            final text = newValue.text;
+
+                            if ('.'.allMatches(text).length > 1) {
+                              return oldValue;
+                            }
+
+                            if (text.contains('.')) {
+                              final parts = text.split('.');
+                              if (parts.length > 1 && parts[1].length > 8) {
+                                return oldValue;
+                              }
+                            }
+
+                            return newValue;
+                          }),
+                        ],
+                        onChanged: (val) {
+                          setState(() {
+                            if (_isWithdrawAll) {
+                              _isWithdrawAll = false;
+                            }
+                            _amountError = _validateAmount(val);
+                          });
+
+                          /// 🔹 This line updates withdraw fee
+                          controller.calculateFee(val);
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "0.00",
+                          errorText: _amountError,
+                          hintStyle: const TextStyle(
+                            color: Color(0xFF717F9A),
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                          contentPadding: const EdgeInsets.only(
+                            left: 10,
+                            right: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: _toggleWithdrawAll,
+                                child: Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: const Color(0xFFDAE0EE),
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: _isWithdrawAll
+                                        ? const Color(0xFF1D5DE5)
+                                        : Colors.transparent,
+                                  ),
+                                  child: _isWithdrawAll
+                                      ? const Icon(
+                                          Icons.check,
+                                          size: 12,
+                                          color: Colors.white,
+                                        )
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Withdraw All",
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                  color: Color(0xFF2E3D5B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Obx(
+                            () => Text(
+                              "Fee : ${controller.fee.value.toStringAsFixed(4)} ${controller.symbol.value}",
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
                                 fontSize: 12,
                                 color: Color(0xFF2E3D5B),
                               ),
                             ),
-                          ],
-                        ),
-                        Obx(
-                          () => Text(
-                            "Fee : ${controller.fee.value.toStringAsFixed(4)} ${controller.symbol.value}",
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Color(0xFF2E3D5B),
-                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Text(
-                      "Transaction Password",
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                        color: Color(0xFF2E3D5B),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: controller.tradeController,
-                      onChanged: (_) => setState(() {}),
-                      obscureText: _isPasswordObscure,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "Enter Transaction Password",
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF717F9A),
+                      const SizedBox(height: 30),
+                      Text(
+                        "Transaction Password",
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: Color(0xFF2E3D5B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: controller.tradeController,
+                        onChanged: (_) => setState(() {}),
+                        obscureText: _isPasswordObscure,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Enter Transaction Password",
+                          hintStyle: const TextStyle(
+                            color: Color(0xFF717F9A),
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                          contentPadding: const EdgeInsets.only(
+                            left: 10,
+                            right: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFDAE0EE),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF1D5DE5),
+                            ),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isPasswordObscure = !_isPasswordObscure;
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: SvgPicture.asset(
+                                _isPasswordObscure
+                                    ? 'assets/icons/forgot_password/eye-slash.svg'
+                                    : 'assets/icons/forgot_password/eye.svg',
+                                width: 20,
+                                height: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Verification Code
+                      _label("Verification code"),
+                      TextFormField(
+                        controller: _verificationCodeController,
+                        style: const TextStyle(
+                          color: Color(0xFF151E2F),
                           fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Inter',
                         ),
-                        contentPadding: const EdgeInsets.only(
-                          left: 10,
-                          right: 16,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFDAE0EE),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF1D5DE5),
-                          ),
-                        ),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isPasswordObscure = !_isPasswordObscure;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: SvgPicture.asset(
-                              _isPasswordObscure
-                                  ? 'assets/icons/forgot_password/eye-slash.svg'
-                                  : 'assets/icons/forgot_password/eye.svg',
-                              width: 20,
-                              height: 20,
+                        readOnly: true,
+                        decoration: _inputDecoration(
+                          hint: _userEmail,
+                          fillColor: const Color(0xFFECEFF5),
+                          suffixWidget: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 6,
+                              top: 6,
+                              bottom: 6,
+                            ),
+                            child: _verifyButton(
+                              text: _isVerified
+                                  ? "Verified"
+                                  : (_isSendingOtp
+                                        ? "Sending..."
+                                        : "Get a code"),
+                              onPressed: _handleGetCode,
+                              isEnabled: !_isSendingOtp && !_isVerified,
+                              isVerified: _isVerified,
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Verification Code
-                    _label("Verification code"),
-                    TextFormField(
-                      controller: _verificationCodeController,
-                      style: const TextStyle(
-                        color: Color(0xFF151E2F),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Inter',
-                      ),
-                      readOnly: true,
-                      decoration: _inputDecoration(
-                        hint: _userEmail,
-                        fillColor: const Color(0xFFECEFF5),
-                        suffixWidget: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 6,
-                            top: 6,
-                            bottom: 6,
-                          ),
-                          child: _verifyButton(
-                            text: _isVerified
-                                ? "Verified"
-                                : (_isSendingOtp ? "Sending..." : "Get a code"),
-                            onPressed: _handleGetCode,
-                            isEnabled: !_isSendingOtp && !_isVerified,
-                            isVerified: _isVerified,
-                          ),
+                      Obx(() {
+                        final isGoogleEnabled =
+                            controller.googleStatus.value == '1';
+                        if (!isGoogleEnabled) return const SizedBox.shrink();
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _label("Authenticator code"),
+                            TextFormField(
+                              controller: _authenticatorCodeController,
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(
+                                color: Color(0xFF151E2F),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: 'Inter',
+                              ),
+                              decoration: _inputDecoration(
+                                hint: "Enter Authenticator Code",
+                                fillColor: Colors.white,
+                              ),
+                              onChanged: (_) => setState(
+                                () {},
+                              ), // Refresh state to enable button
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        );
+                      }),
+
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEAF9F0),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    Obx(() {
-                      final isGoogleEnabled =
-                          controller.googleStatus.value == '1';
-                      if (!isGoogleEnabled) return const SizedBox.shrink();
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _label("Authenticator code"),
-                          TextFormField(
-                            controller: _authenticatorCodeController,
-                            keyboardType: TextInputType.number,
-                            style: const TextStyle(
-                              color: Color(0xFF151E2F),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Inter',
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/withdrawal/lightbulb.svg',
+                              width: 24,
+                              height: 24,
+                              color: const Color(0xFF40A372),
                             ),
-                            decoration: _inputDecoration(
-                              hint: "Enter Authenticator Code",
-                              fillColor: Colors.white,
-                            ),
-                            onChanged: (_) => setState(
-                              () {},
-                            ), // Refresh state to enable button
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      );
-                    }),
-
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEAF9F0),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/withdrawal/lightbulb.svg',
-                            width: 24,
-                            height: 24,
-                            color: const Color(0xFF40A372),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Friendly Reminder",
-                                  style: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    color: Color(0xFF40A372),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                // Obx(
-                                //   () => Text(
-                                //     controller.note.value.isNotEmpty
-                                //         ? controller.note.value
-                                //         : "Minimum withdrawal amount: ${controller.ruleInfo.value?.minAmount ?? '10'} ${controller.symbol.value}",
-                                //     style: const TextStyle(
-                                //       fontFamily: 'Inter',
-                                //       fontWeight: FontWeight.w400,
-                                //       fontSize: 14,
-                                //       color: Color(0xFF40A372),
-                                //     ),
-                                //   ),
-                                // ),
-                                Obx(() {
-                                  final rule =
-                                      controller.ruleInfo.value?.withdrawRule;
-
-                                  return Text(
-                                    (rule != null && rule.trim().isNotEmpty)
-                                        ? rule
-                                        : "Withdrawal rules not available",
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Friendly Reminder",
                                     style: const TextStyle(
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
                                       color: Color(0xFF40A372),
                                     ),
-                                  );
-                                }),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // Obx(
+                                  //   () => Text(
+                                  //     controller.note.value.isNotEmpty
+                                  //         ? controller.note.value
+                                  //         : "Minimum withdrawal amount: ${controller.ruleInfo.value?.minAmount ?? '10'} ${controller.symbol.value}",
+                                  //     style: const TextStyle(
+                                  //       fontFamily: 'Inter',
+                                  //       fontWeight: FontWeight.w400,
+                                  //       fontSize: 14,
+                                  //       color: Color(0xFF40A372),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  Obx(() {
+                                    final rule =
+                                        controller.ruleInfo.value?.withdrawRule;
 
-                          color: _isWithdrawEnabled()
-                              ? const Color(0xff1D5DE5)
-                              : const Color(0xFFB9C6E2),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: _isWithdrawEnabled()
-                              ? _handleWithdraw
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                                    return Text(
+                                      (rule != null && rule.trim().isNotEmpty)
+                                          ? rule
+                                          : "Withdrawal rules not available",
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        color: Color(0xFF40A372),
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
                             ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+
+                            color: _isWithdrawEnabled()
+                                ? const Color(0xff1D5DE5)
+                                : const Color(0xFFB9C6E2),
                           ),
-                          child: Text(
-                            "Withdraw",
-                            style: TextStyle(
-                              color: _isWithdrawEnabled()
-                                  ? Color(0xffFFFFFF)
-                                  : Color(0xff717F9A),
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
+                          child: ElevatedButton(
+                            onPressed: _isWithdrawEnabled()
+                                ? _handleWithdraw
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              "Withdraw",
+                              style: TextStyle(
+                                color: _isWithdrawEnabled()
+                                    ? Color(0xffFFFFFF)
+                                    : Color(0xff717F9A),
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:BitOwi/core/theme/app_input_decorations.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/input_title_label.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
@@ -16,28 +17,31 @@ class ChangeNickname extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(title: "Change Nickname", onBack: () => Get.back()),
-      body: SafeArea(
-        top: false,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InputTitleLable("Nickname"),
-                  buildNickNameTextInput(),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 40.0),
-                child: buildUpdateButton(),
-              ),
-            ],
+    return PageLoaderWrapper(
+      isLoading: settingsController.userNicknameLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7FB),
+        appBar: CommonAppBar(title: "Change Nickname", onBack: () => Get.back()),
+        body: SafeArea(
+          top: false,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InputTitleLable("Nickname"),
+                    buildNickNameTextInput(),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 40.0),
+                  child: buildUpdateButton(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -89,7 +93,6 @@ class ChangeNickname extends StatelessWidget {
         text: "Update",
         enabled: !isLoading,
         onPressed: settingsController.onSave,
-        child: isLoading ? const CustomLoader() : null,
       );
     });
   }

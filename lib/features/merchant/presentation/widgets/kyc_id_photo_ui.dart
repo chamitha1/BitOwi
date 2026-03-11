@@ -1,4 +1,3 @@
-import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,7 @@ Widget buildIdUploadPlaceholder({
       child: isUploading
           ? const SizedBox(
               height: 274,
-              child: Center(child: CustomLoader()),
+              child: Center(child: SoftCircularLoader()),
             )
           : Column(
               children: [
@@ -178,7 +177,7 @@ Widget buildUploadedIdPreview({
                       height: 274,
                       alignment: Alignment.center,
                       color: const Color(0xFFEFF6FF),
-                      child: CustomLoader(),
+                      child: const SoftCircularLoader(),
                     );
                   },
 

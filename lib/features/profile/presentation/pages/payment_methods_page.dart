@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
@@ -31,7 +32,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
   // bool canChose = false;
   bool isSelectionMode = false;
   bool isEnd = false;
-  bool isLoading = false;
+  final RxBool isLoading = false.obs;
 
   @override
   void initState() {
@@ -51,11 +52,9 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
   }
 
   Future<void> getBankCardList() async {
-    if (isLoading) return;
+    if (isLoading.value) return;
     try {
-      setState(() {
-        isLoading = true;
-      });
+      isLoading.value = true;
       final resList = await AccountApi.getBankCardList();
       if (!mounted) return;
       setState(() {
@@ -66,7 +65,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
       AppLogger.d("getBankCardList getList error: $e");
     } finally {
       setState(() {
-        isLoading = false;
+        isLoading.value = false;
       });
     }
     _controller.finishRefresh();
@@ -78,60 +77,44 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(
-        title: isSelectionMode ? "Select Payment Method" : "Payment Methods",
-        onBack: () => Get.back(),
-      ),
-      body: SafeArea(
-        top: false,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Payment methods list
-              Expanded(
-                child: EasyRefresh(
-                  header: BuilderHeader(
-                    position: IndicatorPosition.above,
-                    triggerOffset: 60,
-                    clamping: false,
-                    builder: (context, state) {
-                      if (state.offset == 0) return const SizedBox.shrink();
-                      return Container(
-                        height: state.offset,
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        child: const CustomLoader(
-                          width: 50,
-                          height: 50,
-                        ),
-                      );
-                    },
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: CommonAppBar(
+          title: isSelectionMode ? "Select Payment Method" : "Payment Methods",
+          onBack: () => Get.back(),
+        ),
+        body: SafeArea(
+          top: false,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Payment methods list
+                Expanded(
+                  child: EasyRefresh(
+                    controller: _controller,
+                    onRefresh: getBankCardList,
+                    child: isEmpty && !isLoading.value
+                        ? CommonEmptyState(title: 'No Payment Methods Added')
+                        : ListView.builder(
+                            padding: EdgeInsets.only(top: 20),
+                            itemCount: list.length,
+                            itemBuilder: (context, index) {
+                              return buildPaymentMethodCard(list[index], index);
+                            },
+                          ),
                   ),
-                  controller: _controller,
-                  onRefresh: getBankCardList,
-                  child: isLoading
-                      ? const CustomLoader()
-                      : isEmpty
-                      ? CommonEmptyState(title: 'No Payment Methods Added')
-                      : ListView.builder(
-                          padding: EdgeInsets.only(top: 20),
-                          itemCount: list.length,
-                          itemBuilder: (context, index) {
-                            return buildPaymentMethodCard(list[index], index);
-                          },
-                        ),
                 ),
-              ),
-              // Add Payment Method button
-              Padding(
-                padding: const EdgeInsets.only(bottom: 40.0, top: 20),
-                child: buildAddPaymentButton(),
-              ),
-            ],
+                // Add Payment Method button
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 40.0, top: 20),
+                  child: buildAddPaymentButton(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -308,11 +291,9 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
       primaryText: "Confirm",
       secondaryText: "Cancel",
       onPrimary: () async {
-        if (isLoading) return;
+        if (isLoading.value) return;
 
-        setState(() {
-          isLoading = true;
-        });
+        isLoading.value = true;
 
         try {
           await AccountApi.deleteBankCard(item.id);
@@ -335,7 +316,7 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
         } finally {
           if (mounted) {
             setState(() {
-              isLoading = false;
+              isLoading.value = false;
             });
           }
         }

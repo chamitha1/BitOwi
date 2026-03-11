@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/api/p2p_api.dart';
 import 'package:BitOwi/models/coin_list_res.dart';
 import 'package:BitOwi/utils/app_logger.dart';
@@ -27,7 +28,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
   List<CoinListRes> coinList = [];
   int pageNum = 1;
   bool isEnd = false;
-  bool isLoading = false;
+  final RxBool isLoading = false.obs;
   late EasyRefreshController _refreshController;
 
   @override
@@ -57,9 +58,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
   Future<void> getInitData() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      isLoading.value = true;
 
       // Fetch merchant profile stats
       final stats = await P2PApi.getMerchantHome(userId);
@@ -79,9 +78,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
       AppLogger.d("getInitData Error: $e");
     } finally {
       if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
+        isLoading.value = false;
       }
     }
   }
@@ -214,35 +211,35 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/merchant_details/arrow_left.svg',
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF151E2F),
-              BlendMode.srcIn,
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/merchant_details/arrow_left.svg',
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF151E2F),
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () => Get.back(),
+          ),
+          title: const Text(
+            "Merchant Profile",
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
+              fontSize: 20,
+              color: Color(0xFF151E2F),
             ),
           ),
-          onPressed: () => Get.back(),
+          centerTitle: false,
+          backgroundColor: const Color(0xFFF6F9FF),
+          elevation: 0,
         ),
-        title: const Text(
-          "Merchant Profile",
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            color: Color(0xFF151E2F),
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: const Color(0xFFF6F9FF),
-        elevation: 0,
-      ),
-      body: isLoading
-          ? const Center(child: CustomLoader())
-          : EasyRefresh(
+        body: EasyRefresh(
               header: BuilderHeader(
                 position: IndicatorPosition.above,
                 triggerOffset: 60,
@@ -285,6 +282,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
                 ),
               ),
             ),
+      ),
     );
   }
 

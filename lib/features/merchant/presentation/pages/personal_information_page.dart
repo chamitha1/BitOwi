@@ -1,7 +1,8 @@
+import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/theme/app_input_decorations.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
-import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
@@ -37,8 +38,10 @@ class KycPersonalInformationPage extends StatelessWidget {
         // Handle system back + gesture back
         Get.back(result: controller.merchantStatus.value != '-1');
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF6F9FF),
+      child: PageLoaderWrapper(
+        isLoading: controller.isLoading,
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF6F9FF),
         appBar: CommonAppBar(
           title: "Personal Information",
           onBack: () =>
@@ -47,9 +50,7 @@ class KycPersonalInformationPage extends StatelessWidget {
 
         body: SafeArea(
           child: Obx(() {
-            if (controller.isLoading.value) {
-              return const Center(child: CustomLoader());
-            }
+            // Loading state handled by PageLoaderWrapper
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -71,7 +72,7 @@ class KycPersonalInformationPage extends StatelessWidget {
           }),
         ),
       ),
-    );
+    ));
   }
 
   //* -- select nationality methods --

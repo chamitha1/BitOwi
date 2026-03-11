@@ -1,5 +1,6 @@
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/transaction_history_controller.dart';
 
@@ -41,208 +42,210 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffF6F9FF),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        // color: Color(0xffECEFF5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          "assets/icons/withdrawal/arrow-left.svg",
-                          width: 20,
-                          height: 20,
-                          color: const Color(0xff151E2F),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    "History",
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff151E2F),
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () async {
-                      await userController.customerServiceChatNavigate(context);
-                    },
-                    child: SvgPicture.asset(
-                      "assets/icons/home/headphones.svg",
-                      width: 24,
-                      height: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Tabs
-            Obx(
-              () => Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: const Color(0xffF6F9FF),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xffECEFF5), width: 1),
-                ),
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xffF6F9FF),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => controller.changeTab(true),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: controller.isDeposit.value
-                                ? Colors.white
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: controller.isDeposit.value
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.06),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Deposit",
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: controller.isDeposit.value
-                                    ? const Color(0xff151E2F)
-                                    : const Color(0xff929EB8),
-                              ),
-                            ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          // color: Color(0xffECEFF5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            "assets/icons/withdrawal/arrow-left.svg",
+                            width: 20,
+                            height: 20,
+                            color: const Color(0xff151E2F),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => controller.changeTab(false),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: !controller.isDeposit.value
-                                ? Colors.white
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: !controller.isDeposit.value
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.06),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Withdraw",
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: !controller.isDeposit.value
-                                    ? const Color(0xff151E2F)
-                                    : const Color(0xff929EB8),
-                              ),
-                            ),
-                          ),
-                        ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      "History",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff151E2F),
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () async {
+                        await userController.customerServiceChatNavigate(
+                          context,
+                        );
+                      },
+                      child: SvgPicture.asset(
+                        "assets/icons/home/headphones.svg",
+                        width: 24,
+                        height: 24,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
 
-            const SizedBox(height: 12),
-
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value &&
-                    (controller.isDeposit.value
-                        ? controller.depositList.isEmpty
-                        : controller.withdrawList.isEmpty)) {
-                  return const Center(
-                    child: CustomLoader(),
-                  );
-                }
-
-                final list = controller.isDeposit.value
-                    ? controller.depositList
-                    : controller.withdrawList;
-                if (list.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No transactions yet",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(
+              // Tabs
+              Obx(
+                () => Container(
+                  margin: const EdgeInsets.symmetric(
                     horizontal: 24,
-                    vertical: 8,
+                    vertical: 12,
                   ),
-                  itemCount: list.length + (controller.isLoading.value ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == list.length) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8),
-                          child: CustomLoader(width: 30, height: 30),
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffF6F9FF),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: const Color(0xffECEFF5),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => controller.changeTab(true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: controller.isDeposit.value
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: controller.isDeposit.value
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.06),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Deposit",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: controller.isDeposit.value
+                                      ? const Color(0xff151E2F)
+                                      : const Color(0xff929EB8),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      );
-                    }
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => controller.changeTab(false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: !controller.isDeposit.value
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: !controller.isDeposit.value
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.06),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Withdraw",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: !controller.isDeposit.value
+                                      ? const Color(0xff151E2F)
+                                      : const Color(0xff929EB8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
-                    final item = list[index];
+              const SizedBox(height: 12),
 
-                    if (controller.isDeposit.value) {
-                      return _buildDepositItem(item);
-                    } else {
-                      return _buildWithdrawItem(item);
-                    }
-                  },
-                );
-              }),
-            ),
-          ],
+              Expanded(
+                child: Obx(() {
+                  // Loading state handled by PageLoaderWrapper
+
+                  final list = controller.isDeposit.value
+                      ? controller.depositList
+                      : controller.withdrawList;
+                  if (list.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No transactions yet",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    itemCount:
+                        list.length + (controller.isLoading.value ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == list.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: CustomLoader(width: 30, height: 30),
+                          ),
+                        );
+                      }
+
+                      final item = list[index];
+
+                      if (controller.isDeposit.value) {
+                        return _buildDepositItem(item);
+                      } else {
+                        return _buildWithdrawItem(item);
+                      }
+                    },
+                  );
+                }),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/profile/presentation/controllers/settings_controller.dart';
@@ -14,30 +15,28 @@ class LocalCurrency extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(
-        title: "Preferred Currency",
-        onBack: () => Get.back(),
-      ),
-      body: SafeArea(
-        top: false,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Obx(() {
-                  if (settingsController.currencyLoading.value) {
-                    return const Center(child: CustomLoader());
-                  }
+    return PageLoaderWrapper(
+      isLoading: settingsController.currencyLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7FB),
+        appBar: CommonAppBar(
+          title: "Preferred Currency",
+          onBack: () => Get.back(),
+        ),
+        body: SafeArea(
+          top: false,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Obx(() {
+                    if (settingsController.currencyList.isEmpty && !settingsController.currencyLoading.value) {
+                      return const Center(child: Text("No currencies available"));
+                    }
 
-                  if (settingsController.currencyList.isEmpty) {
-                    return const Center(child: Text("No currencies available"));
-                  }
-
-                  return SingleChildScrollView(
+                    return SingleChildScrollView(
                     child: Column(
                       children: List.generate(
                         settingsController.currencyList.length,
@@ -90,11 +89,10 @@ class LocalCurrency extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 40.0),
                 child: buildUpdateButton(),
               ),
-            ],
-          ),
+          ]),
         ),
       ),
-    );
+    ));
   }
 
   // SizedBox buildUpdateButton() {

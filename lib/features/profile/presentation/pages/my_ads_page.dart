@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/c2c_api.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
@@ -36,7 +37,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
   List<AdsMyPageRes> list = [];
   int pageNum = 1;
   bool isEnd = false;
-  bool isLoading = false;
+  final RxBool isLoading = false.obs;
 
   @override
   void initState() {
@@ -77,10 +78,10 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
   /// Get list from API based on selected tab
   Future<void> getList([bool isRefresh = false]) async {
-    if (isLoading) return;
+    if (isLoading.value) return;
     try {
       setState(() {
-        isLoading = true;
+        isLoading.value = true;
         if (isRefresh) {
           pageNum = 1;
         }
@@ -108,7 +109,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
       AppLogger.d("getMyAdsPageList getList error: $e");
     } finally {
       setState(() {
-        isLoading = false;
+        isLoading.value = false;
       });
     }
   }
@@ -119,130 +120,137 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(title: "My Ads", onBack: () => Get.back()),
-      body: Column(
-        children: [
-          SizedBox(height: 10),
-          // Tab Bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildTab("Draft", 0),
-                const SizedBox(width: 12),
-                _buildTab("Posted", 1),
-                const SizedBox(width: 12),
-                _buildTab("Archived", 2),
-              ],
-            ),
-          ),
-          // List Content with Pull-to-Refresh
-          Expanded(
-            child: EasyRefresh(
-              header: BuilderHeader(
-                position: IndicatorPosition.above,
-                triggerOffset: 60,
-                clamping: false,
-                builder: (context, state) {
-                  if (state.offset == 0) return const SizedBox.shrink();
-                  return Container(
-                    height: state.offset,
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    child: const CustomLoader(width: 50, height: 50),
-                  );
-                },
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: CommonAppBar(
+          title: "My Ads",
+          onBack: () => Get.back(),
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              // Tab Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildTab("Draft", 0),
+                    const SizedBox(width: 12),
+                    _buildTab("Posted", 1),
+                    const SizedBox(width: 12),
+                    _buildTab("Archived", 2),
+                  ],
+                ),
               ),
-              controller: _controller,
-              onRefresh: onRefresh,
-              refreshOnStart: true,
-              onLoad: onLoad,
-              child: isLoading
-                  ? CustomLoader()
-                  : isEmpty
-                  ? ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(20),
-                      children: [
-                        SizedBox(height: 50),
-                        CommonEmptyState(
-                          title: 'No Ads Available',
-                          description:
-                              'Post an ad to start trading with others.',
-                          action: SizedBox(
-                            width: 287,
-                            child: PrimaryButton(
-                              text: 'Post Ads',
-                              onPressed: () async {
-                                if (kIsWeb) {
-                                  await showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    builder: (_) =>
-                                        const DownloadAppBottomSheet(),
-                                  );
-                                } else {
-                                  // final result = await Get.toNamed(
-                                  //   Routes.postAdsPage,
-                                  // );
-                                  // // refresh after coming back
-                                  // if (result == true) {
-                                  //   // await _controller.callRefresh();
-                                  //   onRefresh();
-                                  // }
-
-                                  final token = await StorageService.getToken();
-                                  if (token != null) {
-                                    if (Get.find<UserController>()
-                                            .user
-                                            .value
-                                            ?.merchantStatus ==
-                                        '1') {
-                                      final result = await Get.toNamed(
-                                        Routes.postAdsPage,
+              // List Content with Pull-to-Refresh
+              Expanded(
+                child: EasyRefresh(
+                  header: BuilderHeader(
+                    position: IndicatorPosition.above,
+                    triggerOffset: 60,
+                    clamping: false,
+                    builder: (context, state) {
+                      if (state.offset == 0) return const SizedBox.shrink();
+                      return Container(
+                        height: state.offset,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: const CustomLoader(width: 50, height: 50),
+                      );
+                    },
+                  ),
+                  controller: _controller,
+                  onRefresh: onRefresh,
+                  refreshOnStart: true,
+                  onLoad: onLoad,
+                  child: isEmpty && !isLoading.value
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(20),
+                          children: [
+                            SizedBox(height: 50),
+                            CommonEmptyState(
+                              title: 'No Ads Available',
+                              description:
+                                  'Post an ad to start trading with others.',
+                              action: SizedBox(
+                                width: 287,
+                                child: PrimaryButton(
+                                  text: 'Post Ads',
+                                  onPressed: () async {
+                                    if (kIsWeb) {
+                                      await showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: Colors.transparent,
+                                        isScrollControlled: true,
+                                        builder: (_) =>
+                                            const DownloadAppBottomSheet(),
                                       );
-                                      // refresh after coming back
-                                      if (result == true) {
-                                        // await _controller.callRefresh();
-                                        onRefresh();
-                                      }
                                     } else {
-                                      // ToastUtil.showToast('您还未完成商家认证'.tr);
-                                      CustomSnackbar.showWarning(
-                                        title: 'Warning',
-                                        message:
-                                            'You have not completed merchant certification yet',
-                                      );
-                                      await Future.delayed(
-                                        const Duration(seconds: 1),
-                                      );
-                                      Get.toNamed(Routes.becomeMerchant);
+                                      // final result = await Get.toNamed(
+                                      //   Routes.postAdsPage,
+                                      // );
+                                      // // refresh after coming back
+                                      // if (result == true) {
+                                      //   // await _controller.callRefresh();
+                                      //   onRefresh();
+                                      // }
+
+                                      final token =
+                                          await StorageService.getToken();
+                                      if (token != null) {
+                                        if (Get.find<UserController>()
+                                                .user
+                                                .value
+                                                ?.merchantStatus ==
+                                            '1') {
+                                          final result = await Get.toNamed(
+                                            Routes.postAdsPage,
+                                          );
+                                          // refresh after coming back
+                                          if (result == true) {
+                                            // await _controller.callRefresh();
+                                            onRefresh();
+                                          }
+                                        } else {
+                                          // ToastUtil.showToast('您还未完成商家认证'.tr);
+                                          CustomSnackbar.showWarning(
+                                            title: 'Warning',
+                                            message:
+                                                'You have not completed merchant certification yet',
+                                          );
+                                          await Future.delayed(
+                                            const Duration(seconds: 1),
+                                          );
+                                          Get.toNamed(Routes.becomeMerchant);
+                                        }
+                                      } else {
+                                        Get.toNamed(Routes.login);
+                                      }
                                     }
-                                  } else {
-                                    Get.toNamed(Routes.login);
-                                  }
-                                }
-                              },
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(20),
+                          itemCount: list.length,
+                          itemBuilder: (context, index) {
+                            return _buildAdCard(ad: list[index]);
+                          },
                         ),
-                      ],
-                    )
-                  : ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(20),
-                      itemCount: list.length,
-                      itemBuilder: (context, index) {
-                        return _buildAdCard(ad: list[index]);
-                      },
-                    ),
-            ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -677,10 +685,10 @@ class _MyAdsPageState extends State<MyAdsPage> {
         primaryText: "Confirm",
         secondaryText: "Cancel",
         onPrimary: () async {
-          if (isLoading) return;
+          if (isLoading.value) return;
 
           setState(() {
-            isLoading = true;
+            isLoading.value = true;
           });
 
           try {
@@ -704,7 +712,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
           } finally {
             if (mounted) {
               setState(() {
-                isLoading = false;
+                isLoading.value = false;
               });
             }
           }
@@ -736,9 +744,9 @@ class _MyAdsPageState extends State<MyAdsPage> {
         primaryText: "Confirm",
         secondaryText: "Cancel",
         onPrimary: () async {
-          if (isLoading) return;
+          if (isLoading.value) return;
           setState(() {
-            isLoading = true;
+            isLoading.value = true;
           });
 
           try {
@@ -759,7 +767,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
           } finally {
             if (mounted) {
               setState(() {
-                isLoading = false;
+                isLoading.value = false;
               });
             }
           }

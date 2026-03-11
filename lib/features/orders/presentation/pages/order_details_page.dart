@@ -1,5 +1,6 @@
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/features/p2p/presentation/widgets/download_app_bottom_sheet.dart';
 import 'package:BitOwi/features/profile/presentation/pages/chat/chat.dart';
 import 'package:BitOwi/utils/app_logger.dart';
@@ -32,7 +33,7 @@ class OrderDetailsPage extends StatefulWidget {
 
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
   TradeOrderDetailRes? orderDetail;
-  bool isLoading = true;
+  final RxBool isLoading = true.obs;
   String? error;
 
   @override
@@ -45,7 +46,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     try {
       AppLogger.d('🔄 Fetching order detail for ID: ${widget.orderId}');
       setState(() {
-        isLoading = true;
+        isLoading.value = true;
         error = null;
       });
 
@@ -57,14 +58,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
       setState(() {
         orderDetail = detail;
-        isLoading = false;
+        isLoading.value = false;
       });
       AppLogger.d('✅ State updated, UI should rebuild now');
     } catch (e) {
       AppLogger.d('❌ Error fetching order detail: $e');
       setState(() {
         error = e.toString();
-        isLoading = false;
+        isLoading.value = false;
       });
     }
   }
@@ -206,40 +207,25 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF6F9FF),
-        appBar: _buildAppBar(),
-        body: const Center(
-          child: CustomLoader(),
+    Widget content;
+    if (error != null) {
+      content = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: ${error ?? "Failed to load order"}'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _fetchOrderDetail,
+              child: const Text('Retry'),
+            ),
+          ],
         ),
       );
-    }
-
-    if (error != null || orderDetail == null) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF6F9FF),
-        appBar: _buildAppBar(),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: ${error ?? "Failed to load order"}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _fetchOrderDetail,
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
+    } else if (orderDetail == null) {
+      content = const SizedBox.shrink();
+    } else {
+      content = SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
@@ -248,6 +234,15 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             _buildBottomButtons(),
           ],
         ),
+      );
+    }
+
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: _buildAppBar(),
+        body: content,
       ),
     );
   }

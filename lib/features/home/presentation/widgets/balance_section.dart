@@ -1,4 +1,4 @@
-import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/home/presentation/controllers/balance_controller.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/balance_history_page.dart';
@@ -131,7 +131,7 @@ class _BalanceSectionState extends State<BalanceSection> {
           Obx(() {
             if (controller.isLoading.value) {
               return const Center(
-                child: CustomLoader(),
+                child: const SoftCircularLoader(),
               );
             } else if (controller.errorMessage.value.isNotEmpty) {
               return Center(

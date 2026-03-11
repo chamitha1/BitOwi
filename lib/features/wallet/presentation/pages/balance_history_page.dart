@@ -1,7 +1,9 @@
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/balance_history_controller.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/jour.dart';
+import 'package:BitOwi/features/wallet/presentation/widgets/transaction_card.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/withdraw_screen.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/deposit_screen.dart';
@@ -25,8 +27,10 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
       Get.put(BalanceHistoryController());
     }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
       body: SafeArea(
         child: Column(
           children: [
@@ -57,12 +61,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
                     _buildFilterTabs(),
                     const SizedBox(height: 16),
                     Obx(() {
-                      if (controller.isLoading.value &&
-                          controller.transactions.isEmpty) {
-                        return const Center(
-                          child: CustomLoader(),
-                        );
-                      }
+                      // Loading state handled by PageLoaderWrapper
                       if (controller.transactions.isEmpty) {
                         return const Center(
                           child: Padding(
@@ -91,7 +90,7 @@ class BalanceHistoryPage extends GetView<BalanceHistoryController> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildAppBar(BuildContext context) {

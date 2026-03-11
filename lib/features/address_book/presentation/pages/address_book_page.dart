@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/account_api.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/features/address_book/data/models/address_item.dart';
 import 'package:BitOwi/features/address_book/data/models/personal_address_list_res.dart';
 import 'package:BitOwi/features/address_book/presentation/widgets/address_card.dart';
@@ -25,7 +26,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
   final TextEditingController _searchController = TextEditingController();
   List<PersonalAddressListRes> addresses = [];
   List<PersonalAddressListRes> filteredAddresses = [];
-  bool isLoading = true;
+  final RxBool isLoading = true.obs;
 
   @override
   void initState() {
@@ -45,13 +46,13 @@ class _AddressBookPageState extends State<AddressBookPage> {
       setState(() {
         addresses = list;
         filteredAddresses = list;
-        isLoading = false;
+      isLoading.value = false;
       });
       if (_searchController.text.isNotEmpty) {
         _filterAddresses(_searchController.text);
       }
     } catch (e) {
-      setState(() => isLoading = false);
+      isLoading.value = false;
       AppLogger.d("Error loading addresses: $e");
     }
   }
@@ -78,9 +79,11 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      appBar: AppBar(
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: AppBar(
         backgroundColor: const Color(0xFFF6F9FF),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -160,11 +163,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
             // Address List
             Expanded(
-              child: isLoading
-                  ? const Center(
-                      child: CustomLoader(),
-                    )
-                  : filteredAddresses.isEmpty
+              child: filteredAddresses.isEmpty && !isLoading.value
                   ? const Center(
                       child: Text(
                         "No addresses found",
@@ -301,6 +300,6 @@ class _AddressBookPageState extends State<AddressBookPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

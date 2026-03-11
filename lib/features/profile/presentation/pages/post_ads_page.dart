@@ -8,6 +8,7 @@ import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_bottom_sheets.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/info_dialog.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
@@ -32,7 +33,7 @@ class PostAdsPage extends StatefulWidget {
 
 class _PostAdsPageState extends State<PostAdsPage> {
   String id = '';
-  bool isLoading = false;
+  final RxBool isLoading = false.obs;
   int currentStep = 1;
 
   // ! ------ step 1 ------
@@ -150,9 +151,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
 
   Future<void> getInitData() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      isLoading.value = true;
       List<Future<dynamic>> futures = [
         // AccountApi.getCoinList({"otcFlag": "1"}), //todo check param
         AccountApi.getCoinList(),
@@ -256,9 +255,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
     } catch (e) {
       AppLogger.d("$e");
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      isLoading.value = false;
     }
   }
 
@@ -558,9 +555,7 @@ class _PostAdsPageState extends State<PostAdsPage> {
 
   Future<void> doSubmit([bool saveDraft = false]) async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      isLoading.value = true;
 
       String publishType = '';
       if (id.isNotEmpty) {
@@ -654,100 +649,99 @@ class _PostAdsPageState extends State<PostAdsPage> {
     } catch (e) {
       AppLogger.d("doSubmit error: $e");
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      isLoading.value = false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(
-        title: "Post Ads",
-        onBack: () => Get.back(),
-        actions: [
-          TextButton(
-            onPressed: onSaveDraftTap,
-            child: AppText.p1Medium(
-              'Save Draft',
-              color: const Color(0xFF1D5DE5),
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7FB),
+        appBar: CommonAppBar(
+          title: "Post Ads",
+          onBack: () => Get.back(),
+          actions: [
+            TextButton(
+              onPressed: onSaveDraftTap,
+              child: AppText.p1Medium(
+                'Save Draft',
+                color: const Color(0xFF1D5DE5),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: isLoading
-              ? CustomLoader()
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    /// STEP HEADER
-                    stepHeader(),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /// STEP HEADER
+                stepHeader(),
 
-                    /// CONTENT
-                    Expanded(
-                      child: SingleChildScrollView(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0x0F555555),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: LazyLoadIndexedStack(
-                            index: currentStep - 1,
-                            children: [
-                              _buildStep1(),
-                              _buildStep2(typeIndex),
-                              _buildStep3(),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    /// BUTTON
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 40.0, top: 20),
-                      child: Row(
-                        children: [
-                          if (currentStep > 1)
-                            Expanded(
-                              child: PrimaryButton(
-                                text: "Previous",
-                                enabled: true,
-                                onPressed: onPrevStepTap,
-                              ),
-                            ),
-                          if (currentStep > 1) const SizedBox(width: 12),
-                          Expanded(
-                            child: PrimaryButton(
-                              text: currentStep == 3 ? "Post Ad" : "Next",
-
-                              showArrow: true,
-                              enabled: !isBtnDisabled,
-                              onPressed: isBtnDisabled ? null : onNextStepTap,
-                            ),
+                /// CONTENT
+                Expanded(
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0x0F555555),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
+                      child: LazyLoadIndexedStack(
+                        index: currentStep - 1,
+                        children: [
+                          _buildStep1(),
+                          _buildStep2(typeIndex),
+                          _buildStep3(),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
+
+                /// BUTTON
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 40.0, top: 20),
+                  child: Row(
+                    children: [
+                      if (currentStep > 1)
+                        Expanded(
+                          child: PrimaryButton(
+                            text: "Previous",
+                            enabled: true,
+                            onPressed: onPrevStepTap,
+                          ),
+                        ),
+                      if (currentStep > 1) const SizedBox(width: 12),
+                      Expanded(
+                        child: PrimaryButton(
+                          text: currentStep == 3 ? "Post Ad" : "Next",
+
+                          showArrow: true,
+                          enabled: !isBtnDisabled,
+                          onPressed: isBtnDisabled ? null : onNextStepTap,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

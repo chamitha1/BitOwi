@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/theme/app_input_decorations.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
@@ -34,8 +35,10 @@ class UserKycInformationPage extends StatelessWidget {
         if (didPop) return;
         Get.back();
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF6F9FF),
+      child: PageLoaderWrapper(
+        isLoading: controller.isLoading,
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF6F9FF),
         appBar: CommonAppBar(
           title: "Personal Information",
           onBack: () {
@@ -44,9 +47,7 @@ class UserKycInformationPage extends StatelessWidget {
         ),
         body: SafeArea(
           child: Obx(() {
-            if (controller.isLoading.value) {
-              return const Center(child: CustomLoader());
-            }
+            // Loading state handled by PageLoaderWrapper
 
             final status = controller.latestIdentifyOrderStatus.value;
 
@@ -68,7 +69,7 @@ class UserKycInformationPage extends StatelessWidget {
           }),
         ),
       ),
-    );
+    ));
   }
 
   //* -- select nationality methods --

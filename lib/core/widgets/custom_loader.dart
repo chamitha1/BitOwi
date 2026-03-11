@@ -10,13 +10,26 @@ class CustomLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String animationPath = kIsWeb
-        ? 'assets/animations/web_loading.json'
-        : 'assets/animations/mobile_loading.json';
+    if (kIsWeb) {
+      return Align(
+        alignment: Alignment.topCenter,
+        child: Lottie.asset(
+          'assets/animations/web_loading.json',
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: height + 1,
+          fit: BoxFit.fitWidth,
+          errorBuilder: (context, error, stackTrace) {
+            return const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Color(0xff1D5DE5)),
+            );
+          },
+        ),
+      );
+    }
 
     return Center(
       child: Lottie.asset(
-        animationPath,
+        'assets/animations/mobile_loading.json',
         width: width,
         height: height,
         fit: BoxFit.contain,

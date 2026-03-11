@@ -1,6 +1,7 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/soft_circular_loader.dart';
 import 'package:BitOwi/features/profile/presentation/pages/contact_us.dart';
 import 'package:BitOwi/features/profile/presentation/widgets/profile_widgets.dart';
@@ -29,7 +30,7 @@ class _AboutUsState extends State<AboutUs> {
   bool isNewVersion = false;
   String downloadUrl = '';
 
-  bool isLoading = true;
+  final RxBool isLoading = true.obs;
 
   @override
   void initState() {
@@ -40,24 +41,20 @@ class _AboutUsState extends State<AboutUs> {
 
   Future<void> getArticleList() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      isLoading.value = true;
       final list = await CommonApi.getArticleList("2");
       if (!mounted) {
-        isLoading = true;
+        isLoading.value = true;
         return;
       }
       setState(() {
         if (list.isNotEmpty) {
           articleType = list;
-          isLoading = false;
+          isLoading.value = false;
         }
       });
     } catch (e) {}
-    setState(() {
-      isLoading = false;
-    });
+      isLoading.value = false;
   }
 
   void onLineTap(int index) {
@@ -121,29 +118,27 @@ class _AboutUsState extends State<AboutUs> {
       );
     });
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-
-      appBar: CommonAppBar(title: "About us", onBack: () => Get.back()),
-
-      body: SafeArea(
-        child: isLoading
-            ? Center(child: CustomLoader())
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 20),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          'assets/images/public/bitowi_app_icon.png',
-                          height: 87,
-                          width: 87,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7FB),
+        appBar: CommonAppBar(title: "About us", onBack: () => Get.back()),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/images/public/bitowi_app_icon.png',
+                      height: 87,
+                      width: 87,
+                      fit: BoxFit.cover,
                     ),
+                  ),
+                ),
                     Container(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -153,6 +148,7 @@ class _AboutUsState extends State<AboutUs> {
                   ],
                 ),
               ),
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/transaction_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,37 +13,37 @@ class TransactionDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(TransactionDetailController());
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      appBar: AppBar(
-        toolbarHeight: 56,
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FF),
-        elevation: 0,
-        centerTitle: true,
-        leading: GestureDetector(
-          onTap: () => Get.back(),
-          child: const Icon(Icons.arrow_back, color: Colors.black),
-        ),
-        title: const Text(
-          "Transaction Details",
-          style: TextStyle(
-            color: Color(0xFF151E2F),
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+        appBar: AppBar(
+          toolbarHeight: 56,
+          backgroundColor: const Color(0xFFF6F9FF),
+          elevation: 0,
+          centerTitle: true,
+          leading: GestureDetector(
+            onTap: () => Get.back(),
+            child: const Icon(Icons.arrow_back, color: Colors.black),
+          ),
+          title: const Text(
+            "Transaction Details",
+            style: TextStyle(
+              color: Color(0xFF151E2F),
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Inter',
+            ),
           ),
         ),
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CustomLoader(),
-          );
-        }
-
+        body: Obx(() {
         final detail = controller.detail.value;
-        if (detail == null) {
+        if (detail == null && !controller.isLoading.value) {
           return const Center(child: Text("Transaction details not found."));
+        }
+        
+        if (detail == null) {
+          return const SizedBox.shrink();
         }
 
         double amount = double.tryParse(detail.transAmount) ?? 0.0;
@@ -186,7 +187,7 @@ class TransactionDetailPage extends StatelessWidget {
           ),
         );
       }),
-    );
+    ));
   }
 
   String _formatDate(dynamic date) {

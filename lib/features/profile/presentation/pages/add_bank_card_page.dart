@@ -5,6 +5,7 @@ import 'package:BitOwi/core/theme/app_text_styles.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/input_title_label.dart';
 import 'package:BitOwi/core/widgets/primary_button.dart';
@@ -40,7 +41,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
   String bankcardId = '';
 
   // bool isAddBankCardFormValid = false;
-  bool isLoading = false;
+  final RxBool isLoading = false.obs;
 
   // void validateForm() {
   //   final isValid =
@@ -56,9 +57,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
 
   Future<void> getInitData() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+        isLoading.value = true;
       final list = await CommonApi.getDictList(parentKey: 'ads_trade_currency');
       coinList = list;
 
@@ -79,14 +78,10 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
 
       // setState(() {});
 
-      setState(() {
-        isLoading = false;
-      });
+        isLoading.value = false;
     } catch (e) {
       CustomSnackbar.showError(title: "Error", message: "Something went wrong");
-      setState(() {
-        isLoading = false;
-      });
+        isLoading.value = false;
     }
   }
 
@@ -107,19 +102,19 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(title: "Add Bank Card", onBack: () => Get.back()),
-      body: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              Expanded(
-                child: isLoading
-                    ? CustomLoader()
-                    : SingleChildScrollView(
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7FB),
+        appBar: CommonAppBar(title: "Add Bank Card", onBack: () => Get.back()),
+        body: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
                         child: Form(
                           key: _formKey,
                           autovalidateMode: _autoValidate
@@ -151,7 +146,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
                 padding: const EdgeInsets.only(top: 10, bottom: 20),
                 child: PrimaryButton(
                   text: bankcardId.isNotEmpty ? "Update" : "Save",
-                  enabled: !isLoading,
+                  enabled: true,
                   onPressed: onSubmit,
                 ),
               ),
@@ -161,7 +156,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   // ===============================
@@ -291,7 +286,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
       return;
     }
     try {
-      setState(() => isLoading = true);
+      isLoading.value = true;
 
       final payload = {
         "realName": _realNameController.text.trim(),
@@ -322,7 +317,7 @@ class _AddBankCardPageState extends State<AddBankCardPage> {
     } catch (e) {
       CustomSnackbar.showError(title: "Error", message: "Something went wrong");
     } finally {
-      setState(() => isLoading = false);
+      isLoading.value = false;
     }
   }
 }

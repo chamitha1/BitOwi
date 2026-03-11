@@ -1,6 +1,7 @@
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/orders/presentation/widgets/order_card.dart';
 import 'package:BitOwi/features/orders/presentation/controllers/orders_controller.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/orders/presentation/pages/order_details_page.dart';
 import 'package:BitOwi/features/orders/utils/order_helper.dart';
@@ -46,8 +47,10 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -88,12 +91,7 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
               // Order Cards with pagination
               Expanded(
                 child: Obx(() {
-                  if (controller.isLoading.value &&
-                      controller.ordersList.isEmpty) {
-                    return const Center(
-                      child: CustomLoader(),
-                    );
-                  }
+                  // Loading state handled by PageLoaderWrapper
 
                   if (controller.ordersList.isEmpty) {
                     return Align(
@@ -175,7 +173,7 @@ class _OrdersPageState extends State<OrdersPage> with WidgetsBindingObserver {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildOrderCard(TradeOrderItem orderItem) {

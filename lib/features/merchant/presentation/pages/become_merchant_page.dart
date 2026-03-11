@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
@@ -23,9 +24,11 @@ class BecomeMerchantPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      appBar: CommonAppBar(title: "Merchant Details", onBack: () => Get.back()),
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
+        appBar: CommonAppBar(title: "Merchant Details", onBack: () => Get.back()),
 
       body: SafeArea(
         top: false,
@@ -53,12 +56,7 @@ class BecomeMerchantPage extends StatelessWidget {
             controller.refreshController.finishRefresh();
           },
           child: Obx(() {
-            if (controller.isLoading.value) {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: const Center(child: CustomLoader()),
-              );
-            }
+            // Loading state handled by PageLoaderWrapper
 
             // final assetInfo = controller.assetInfo.value;
             final latestInfo = controller.latestSubmittedInfo.value;
@@ -246,7 +244,7 @@ class BecomeMerchantPage extends StatelessWidget {
           }),
         ),
       ),
-    );
+    ));
   }
 
   Container buildBecomeMerchantIcon() {

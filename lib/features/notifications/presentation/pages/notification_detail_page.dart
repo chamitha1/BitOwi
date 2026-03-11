@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/models/sms_model.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
@@ -40,47 +41,49 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
-      appBar: AppBar(
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FF),
-        elevation: 0,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/merchant_details/arrow_left.svg',
-            width: 24,
-            height: 24,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF151E2F),
-              BlendMode.srcIn,
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFF6F9FF),
+          elevation: 0,
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/merchant_details/arrow_left.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF151E2F),
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () => Get.back(),
+          ),
+          title: Obx(
+            () => Text(
+              detail.value?.title ?? "",
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                color: Color(0xFF151E2F),
+              ),
             ),
           ),
-          onPressed: () => Get.back(),
+          centerTitle: true,
         ),
-        title: Obx(
-          () => Text(
-            detail.value?.title ?? "",
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Color(0xFF151E2F),
-            ),
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: Obx(() {
-        if (isLoading.value) {
-          return const Center(child: CustomLoader());
-        }
+        body: Obx(() {
+          if (detail.value == null && !isLoading.value) {
+            return const Center(child: Text("Details not found"));
+          }
+          
+          if (detail.value == null) {
+            return const SizedBox.shrink();
+          }
 
-        if (detail.value == null) {
-          return const Center(child: Text("Details not found"));
-        }
-
-        final sms = detail.value!;
-        return SingleChildScrollView(
+          final sms = detail.value!;
+          return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Container(
             padding: const EdgeInsets.all(20),
@@ -139,6 +142,6 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
           ),
         );
       }),
-    );
+    ));
   }
 }

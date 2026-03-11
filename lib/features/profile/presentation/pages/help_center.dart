@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/common_image.dart';
@@ -24,7 +25,7 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
   List<ArticleType> helpCententList = [];
   late EasyRefreshController _controller;
 
-  bool isLoading = false;
+  final RxBool isLoading = false.obs;
 
   final userController = Get.find<UserController>();
 
@@ -42,9 +43,7 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
   }
 
   Future<void> onRefresh() async {
-    setState(() {
-      isLoading = true;
-    });
+      isLoading.value = true;
     try {
       final list = await CommonApi.getArticleList("0");
       if (!mounted) return;
@@ -53,13 +52,11 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
         helpCententList = list;
         expandedSectionIndex = -1;
         expandedQuestionIndex.clear();
-        isLoading = false;
+        isLoading.value = false;
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() {
-        isLoading = false;
-      });
+        isLoading.value = false;
     } finally {
       _controller.finishRefresh();
     }
@@ -70,13 +67,15 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      appBar: CommonAppBar(title: "Help", onBack: () => Get.back()),
-      body: SafeArea(
-        top: false,
-        child: EasyRefresh(
-          header: BuilderHeader(
+    return PageLoaderWrapper(
+      isLoading: isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7FB),
+        appBar: CommonAppBar(title: "Help", onBack: () => Get.back()),
+        body: SafeArea(
+          top: false,
+          child: EasyRefresh(
+            header: BuilderHeader(
             position: IndicatorPosition.above,
             triggerOffset: 60,
             clamping: false,
@@ -100,14 +99,6 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
             children: [
               _buildHeader(),
               const SizedBox(height: 16),
-              if (isLoading)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 100.0),
-                    child: CustomLoader(),
-                  ),
-                )
-              else
                 ...List.generate(
                   helpCententList.length,
                   (index) => _buildSectionCard(
@@ -119,7 +110,7 @@ class _HelpCenterState extends State<HelpCenter> with TickerProviderStateMixin {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildHeader() {

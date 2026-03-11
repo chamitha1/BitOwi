@@ -1,4 +1,5 @@
 import 'package:BitOwi/features/wallet/presentation/controllers/wallet_detail_controller.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/pages/transaction_detail_page.dart';
 import 'package:BitOwi/features/wallet/presentation/widgets/transaction_card.dart';
@@ -18,8 +19,10 @@ class WalletDetailPage extends GetView<WalletDetailController> {
   Widget build(BuildContext context) {
     Get.put(WalletDetailController());
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FF),
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF6F9FF),
       appBar: AppBar(
         toolbarHeight: 56,
         backgroundColor: Colors.transparent,
@@ -53,12 +56,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
         ),
       ),
       body: Obx(() {
-        if (controller.accountInfo.value == null &&
-            controller.isLoading.value) {
-          return const Center(
-            child: CustomLoader(),
-          );
-        }
+        // Loading state handled by PageLoaderWrapper
 
         if (controller.accountInfo.value == null) {
           return Center(
@@ -164,7 +162,7 @@ class WalletDetailPage extends GetView<WalletDetailController> {
           ],
         );
       }),
-    );
+    ));
   }
 
   Widget _buildTopBox(AccountDetailAccountAndJourRes info) {

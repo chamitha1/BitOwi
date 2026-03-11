@@ -1,3 +1,6 @@
+import 'package:BitOwi/core/widgets/app_text.dart';
+import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
+import 'package:BitOwi/core/widgets/common_appbar.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/features/wallet/presentation/controllers/deposit_controller.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
@@ -18,8 +21,10 @@ class DepositScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(DepositController());
 
-    return Scaffold(
-      backgroundColor: const Color(0xffF6F9FF),
+    return PageLoaderWrapper(
+      isLoading: controller.isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xffF6F9FF),
       body: SafeArea(
         child: Column(
           children: [
@@ -161,11 +166,7 @@ class DepositScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Obx(() {
-                      if (controller.isLoading.value) {
-                        return const Center(
-                          child: CustomLoader(),
-                        );
-                      }
+                      // Loading state handled by PageLoaderWrapper
                       return DepositAddressSection(
                         address: controller.depositAddress.value,
                         screenshotController: controller.screenshotController,
@@ -258,6 +259,6 @@ class DepositScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
