@@ -10,8 +10,8 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: "AIzaSyARkNaldI5I18nZRgyMCski8Nh7euPrpH0",
-    appId: "1:817994993109:web:df32b79f0d98236755c15c",
+    apiKey: "AIzaSyBNYOJAGmFCSJj_Wmtcl72-nGy-_8i0iyM",
+    appId: "1:817994993109:web:e07494270cc3bb2255c15c",
     messagingSenderId: "817994993109",
     projectId: "bitowi-analytics",
     authDomain: "bitowi-analytics.firebaseapp.com",
@@ -20,7 +20,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: "AIzaSyARkNaldI5I18nZRgyMCski8Nh7euPrpH0",
+    apiKey: "AIzaSyAit8I2rksltk_CEkn7bLQ3THblA-QQsBM",
     appId: "1:817994993109:android:df32b79f0d98236755c15c",
     messagingSenderId: "817994993109",
     projectId: "bitowi-analytics",
