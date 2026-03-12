@@ -140,8 +140,22 @@ class _MyAdsPageState extends State<MyAdsPage> {
                 return Container(
                   height: state.offset,
                   width: double.infinity,
-                  alignment: Alignment.center,
+                  alignment: Alignment.topCenter,
                   child: const CustomLoader(width: 50, height: 50),
+                );
+              },
+            ),
+            footer: BuilderFooter(
+              triggerOffset: 60,
+              clamping: false,
+              position: IndicatorPosition.locator,
+              builder: (context, state) {
+                if (state.offset == 0) return const SizedBox.shrink();
+                return Container(
+                  height: state.offset,
+                  width: double.infinity,
+                  alignment: Alignment.bottomCenter,
+                  child: const CustomLoader(width: 40, height: 40),
                 );
               },
             ),
@@ -246,6 +260,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
                       }, childCount: list.length),
                     ),
                   ),
+                const SliverToBoxAdapter(child: FooterLocator()),
               ],
             ),
           ),
