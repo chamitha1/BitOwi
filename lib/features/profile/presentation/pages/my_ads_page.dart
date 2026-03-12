@@ -128,131 +128,126 @@ class _MyAdsPageState extends State<MyAdsPage> {
       isLoading: isLoading,
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FF),
-        appBar: CommonAppBar(
-          title: "My Ads",
-          onBack: () => Get.back(),
-        ),
+        appBar: CommonAppBar(title: "My Ads", onBack: () => Get.back()),
         body: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              // Tab Bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildTab("Draft", 0),
-                    const SizedBox(width: 12),
-                    _buildTab("Posted", 1),
-                    const SizedBox(width: 12),
-                    _buildTab("Archived", 2),
-                  ],
-                ),
-              ),
-              // List Content with Pull-to-Refresh
-              Expanded(
-                child: EasyRefresh(
-                  header: BuilderHeader(
-                    position: IndicatorPosition.above,
-                    triggerOffset: 60,
-                    clamping: false,
-                    builder: (context, state) {
-                      if (state.offset == 0) return const SizedBox.shrink();
-                      return Container(
-                        height: state.offset,
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        child: const CustomLoader(width: 50, height: 50),
-                      );
-                    },
-                  ),
-                  controller: _controller,
-                  onRefresh: onRefresh,
-                  refreshOnStart: true,
-                  onLoad: onLoad,
-                  child: isEmpty && !isLoading.value
-                      ? ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(20),
+          child: EasyRefresh(
+            header: BuilderHeader(
+              position: IndicatorPosition.above,
+              triggerOffset: 60,
+              clamping: false,
+              builder: (context, state) {
+                if (state.offset == 0) return const SizedBox.shrink();
+                return Container(
+                  height: state.offset,
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: const CustomLoader(width: 50, height: 50),
+                );
+              },
+            ),
+            controller: _controller,
+            onRefresh: onRefresh,
+            refreshOnStart: true,
+            onLoad: onLoad,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      // Tab Bar
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            SizedBox(height: 50),
-                            CommonEmptyState(
-                              title: 'No Ads Available',
-                              description:
-                                  'Post an ad to start trading with others.',
-                              action: SizedBox(
-                                width: 287,
-                                child: PrimaryButton(
-                                  text: 'Post Ads',
-                                  onPressed: () async {
-                                    if (kIsWeb) {
-                                      await showModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: Colors.transparent,
-                                        isScrollControlled: true,
-                                        builder: (_) =>
-                                            const DownloadAppBottomSheet(),
-                                      );
-                                    } else {
-                                      // final result = await Get.toNamed(
-                                      //   Routes.postAdsPage,
-                                      // );
-                                      // // refresh after coming back
-                                      // if (result == true) {
-                                      //   // await _controller.callRefresh();
-                                      //   onRefresh();
-                                      // }
+                            _buildTab("Draft", 0),
+                            const SizedBox(width: 12),
+                            _buildTab("Posted", 1),
+                            const SizedBox(width: 12),
+                            _buildTab("Archived", 2),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
 
-                                      final token =
-                                          await StorageService.getToken();
-                                      if (token != null) {
-                                        if (Get.find<UserController>()
-                                                .user
-                                                .value
-                                                ?.merchantStatus ==
-                                            '1') {
-                                          final result = await Get.toNamed(
-                                            Routes.postAdsPage,
-                                          );
-                                          // refresh after coming back
-                                          if (result == true) {
-                                            // await _controller.callRefresh();
-                                            onRefresh();
-                                          }
-                                        } else {
-                                          // ToastUtil.showToast('您还未完成商家认证'.tr);
-                                          CustomSnackbar.showWarning(
-                                            title: 'Warning',
-                                            message:
-                                                'You have not completed merchant certification yet',
-                                          );
-                                          await Future.delayed(
-                                            const Duration(seconds: 1),
-                                          );
-                                          Get.toNamed(Routes.becomeMerchant);
+                // Content List or Empty State
+                if (isEmpty && !isLoading.value)
+                  SliverPadding(
+                    padding: const EdgeInsets.all(20),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 30),
+                          CommonEmptyState(
+                            title: 'No Ads Available',
+                            description:
+                                'Post an ad to start trading with others.',
+                            action: SizedBox(
+                              width: 287,
+                              child: PrimaryButton(
+                                text: 'Post Ads',
+                                onPressed: () async {
+                                  if (kIsWeb) {
+                                    await showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      builder: (_) =>
+                                          const DownloadAppBottomSheet(),
+                                    );
+                                  } else {
+                                    final token =
+                                        await StorageService.getToken();
+                                    if (token != null) {
+                                      if (Get.find<UserController>()
+                                              .user
+                                              .value
+                                              ?.merchantStatus ==
+                                          '1') {
+                                        final result = await Get.toNamed(
+                                          Routes.postAdsPage,
+                                        );
+                                        if (result == true) {
+                                          onRefresh();
                                         }
                                       } else {
-                                        Get.toNamed(Routes.login);
+                                        CustomSnackbar.showWarning(
+                                          title: 'Warning',
+                                          message:
+                                              'You have not completed merchant certification yet',
+                                        );
+                                        await Future.delayed(
+                                          const Duration(seconds: 1),
+                                        );
+                                        Get.toNamed(Routes.becomeMerchant);
                                       }
+                                    } else {
+                                      Get.toNamed(Routes.login);
                                     }
-                                  },
-                                ),
+                                  }
+                                },
                               ),
                             ),
-                          ],
-                        )
-                      : ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(20),
-                          itemCount: list.length,
-                          itemBuilder: (context, index) {
-                            return _buildAdCard(ad: list[index]);
-                          },
-                        ),
-                ),
-              ),
-            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.all(20),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return _buildAdCard(ad: list[index]);
+                      }, childCount: list.length),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
