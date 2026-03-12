@@ -57,7 +57,7 @@ class _MyAdsPageState extends State<MyAdsPage> {
 
   Future<void> onRefresh() async {
     try {
-      await getList(true);
+      await getList(true, false);
       if (!mounted) {
         return;
       }
@@ -70,18 +70,20 @@ class _MyAdsPageState extends State<MyAdsPage> {
   }
 
   Future<void> onLoad() async {
-    await getList();
+    await getList(false, false);
     if (!mounted) {
       return;
     }
   }
 
   /// Get list from API based on selected tab
-  Future<void> getList([bool isRefresh = false]) async {
+  Future<void> getList([bool isRefresh = false, bool showLoader = true]) async {
     if (isLoading.value) return;
     try {
       setState(() {
-        isLoading.value = true;
+        if (showLoader) {
+          isLoading.value = true;
+        }
         if (isRefresh) {
           pageNum = 1;
         }
@@ -108,9 +110,11 @@ class _MyAdsPageState extends State<MyAdsPage> {
     } catch (e) {
       AppLogger.d("getMyAdsPageList getList error: $e");
     } finally {
-      setState(() {
-        isLoading.value = false;
-      });
+      if (showLoader) {
+        setState(() {
+          isLoading.value = false;
+        });
+      }
     }
   }
 

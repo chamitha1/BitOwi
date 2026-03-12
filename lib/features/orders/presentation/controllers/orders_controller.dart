@@ -57,7 +57,10 @@ class OrdersController extends GetxController {
     }).toList();
   }
 
-  Future<void> fetchOrders({bool isRefresh = false, bool showLoader = true}) async {
+  Future<void> fetchOrders({
+    bool isRefresh = false,
+    bool showLoader = true,
+  }) async {
     if (isLoading.value) return;
     if (!hasInitialized) {
       hasInitialized = true;
