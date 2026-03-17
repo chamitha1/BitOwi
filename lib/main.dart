@@ -39,9 +39,7 @@ void main() async {
     await Firebase.initializeApp();
   }
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -102,9 +100,7 @@ class _BitOwiState extends State<BitOwi> {
           debugShowCheckedModeBanner: false,
 
           /// 📊 Automatic screen tracking
-          navigatorObservers: [
-            FirebaseAnalyticsObserver(analytics: analytics),
-          ],
+          navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
 
           builder: EasyLoading.init(
             builder: (context, widget) {
@@ -145,8 +141,7 @@ class _BitOwiState extends State<BitOwi> {
 void hideKeyboard(BuildContext context) {
   FocusScopeNode currentFocus = FocusScope.of(context);
 
-  if (!currentFocus.hasPrimaryFocus &&
-      currentFocus.focusedChild != null) {
+  if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 }

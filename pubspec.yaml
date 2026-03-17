@@ -134,31 +134,32 @@
 
     # To add assets to your application, add an assets section, like this:
     assets:
-      - assets/images/onboarding/
-      - assets/images/login/
-      - assets/images/home/
-      - assets/images/deposit/
-      - assets/icons/login/
-      - assets/icons/sign_up/
-      - assets/icons/verify_email/
-      - assets/icons/home/
-      - assets/icons/deposit/
-      - assets/icons/withdrawal/
-      - assets/icons/balance_history/
-      - assets/icons/merchant_details/
-      - assets/icons/forgot_password/
-      - assets/icons/profile_page/
-      - assets/icons/profile_page/account_security/
-      - assets/icons/profile_page/address/
-      - assets/icons/p2p/
-      - assets/icons/public/
-      - assets/app_icons/
-      - assets/images/public/
-      - assets/icons/profile_page/about_us/
-      - assets/icons/orders/
-      - assets/icons/post_ads/
-      - assets/icons/chat/
-      - assets/animations/
+        - assets/images/onboarding/
+        - assets/images/login/
+        - assets/images/home/
+        - assets/images/deposit/
+        - assets/icons/login/
+        - assets/icons/sign_up/
+        - assets/icons/verify_email/
+        - assets/icons/home/
+        - assets/icons/deposit/
+        - assets/icons/withdrawal/
+        - assets/icons/balance_history/
+        - assets/icons/merchant_details/
+        - assets/icons/forgot_password/
+        - assets/icons/profile_page/
+        - assets/icons/profile_page/account_security/
+        - assets/icons/profile_page/address/
+        - assets/icons/p2p/
+        - assets/icons/public/
+        - assets/app_icons/
+        - assets/images/public/
+        - assets/icons/profile_page/about_us/
+        - assets/icons/orders/
+        - assets/icons/post_ads/
+        - assets/icons/chat/
+        - assets/animations/
+        - shorebird.yaml
 
 
     # An image asset can refer to one or more resolution-specific "variants", see
