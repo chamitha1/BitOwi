@@ -13,6 +13,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:BitOwi/core/services/analytics_service.dart';
 
 class MerchantProfilePage extends StatefulWidget {
   const MerchantProfilePage({super.key});
@@ -34,6 +35,8 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
   @override
   void initState() {
     super.initState();
+
+    AnalyticsService.trackScreen("merchant_profile_page");
 
     final args = Get.arguments;
     if (args != null) {
@@ -63,6 +66,8 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
       // Fetch merchant profile stats
       final stats = await P2PApi.getMerchantHome(userId);
 
+      await AnalyticsService.buttonClick("merchant_profile_loaded");
+
       if (mounted) {
         setState(() {
           merchantInfo = stats;
@@ -89,13 +94,19 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
     try {
       if (merchantInfo!.isTrust == '1') {
+        await AnalyticsService.buttonClick("merchant_untrust_clicked");
         await UserApi.removeUserRelation(toUser: userId, type: '1');
+
+        // await UserApi.removeUserRelation(toUser: userId, type: '1');
+
         if (mounted) {
           setState(() {
             merchantInfo!.isTrust = '0';
           });
         }
       } else {
+
+        await AnalyticsService.buttonClick("merchant_trust_clicked");
         await UserApi.createUserRelation(toUser: userId, type: '1');
         if (mounted) {
           setState(() {
@@ -116,6 +127,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
     try {
       if (merchantInfo!.isAddBlackList == '1') {
+        await AnalyticsService.buttonClick("merchant_remove_blacklist");
         await UserApi.removeUserRelation(toUser: userId, type: '0');
         if (mounted) {
           setState(() {
@@ -123,6 +135,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
           });
         }
       } else {
+        await AnalyticsService.buttonClick("merchant_blacklist_clicked");
         await UserApi.createUserRelation(toUser: userId, type: '0');
         if (mounted) {
           setState(() {
@@ -151,6 +164,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
   Future<void> getAdsList({bool isRefresh = false}) async {
     if (isRefresh) {
+      await AnalyticsService.buttonClick("merchant_load_more");
       pageNum = 1;
       isEnd = false;
     } else if (isEnd) {
@@ -163,6 +177,7 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
         "pageSize": 10,
         "userId": userId,
       });
+      await AnalyticsService.buttonClick("merchant_ads_loaded_${res.list?.length ?? 0}");
 
       if (mounted) {
         setState(() {
@@ -575,12 +590,17 @@ class _MerchantProfilePageState extends State<MerchantProfilePage> {
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
+          child: GestureDetector(
+          onTap: () {
+            AnalyticsService.buttonClick("merchant_ad_click_${ad.tradeCoin}_${ad.tradeType}");
+          },
           child: P2POrderCard(
             adItem: ad,
             isBuy: isBuy,
             onRefresh: () => getAdsList(isRefresh: true),
             isMerchantProfile: true,
             coinIcon: coin?.icon,
+          ),
           ),
         );
       }).toList(),

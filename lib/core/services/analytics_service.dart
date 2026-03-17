@@ -138,6 +138,9 @@ class AnalyticsService {
 
   static bool analyticsEnabled = true;
 
+  /// ----------------------
+  /// DEFAULT PARAMS
+  /// ----------------------
   static Future<Map<String, Object>> _defaultParams() async {
     final packageInfo = await PackageInfo.fromPlatform();
 
@@ -164,6 +167,18 @@ class AnalyticsService {
     };
   }
 
+  /// ----------------------
+  /// SAFE WRAPPER (NO CRASH)
+  /// ----------------------
+  static Future<void> _safeLog(Future<void> Function() fn) async {
+    try {
+      await fn();
+    } catch (_) {}
+  }
+
+  /// ----------------------
+  /// ENABLE / DISABLE
+  /// ----------------------
   static void disableAnalytics() {
     analyticsEnabled = false;
     _analytics.setAnalyticsCollectionEnabled(false);
@@ -174,41 +189,56 @@ class AnalyticsService {
     _analytics.setAnalyticsCollectionEnabled(true);
   }
 
+  /// ----------------------
+  /// SCREEN TRACKING (FIXED)
+  /// ----------------------
   static Future<void> trackScreen(String screen) async {
     if (!analyticsEnabled) return;
 
     final params = await _defaultParams();
 
-    await _analytics.logEvent(
-      name: "screen_view",
-      parameters: {
-        "screen_name": screen,
-        ...params,
-      },
-    );
+    await _safeLog(() async {
+      await _analytics.logScreenView(
+        screenName: screen,
+        screenClass: kIsWeb ? 'WebScreen' : 'FlutterScreen',
+        parameters: params,
+      );
+    });
   }
 
+  /// ----------------------
+  /// APP EVENTS
+  /// ----------------------
   static Future<void> appLaunch() async {
+    if (!analyticsEnabled) return;
+
     final params = await _defaultParams();
 
-    await _analytics.logEvent(
-      name: "Vo_app_launch",
-      parameters: {
-        "device_type": kIsWeb ? "web" : "mobile",
-        ...params,
-      },
-    );
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_app_launch",
+        parameters: {
+          "device_type": kIsWeb ? "web" : "mobile",
+          ...params,
+        },
+      );
+    });
   }
 
+  /// ----------------------
+  /// AUTH
+  /// ----------------------
   static Future<void> login(String method) async {
     if (!analyticsEnabled) return;
 
     final params = await _defaultParams();
 
-    await _analytics.logLogin(
-      loginMethod: method,
-      parameters: params,
-    );
+    await _safeLog(() async {
+      await _analytics.logLogin(
+        loginMethod: method,
+        parameters: params,
+      );
+    });
   }
 
   static Future<void> logout() async {
@@ -216,10 +246,12 @@ class AnalyticsService {
 
     final params = await _defaultParams();
 
-    await _analytics.logEvent(
-      name: "logout",
-      parameters: params,
-    );
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "logout",
+        parameters: params,
+      );
+    });
   }
 
   static Future<void> signUp(String method) async {
@@ -227,103 +259,174 @@ class AnalyticsService {
 
     final params = await _defaultParams();
 
-    await _analytics.logSignUp(
-      signUpMethod: method,
-      parameters: params,
-    );
+    await _safeLog(() async {
+      await _analytics.logSignUp(
+        signUpMethod: method,
+        parameters: params,
+      );
+    });
   }
 
+  /// ----------------------
+  /// REGISTER FLOW
+  /// ----------------------
   static Future<void> clickEmailRegister() async {
-    await _analytics.logEvent(name: "Vo_click_email_register");
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(name: "vo_click_email_register");
+    });
   }
 
   static Future<void> registerSubmit(String method) async {
+    if (!analyticsEnabled) return;
+
     final params = await _defaultParams();
 
-    await _analytics.logEvent(
-      name: "Vo_register_submit",
-      parameters: {
-        "register_method": method,
-        ...params,
-      },
-    );
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_register_submit",
+        parameters: {
+          "register_method": method,
+          ...params,
+        },
+      );
+    });
   }
 
   static Future<void> emailCodeSent() async {
-    await _analytics.logEvent(name: "Vo_email_code_sent");
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(name: "vo_email_code_sent");
+    });
   }
 
   static Future<void> emailVerifySuccess() async {
-    await _analytics.logEvent(name: "Vo_email_code_verify_success");
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_email_code_verify_success",
+      );
+    });
   }
 
+  /// ----------------------
+  /// KYC
+  /// ----------------------
   static Future<void> kycApproved() async {
-    await _analytics.logEvent(name: "Vo_kyc_approved");
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(name: "vo_kyc_approved");
+    });
   }
 
+  /// ----------------------
+  /// DEPOSIT
+  /// ----------------------
   static Future<void> depositInitiate(String assetType) async {
-    await _analytics.logEvent(
-      name: "Vo_deposit_initiate",
-      parameters: {"asset_type": assetType},
-    );
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_deposit_initiate",
+        parameters: {"asset_type": assetType},
+      );
+    });
   }
 
-  static Future<void> depositSuccess(double amount, String assetType) async {
-    await _analytics.logEvent(
-      name: "Vo_deposit_success",
-      parameters: {
-        "amount": amount,
-        "asset_type": assetType,
-      },
-    );
+  static Future<void> depositSuccess(
+    double amount,
+    String assetType,
+  ) async {
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_deposit_success",
+        parameters: {
+          "amount": amount,
+          "asset_type": assetType,
+        },
+      );
+    });
   }
 
+  /// ----------------------
+  /// P2P
+  /// ----------------------
   static Future<void> p2pOrderCreate(String type) async {
-    await _analytics.logEvent(
-      name: "Vo_p2p_order_create",
-      parameters: {"order_type": type},
-    );
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_p2p_order_create",
+        parameters: {"order_type": type},
+      );
+    });
   }
 
   static Future<void> p2pOrderComplete(double amount) async {
-    await _analytics.logEvent(
-      name: "Vo_p2p_order_complete",
-      parameters: {"amount": amount},
-    );
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_p2p_order_complete",
+        parameters: {"amount": amount},
+      );
+    });
   }
 
   /// ----------------------
   /// WITHDRAW
   /// ----------------------
   static Future<void> withdrawInitiate(String assetType) async {
-    await _analytics.logEvent(
-      name: "Vo_withdraw_initiate",
-      parameters: {"asset_type": assetType},
-    );
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_withdraw_initiate",
+        parameters: {"asset_type": assetType},
+      );
+    });
   }
 
-  static Future<void> withdrawSuccess(double amount, String assetType) async {
-    await _analytics.logEvent(
-      name: "Vo_withdraw_success",
-      parameters: {
-        "amount": amount,
-        "asset_type": assetType,
-      },
-    );
+  static Future<void> withdrawSuccess(
+    double amount,
+    String assetType,
+  ) async {
+    if (!analyticsEnabled) return;
+
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_withdraw_success",
+        parameters: {
+          "amount": amount,
+          "asset_type": assetType,
+        },
+      );
+    });
   }
 
+  /// ----------------------
+  /// GENERIC EVENTS
+  /// ----------------------
   static Future<void> buttonClick(String name) async {
     if (!analyticsEnabled) return;
 
     final params = await _defaultParams();
 
-    await _analytics.logEvent(
-      name: "button_click",
-      parameters: {
-        "button_name": name,
-        ...params,
-      },
-    );
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "button_click",
+        parameters: {
+          "button_name": name,
+          ...params,
+        },
+      );
+    });
   }
 
   static Future<void> errorEvent(String message) async {
@@ -331,15 +434,20 @@ class AnalyticsService {
 
     final params = await _defaultParams();
 
-    await _analytics.logEvent(
-      name: "error_event",
-      parameters: {
-        "error_message": message,
-        ...params,
-      },
-    );
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "error_event",
+        parameters: {
+          "error_message": message,
+          ...params,
+        },
+      );
+    });
   }
 
+  /// ----------------------
+  /// USER PROPERTIES
+  /// ----------------------
   static Future<void> setUserType(String userType) async {
     if (!analyticsEnabled) return;
 

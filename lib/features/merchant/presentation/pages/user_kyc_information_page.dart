@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:BitOwi/core/services/analytics_service.dart';
 
 class UserKycInformationPage extends StatelessWidget {
   UserKycInformationPage({super.key});
@@ -29,6 +30,7 @@ class UserKycInformationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsService.trackScreen("kyc_information_screen");
     return PopScope(
       canPop: false, // prevent automatic pop
       onPopInvokedWithResult: (didPop, result) {
@@ -152,6 +154,9 @@ class UserKycInformationPage extends StatelessWidget {
 
       if (index != null && index != controller.countryIndex.value) {
         controller.countryIndex.value = index; // 🔄
+
+        final country = controller.countryList[index];
+        AnalyticsService.buttonClick("kyc_nationality_${country.interName}");
       }
     } catch (e) {
       AppLogger.d('areaTapNationality error: $e');
@@ -377,6 +382,9 @@ class UserKycInformationPage extends StatelessWidget {
 
       if (result != null && result != controller.idTypeIndex.value) {
         controller.idTypeIndex.value = result; // 🔁 controller update
+
+        final idType = controller.idTypeList[result];
+        AnalyticsService.buttonClick("kyc_id_type_${idType.value}");
       }
     } catch (e) {
       AppLogger.d('areaTapIdType error: $e');
@@ -820,7 +828,15 @@ class UserKycInformationPage extends StatelessWidget {
         onPressed: () async {
           if (!_formKey.currentState!.validate()) return;
 
-          await controller.submitUserKyc(); 
+          // await controller.submitUserKyc(); 
+            await AnalyticsService.buttonClick("kyc_submit_clicked");
+            try {
+              await controller.submitUserKyc();
+              await AnalyticsService.trackScreen("kyc_submit_success");
+
+            } catch (e) {
+              await AnalyticsService.errorEvent("kyc_submit_failed");
+            }
         },
       );
     });
