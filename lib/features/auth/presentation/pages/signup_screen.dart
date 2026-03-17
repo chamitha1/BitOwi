@@ -7,6 +7,7 @@ import 'package:BitOwi/core/widgets/gradient_button.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:BitOwi/features/auth/presentation/pages/otp_bottom_sheet.dart';
 import 'package:BitOwi/features/rich_text_config.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -62,7 +63,6 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   // void initState() {
   //   super.initState();
-
   //   _termsRec = TapGestureRecognizer()
   //     ..onTap = () {
   //       Get.to(
@@ -73,7 +73,6 @@ class _SignupScreenState extends State<SignupScreen> {
   //         ),
   //       );
   //     };
-
   //   _privacyRec = TapGestureRecognizer()
   //     ..onTap = () {
   //       Get.to(
@@ -88,9 +87,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   // void initState() {
   //   super.initState();
-
   //   AnalyticsService.trackScreen("signup_screen");
-
   //   _termsRec = TapGestureRecognizer()
   //     ..onTap = () {
   //       AnalyticsService.buttonClick("terms_conditions");
@@ -102,7 +99,6 @@ class _SignupScreenState extends State<SignupScreen> {
   //         ),
   //       );
   //     };
-
   //   _privacyRec = TapGestureRecognizer()
   //     ..onTap = () {
   //       AnalyticsService.buttonClick("privacy_policy");
@@ -115,19 +111,15 @@ class _SignupScreenState extends State<SignupScreen> {
   //       );
   //     };
   // }
-
   // @override
   // void dispose() {
   //   _termsRec.dispose();
   //   _privacyRec.dispose();
-
   //   _passController.dispose();
   //   _confirmPassController.dispose();
   //   _inviteController.dispose();
   //   super.dispose();
   // }
-
-
   @override
   void initState() {
     super.initState();
@@ -137,21 +129,25 @@ class _SignupScreenState extends State<SignupScreen> {
     _termsRec = TapGestureRecognizer()
       ..onTap = () {
         AnalyticsService.buttonClick("terms_conditions");
-        Get.to(() => const RichTextConfig(
-              title: "Terms & Condition",
-              configKey: "registered_agreement_textarea",
-              configType: "system",
-            ));
+        Get.to(
+          () => const RichTextConfig(
+            title: "Terms & Condition",
+            configKey: "registered_agreement_textarea",
+            configType: "system",
+          ),
+        );
       };
 
     _privacyRec = TapGestureRecognizer()
       ..onTap = () {
         AnalyticsService.buttonClick("privacy_policy");
-        Get.to(() => const RichTextConfig(
-              title: "Privacy Policy",
-              configKey: "privacy_agreement_textarea",
-              configType: "system",
-            ));
+        Get.to(
+          () => const RichTextConfig(
+            title: "Privacy Policy",
+            configKey: "privacy_agreement_textarea",
+            configType: "system",
+          ),
+        );
       };
   }
 
@@ -181,8 +177,17 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   String _extractBackendMsg(dynamic e) {
-    final s = e.toString();
-    return s.replaceFirst("Exception: ", "");
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map) {
+        final msg = data['errorMsg'] ?? data['message'] ?? data['msg'];
+        if (msg != null && msg.toString().isNotEmpty) {
+          return msg.toString();
+        }
+      }
+      return e.message ?? "Error.";
+    }
+    return e.toString().replaceFirst("Exception: ", "");
   }
 
   String? _validateEmail(String? v) {
@@ -263,7 +268,7 @@ class _SignupScreenState extends State<SignupScreen> {
             // final ok = await userApi.verifyOtp(email: email, bizType: SmsBizType.register, smsCode: pin);
             // return ok;
 
-            _verifiedOtp = pin; 
+            _verifiedOtp = pin;
             return await UserApi().verifyOtpPublic(
               email: email,
               otp: pin,
@@ -340,7 +345,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
       final code = resData['code'];
       if (code == 200 || code == '200') {
-
         // await AnalyticsService.signUp("email");
         // await AnalyticsService.setUserType("standard");
         await AnalyticsService.signUp("email");
@@ -621,9 +625,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                       // ..onTap = () =>
                                       //     Get.offNamed(Routes.login),
                                       ..onTap = () {
-                                        AnalyticsService.buttonClick("signin_redirect");
+                                        AnalyticsService.buttonClick(
+                                          "signin_redirect",
+                                        );
                                         Get.offNamed(Routes.login);
-                                    },
+                                      },
                                   ),
                                 ],
                               ),
