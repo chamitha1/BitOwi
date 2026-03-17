@@ -1,5 +1,6 @@
 import 'package:BitOwi/api/common_api.dart';
 import 'package:BitOwi/api/user_api.dart';
+import 'package:BitOwi/core/services/analytics_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/image_picker_modal.dart';
 import 'package:BitOwi/models/country_list_res.dart';
@@ -83,9 +84,14 @@ class UserKycInformationController extends GetxController {
 
   /// ───────────────── API ─────────────────
   Future<void> getLatestIdentifyOrderList() async {
+    final prevStatus = latestIdentifyOrderStatus.value;
     final list = await UserApi.getIdentifyOrderList();
     latestSubmittedInfo = list.isNotEmpty ? list.first : null;
     latestIdentifyOrderStatus.value = latestSubmittedInfo?.status;
+
+    if (prevStatus != '1' && latestIdentifyOrderStatus.value == '1') {
+      await AnalyticsService.kycApproved(); 
+    }
   }
 
   Future<void> getInitData() async {
@@ -267,12 +273,19 @@ class UserKycInformationController extends GetxController {
 
       if (resCreateIdentifyOrder.success) {
         await getLatestIdentifyOrderList();
+        if (latestIdentifyOrderStatus.value == '1') {
+          await AnalyticsService.kycApproved();
+        }
+
         CustomSnackbar.showSuccess(
           title: "Success",
           message: "KYC Information Submitted!",
         );
       } else {
-        CustomSnackbar.showError(title: "Error", message: resCreateIdentifyOrder.message ?? "Submission failed");
+        CustomSnackbar.showError(
+          title: "Error",
+          message: resCreateIdentifyOrder.message ?? "Submission failed",
+        );
       }
     } finally {
       isLoading.value = false;

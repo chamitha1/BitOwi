@@ -1,7 +1,10 @@
+import 'package:BitOwi/core/services/analytics_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
+import 'package:BitOwi/features/wallet/presentation/controllers/deposit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 
@@ -10,7 +13,7 @@ class DepositAddressSection extends StatelessWidget {
   final ScreenshotController? screenshotController;
 
   const DepositAddressSection({
-    super.key, 
+    super.key,
     required this.address,
     this.screenshotController,
   });
@@ -56,19 +59,20 @@ class DepositAddressSection extends StatelessWidget {
             children: [
               if (address.isNotEmpty)
                 if (screenshotController != null)
-                   Screenshot(
-                      controller: screenshotController!,
-                      child: Container(
-                        color: Colors.white, // Ensure white background for screenshot
-                        padding: const EdgeInsets.all(10), 
-                        child: QrImageView(
-                          data: address,
-                          version: QrVersions.auto,
-                          size: 200,
-                          backgroundColor: Colors.white,
-                        ),
+                  Screenshot(
+                    controller: screenshotController!,
+                    child: Container(
+                      color: Colors
+                          .white, // Ensure white background for screenshot
+                      padding: const EdgeInsets.all(10),
+                      child: QrImageView(
+                        data: address,
+                        version: QrVersions.auto,
+                        size: 200,
+                        backgroundColor: Colors.white,
                       ),
-                   )
+                    ),
+                  )
                 else
                   QrImageView(
                     data: address,

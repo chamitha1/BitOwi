@@ -1,4 +1,5 @@
 import 'package:BitOwi/api/account_api.dart';
+import 'package:BitOwi/core/services/analytics_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/models/withdraw_rule_detail_res.dart';
 import 'package:BitOwi/models/account.dart';
@@ -203,6 +204,8 @@ class WithdrawController extends GetxController {
       });
 
       await StorageService.saveTempWithdrawData(payCardNo, amount, tradePwd);
+
+      await AnalyticsService.withdrawInitiate(symbol.value);
       return true;
     } catch (e) {
       AppLogger.d("Withdraw check failed: $e");
@@ -297,6 +300,10 @@ class WithdrawController extends GetxController {
 
       await AccountApi.createWithdraw(params);
 
+      await AnalyticsService.withdrawSuccess(
+        double.tryParse(amount) ?? 0.0,
+        symbol.value,
+      );
       //  Balance Update
       try {
         final currentBalance =
@@ -349,7 +356,10 @@ class WithdrawController extends GetxController {
         errorMsg = errorMsg.replaceFirst("Exception: ", "");
         CustomSnackbar.showError(title: "Error", message: errorMsg);
       } else {
-        CustomSnackbar.showError(title: "Error", message: 'Unexpected error occurred');
+        CustomSnackbar.showError(
+          title: "Error",
+          message: 'Unexpected error occurred',
+        );
       }
       return false;
     } finally {

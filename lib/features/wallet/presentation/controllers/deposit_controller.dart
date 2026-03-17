@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:BitOwi/core/services/analytics_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:dio/dio.dart';
@@ -130,6 +131,10 @@ class DepositController extends GetxController {
             chainObj.chainSymbol!,
           );
           depositAddress.value = address;
+
+          AnalyticsService.depositInitiate(
+            selectedCoin.value?.symbol ?? 'unknown',
+          );
         }
       }
     } on DioException catch (e) {

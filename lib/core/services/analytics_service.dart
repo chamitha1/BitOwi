@@ -161,10 +161,7 @@ class AnalyticsService {
       }
     }
 
-    return {
-      "app_version": packageInfo.version,
-      "platform": platform,
-    };
+    return {"app_version": packageInfo.version, "platform": platform};
   }
 
   /// ----------------------
@@ -217,10 +214,18 @@ class AnalyticsService {
     await _safeLog(() async {
       await _analytics.logEvent(
         name: "vo_app_launch",
-        parameters: {
-          "device_type": kIsWeb ? "web" : "mobile",
-          ...params,
-        },
+        parameters: {"device_type": kIsWeb ? "web" : "mobile", ...params},
+      );
+    });
+  }
+
+  static Future<void> firstOpen() async {
+    if (!analyticsEnabled) return;
+    final params = await _defaultParams();
+    await _safeLog(() async {
+      await _analytics.logEvent(
+        name: "vo_first_open",
+        parameters: {"device_type": kIsWeb ? "web" : "mobile", ...params},
       );
     });
   }
@@ -234,10 +239,7 @@ class AnalyticsService {
     final params = await _defaultParams();
 
     await _safeLog(() async {
-      await _analytics.logLogin(
-        loginMethod: method,
-        parameters: params,
-      );
+      await _analytics.logLogin(loginMethod: method, parameters: params);
     });
   }
 
@@ -247,10 +249,7 @@ class AnalyticsService {
     final params = await _defaultParams();
 
     await _safeLog(() async {
-      await _analytics.logEvent(
-        name: "logout",
-        parameters: params,
-      );
+      await _analytics.logEvent(name: "logout", parameters: params);
     });
   }
 
@@ -260,10 +259,7 @@ class AnalyticsService {
     final params = await _defaultParams();
 
     await _safeLog(() async {
-      await _analytics.logSignUp(
-        signUpMethod: method,
-        parameters: params,
-      );
+      await _analytics.logSignUp(signUpMethod: method, parameters: params);
     });
   }
 
@@ -286,10 +282,7 @@ class AnalyticsService {
     await _safeLog(() async {
       await _analytics.logEvent(
         name: "vo_register_submit",
-        parameters: {
-          "register_method": method,
-          ...params,
-        },
+        parameters: {"register_method": method, ...params},
       );
     });
   }
@@ -306,9 +299,7 @@ class AnalyticsService {
     if (!analyticsEnabled) return;
 
     await _safeLog(() async {
-      await _analytics.logEvent(
-        name: "vo_email_code_verify_success",
-      );
+      await _analytics.logEvent(name: "vo_email_code_verify_success");
     });
   }
 
@@ -337,19 +328,13 @@ class AnalyticsService {
     });
   }
 
-  static Future<void> depositSuccess(
-    double amount,
-    String assetType,
-  ) async {
+  static Future<void> depositSuccess(double amount, String assetType) async {
     if (!analyticsEnabled) return;
 
     await _safeLog(() async {
       await _analytics.logEvent(
         name: "vo_deposit_success",
-        parameters: {
-          "amount": amount,
-          "asset_type": assetType,
-        },
+        parameters: {"amount": amount, "asset_type": assetType},
       );
     });
   }
@@ -393,19 +378,13 @@ class AnalyticsService {
     });
   }
 
-  static Future<void> withdrawSuccess(
-    double amount,
-    String assetType,
-  ) async {
+  static Future<void> withdrawSuccess(double amount, String assetType) async {
     if (!analyticsEnabled) return;
 
     await _safeLog(() async {
       await _analytics.logEvent(
         name: "vo_withdraw_success",
-        parameters: {
-          "amount": amount,
-          "asset_type": assetType,
-        },
+        parameters: {"amount": amount, "asset_type": assetType},
       );
     });
   }
@@ -421,10 +400,7 @@ class AnalyticsService {
     await _safeLog(() async {
       await _analytics.logEvent(
         name: "button_click",
-        parameters: {
-          "button_name": name,
-          ...params,
-        },
+        parameters: {"button_name": name, ...params},
       );
     });
   }
@@ -437,10 +413,7 @@ class AnalyticsService {
     await _safeLog(() async {
       await _analytics.logEvent(
         name: "error_event",
-        parameters: {
-          "error_message": message,
-          ...params,
-        },
+        parameters: {"error_message": message, ...params},
       );
     });
   }
@@ -451,9 +424,6 @@ class AnalyticsService {
   static Future<void> setUserType(String userType) async {
     if (!analyticsEnabled) return;
 
-    await _analytics.setUserProperty(
-      name: "user_type",
-      value: userType,
-    );
+    await _analytics.setUserProperty(name: "user_type", value: userType);
   }
 }

@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     AnalyticsService.trackScreen("login_screen");
   }
+
   @override
   void dispose() {
     _passwordController.dispose();
@@ -132,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
       // CustomSnackbar.showError(title: 'Login Failed', message: msg);
       await AnalyticsService.errorEvent(msg);
       CustomSnackbar.showError(title: 'Login Failed', message: msg);
-
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -287,11 +287,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             // onPressed: _isLoading ? null : _onLogin,
                             onPressed: _isLoading
-                            ? null
-                            : () {
-                                AnalyticsService.buttonClick("login_button");
-                                _onLogin();
-                              },
+                                ? null
+                                : () {
+                                    AnalyticsService.buttonClick(
+                                      "login_button",
+                                    );
+                                    _onLogin();
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -341,7 +343,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      AnalyticsService.buttonClick("signup_redirect");
+                                      AnalyticsService.buttonClick(
+                                        "signup_redirect",
+                                      );
+                                      AnalyticsService.clickEmailRegister();
                                       Get.offNamed(Routes.signup);
                                     },
                                 ),
@@ -362,7 +367,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        AnalyticsService.buttonClick("terms_conditions");
+                                        AnalyticsService.buttonClick(
+                                          "terms_conditions",
+                                        );
                                         Get.to(
                                           () => RichTextConfig(
                                             title: "Terms & Condition",
@@ -392,7 +399,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        AnalyticsService.buttonClick("privacy_policy");
+                                        AnalyticsService.buttonClick(
+                                          "privacy_policy",
+                                        );
                                         Get.to(
                                           () => RichTextConfig(
                                             title: "Privacy Policy",

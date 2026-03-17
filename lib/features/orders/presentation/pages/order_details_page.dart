@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/services/analytics_service.dart';
 import 'package:BitOwi/core/widgets/app_text.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/page_loader_wrapper.dart';
@@ -185,10 +186,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   // ==================== HELPER METHODS ====================
 
   void _showLoadingDialog() {
-    Get.dialog(
-      const Center(child: CustomLoader()),
-      barrierDismissible: false,
-    );
+    Get.dialog(const Center(child: CustomLoader()), barrierDismissible: false);
   }
 
   void _hideLoadingDialog() {
@@ -1065,6 +1063,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       CustomSnackbar.showSuccess(
         title: "Success",
         message: "Order released successfully",
+      );
+      await AnalyticsService.p2pOrderComplete(
+        double.tryParse(orderDetail?.tradeAmount?.toString() ?? '0.0') ?? 0.0,
       );
       _fetchOrderDetail();
     } catch (e) {

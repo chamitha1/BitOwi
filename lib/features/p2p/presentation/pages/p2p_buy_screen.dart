@@ -1,3 +1,4 @@
+import 'package:BitOwi/core/services/analytics_service.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -184,6 +185,8 @@ class _P2PBuyScreenState extends State<P2PBuyScreen> {
             "tradeAmount": tabIndex == 1 ? amount : "",
             "count": tabIndex == 0 ? amount : "",
           });
+          // buy order
+          await AnalyticsService.p2pOrderCreate("buy");
 
           if (mounted) {
             // Navigate to OrderDetailsPage with the orderId

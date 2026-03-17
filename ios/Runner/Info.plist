@@ -51,5 +51,7 @@
 	<string>This app needs permission to save images to your photo library.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera access is required to scan QR codes.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier is used to track installs and app events to improve your experience.</string>
 </dict>
 </plist>

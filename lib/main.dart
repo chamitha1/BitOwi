@@ -156,6 +156,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'core/services/analytics_service.dart';
@@ -179,6 +180,11 @@ void main() async {
   );
 
   /// 🔥 Track app launch
+  final prefs = await SharedPreferences.getInstance();
+  if (!(prefs.getBool('vo_first_open_fired') ?? false)) {
+    await prefs.setBool('vo_first_open_fired', true);
+    await AnalyticsService.firstOpen(); // Fires ONCE ever
+  }
   await AnalyticsService.appLaunch();
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -224,9 +230,7 @@ class _BitOwiState extends State<BitOwi> {
           debugShowCheckedModeBanner: false,
 
           /// 📊 Auto screen tracking
-          navigatorObservers: [
-            FirebaseAnalyticsObserver(analytics: analytics),
-          ],
+          navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
 
           builder: EasyLoading.init(
             builder: (context, widget) {
