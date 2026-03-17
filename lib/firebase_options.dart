@@ -16,7 +16,7 @@ class DefaultFirebaseOptions {
     projectId: "bitowi-analytics",
     authDomain: "bitowi-analytics.firebaseapp.com",
     storageBucket: "bitowi-analytics.appspot.com",
-    measurementId: "G-X1MG7LLNDS",
+    measurementId: "G-SVE2VTZVWY",
   );
 
   static const FirebaseOptions android = FirebaseOptions(

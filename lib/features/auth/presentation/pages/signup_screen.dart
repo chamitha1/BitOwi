@@ -86,6 +86,49 @@ class _SignupScreenState extends State<SignupScreen> {
   //     };
   // }
   @override
+  // void initState() {
+  //   super.initState();
+
+  //   AnalyticsService.trackScreen("signup_screen");
+
+  //   _termsRec = TapGestureRecognizer()
+  //     ..onTap = () {
+  //       AnalyticsService.buttonClick("terms_conditions");
+  //       Get.to(
+  //         () => const RichTextConfig(
+  //           title: "Terms & Condition",
+  //           configKey: "registered_agreement_textarea",
+  //           configType: "system",
+  //         ),
+  //       );
+  //     };
+
+  //   _privacyRec = TapGestureRecognizer()
+  //     ..onTap = () {
+  //       AnalyticsService.buttonClick("privacy_policy");
+  //       Get.to(
+  //         () => const RichTextConfig(
+  //           title: "Privacy Policy",
+  //           configKey: "privacy_agreement_textarea",
+  //           configType: "system",
+  //         ),
+  //       );
+  //     };
+  // }
+
+  // @override
+  // void dispose() {
+  //   _termsRec.dispose();
+  //   _privacyRec.dispose();
+
+  //   _passController.dispose();
+  //   _confirmPassController.dispose();
+  //   _inviteController.dispose();
+  //   super.dispose();
+  // }
+
+
+  @override
   void initState() {
     super.initState();
 
@@ -94,25 +137,21 @@ class _SignupScreenState extends State<SignupScreen> {
     _termsRec = TapGestureRecognizer()
       ..onTap = () {
         AnalyticsService.buttonClick("terms_conditions");
-        Get.to(
-          () => const RichTextConfig(
-            title: "Terms & Condition",
-            configKey: "registered_agreement_textarea",
-            configType: "system",
-          ),
-        );
+        Get.to(() => const RichTextConfig(
+              title: "Terms & Condition",
+              configKey: "registered_agreement_textarea",
+              configType: "system",
+            ));
       };
 
     _privacyRec = TapGestureRecognizer()
       ..onTap = () {
         AnalyticsService.buttonClick("privacy_policy");
-        Get.to(
-          () => const RichTextConfig(
-            title: "Privacy Policy",
-            configKey: "privacy_agreement_textarea",
-            configType: "system",
-          ),
-        );
+        Get.to(() => const RichTextConfig(
+              title: "Privacy Policy",
+              configKey: "privacy_agreement_textarea",
+              configType: "system",
+            ));
       };
   }
 
@@ -120,7 +159,6 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _termsRec.dispose();
     _privacyRec.dispose();
-
     _passController.dispose();
     _confirmPassController.dispose();
     _inviteController.dispose();
@@ -210,6 +248,7 @@ class _SignupScreenState extends State<SignupScreen> {
         title: "Success",
         message: "OTP sent to your email!",
       );
+      await AnalyticsService.emailCodeSent();
 
       await showModalBottomSheet(
         context: context,
@@ -238,8 +277,8 @@ class _SignupScreenState extends State<SignupScreen> {
             );
           },
           onVerified: () {
-            AnalyticsService.buttonClick("otp_verified");
-
+            // AnalyticsService.buttonClick("otp_verified");
+            AnalyticsService.emailVerifySuccess();
             Navigator.pop(context);
             setState(() => _isEmailVerified = true);
             CustomSnackbar.showSuccess(
@@ -302,7 +341,10 @@ class _SignupScreenState extends State<SignupScreen> {
       final code = resData['code'];
       if (code == 200 || code == '200') {
 
+        // await AnalyticsService.signUp("email");
+        // await AnalyticsService.setUserType("standard");
         await AnalyticsService.signUp("email");
+        await AnalyticsService.registerSubmit("email");
         await AnalyticsService.setUserType("standard");
 
         final tokenData = (resData['data'] as Map<String, dynamic>? ?? {});
