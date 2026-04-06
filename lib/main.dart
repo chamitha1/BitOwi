@@ -161,6 +161,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'core/services/analytics_service.dart';
 import 'core/services/app_update_service.dart';
+import 'core/services/deep_link_service.dart';
 
 import 'config/routes.dart';
 import 'l10n/translations.dart';
@@ -200,6 +201,8 @@ void main() async {
   );
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  await DeepLinkService.instance.init();
 
   runApp(const BitOwi());
 }

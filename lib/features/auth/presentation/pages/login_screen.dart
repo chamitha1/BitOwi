@@ -1,6 +1,7 @@
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/core/services/deep_link_service.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
@@ -123,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await AnalyticsService.login("email");
         await AnalyticsService.setUserType("standard");
 
-        Get.offAllNamed(Routes.home);
+        await DeepLinkService.instance.onLoginSuccess();
       } else {
         throw 'Login failed: ${data['errorMsg'] ?? 'Unknown'}';
       }

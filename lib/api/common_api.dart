@@ -4,8 +4,12 @@ import 'package:BitOwi/models/config.dart';
 import 'package:BitOwi/models/country_list_res.dart';
 import 'package:BitOwi/models/dict.dart';
 import 'package:BitOwi/models/sms_model.dart';
+import 'package:BitOwi/models/common_dynamic_popup.dart';
+import 'package:BitOwi/core/storage/storage_service.dart';
+import 'dart:convert';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:BitOwi/utils/common_utils.dart';
+import 'package:dio/dio.dart';
 
 class CommonApi {
   /// Fetch dictionary list
@@ -172,6 +176,72 @@ class CommonApi {
     } catch (e) {
       AppLogger.d("readAllNotice error: $e");
       rethrow;
+    }
+  }
+
+
+  static const String _popupRootUrl = 'https://tsapi.mocard.store/front/';
+
+  static Future<Dio> _buildPopupDio() async {
+    final token = await StorageService.getToken();
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: _popupRootUrl,
+        connectTimeout: const Duration(seconds: 20),
+        receiveTimeout: const Duration(seconds: 20),
+        responseType: ResponseType.plain,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': 'en_US',
+          if (token != null && token.trim().isNotEmpty) 'Authorization': token,
+        },
+      ),
+    );
+    return dio;
+  }
+
+  /// Home popup list (location: 0 = home)
+  static Future<List<CommonDynamicPopup>> getDynamicPopupList({
+    int location = 0,
+  }) async {
+    try {
+      final dio = await _buildPopupDio();
+      final res = await dio.post(
+        'popup/list',
+        data: {'location': '$location'},
+      );
+      dynamic responseData = res.data;
+      if (responseData is String) {
+        try {
+          responseData = json.decode(responseData);
+        } catch (_) {}
+      }
+      AppLogger.d('getDynamicPopupList Raw Response: $responseData');
+
+      if (responseData is Map<String, dynamic> && responseData['data'] is List) {
+        return (responseData['data'] as List)
+            .map((item) => Map<String, dynamic>.from(item as Map))
+            .map(CommonDynamicPopup.fromJson)
+            .toList();
+      }
+
+      return [];
+    } catch (e) {
+      AppLogger.d('getDynamicPopupList error: $e');
+      return [];
+    }
+  }
+
+  /// Mark popup as handled
+  static Future<void> checkDynamicPopup(int id) async {
+    try {
+      final dio = await _buildPopupDio();
+      await dio.post(
+        'popup/check',
+        data: {'id': id},
+      );
+    } catch (e) {
+      AppLogger.d('checkDynamicPopup error: $e');
     }
   }
 }

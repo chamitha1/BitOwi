@@ -2,6 +2,7 @@ import 'package:BitOwi/api/user_api.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/constants/sms_constants.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/core/services/deep_link_service.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/core/widgets/gradient_button.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
@@ -363,7 +364,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
         await StorageService.saveUserName(_emailController!.text.trim());
 
-        Get.offAllNamed(Routes.home);
+        await DeepLinkService.instance.onLoginSuccess();
       } else {
         final msg =
             (resData['errorMsg'] ?? resData['message'] ?? "Signup failed")

@@ -16,6 +16,9 @@ import 'package:BitOwi/features/profile/presentation/pages/payment_methods_page.
 import 'package:BitOwi/features/profile/presentation/pages/post_ads_page.dart';
 import 'package:BitOwi/features/profile/presentation/pages/settings.dart';
 import 'package:BitOwi/features/profile/presentation/pages/merchant_profile_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/change_email_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/change_login_password_page.dart';
+import 'package:BitOwi/features/profile/presentation/pages/profile_screen.dart';
 import 'package:get/get.dart';
 import 'package:BitOwi/features/auth/presentation/pages/login_screen.dart';
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
@@ -62,6 +65,13 @@ class Routes {
   static const String myAdsPage = '/myAdsPage';
   static const String orderDetailPage = '/orderDetail';
   static const String merchantProfilePage = '/merchantProfile';
+
+  static const String homeAlias = '/home';
+  static const String withdrawAlias = '/withdraw';
+  static const String changePassword = '/changepassword';
+  static const String changeEmail = '/changeemail';
+  static const String profile = '/profile';
+  static const String postAdsAlias = '/postads';
 }
 
 class AppPages {
@@ -78,6 +88,13 @@ class AppPages {
     GetPage(name: Routes.signup, page: () => const SignupScreen()),
     GetPage(
       name: Routes.home,
+      page: () => const HomeScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(BalanceController());
+      }),
+    ),
+    GetPage(
+      name: Routes.homeAlias,
       page: () => const HomeScreen(),
       binding: BindingsBuilder(() {
         Get.put(BalanceController());
@@ -128,20 +145,42 @@ class AppPages {
         );
       },
     ),
+    GetPage(
+      name: Routes.withdrawAlias,
+      page: () {
+        final args = Get.arguments ?? {};
+        return WithdrawScreen(
+          symbol: Get.parameters['symbol'] ?? args['symbol'] ?? '',
+          accountNumber:
+              Get.parameters['accountNumber'] ?? args['accountNumber'] ?? '',
+        );
+      },
+    ),
     GetPage(name: Routes.helpCenter, page: () => HelpCenter()),
     GetPage(name: Routes.aboutUs, page: () => AboutUs()),
     GetPage(name: Routes.settings, page: () => Settings()),
     GetPage(name: Routes.mePage, page: () => MePage()),
     GetPage(name: Routes.changeNickname, page: () => ChangeNickname()),
     GetPage(name: Routes.localCurrency, page: () => LocalCurrency()),
+    GetPage(name: Routes.changePassword, page: () => const ChangeLoginPasswordPage()),
+    GetPage(name: Routes.changeEmail, page: () => const ChangeEmailPage()),
+    GetPage(name: Routes.profile, page: () => const ProfileScreen()),
     //
     GetPage(name: Routes.paymentMethodsPage, page: () => PaymentMethodsPage()),
     GetPage(name: Routes.addBankCardPage, page: () => AddBankCardPage()),
     GetPage(name: Routes.addMobileMoneyPage, page: () => AddMobileMoneyPage()),
     GetPage(name: Routes.postAdsPage, page: () =>PostAdsPage()),
+    GetPage(name: Routes.postAdsAlias, page: () => const PostAdsPage()),
     GetPage(name: Routes.myAdsPage, page: () => MyAdsPage()),
     GetPage(
       name: Routes.orderDetailPage,
+      page: () {
+        final orderId = Get.parameters['orderId'] ?? '';
+        return OrderDetailsPage(orderId: orderId);
+      },
+    ),
+    GetPage(
+      name: '${Routes.orderDetailPage}/:orderId',
       page: () {
         final orderId = Get.parameters['orderId'] ?? '';
         return OrderDetailsPage(orderId: orderId);

@@ -53,5 +53,18 @@
 	<string>Camera access is required to scan QR codes.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This identifier is used to track installs and app events to improve your experience.</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>com.bitowi.app</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>bitowi</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

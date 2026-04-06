@@ -15,8 +15,12 @@ import '../widgets/home_bottom_nav_bar.dart';
 import '../../../../features/profile/presentation/pages/profile_screen.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import '../../../../features/p2p/presentation/pages/p2p_page.dart';
-import 'dart:convert';
 import 'package:BitOwi/features/orders/presentation/pages/orders_page.dart';
+import 'package:BitOwi/core/services/deep_link_service.dart';
+import 'package:BitOwi/features/home/presentation/controllers/home_popup_controller.dart';
+import 'package:BitOwi/features/home/presentation/widgets/home_dynamic_popup.dart';
+import 'package:BitOwi/models/common_dynamic_popup.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,6 +31,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final BalanceController controller = Get.put(BalanceController());
+  final HomePopupController popupController = Get.put(HomePopupController());
 
   int _navIndex = 0;
   DateTime? _lastPressedAt;
@@ -37,6 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _refreshController = EasyRefreshController(controlFinishRefresh: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await popupController.loadHomePopups();
+      await _showNextPopup();
+    });
   }
 
   @override
@@ -50,6 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_navIndex == 0) {
         // Home Tab
         await controller.fetchBalance();
+        await popupController.loadHomePopups(force: true);
+        await _showNextPopup();
       } else if (_navIndex == 3) {
         // Profile Tab
         final userController = Get.find<UserController>();
@@ -60,6 +71,71 @@ class _HomeScreenState extends State<HomeScreen> {
       AppLogger.e(e);
     }
     _refreshController.finishRefresh();
+  }
+
+
+  Future<void> _showNextPopup() async {
+    if (!mounted || _navIndex != 0 || popupController.isShowingPopup.value) {
+      return;
+    }
+
+    final popup = popupController.nextPopup();
+    if (popup == null) return;
+
+    popupController.isShowingPopup.value = true;
+    await popupController.markHandled(popup);
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => HomeDynamicPopup(
+        popup: popup,
+        onClose: () => Navigator.of(context).pop(),
+        onTap: () async {
+          Navigator.of(context).pop();
+          await _handlePopupTap(popup);
+        },
+      ),
+    );
+
+    popupController.isShowingPopup.value = false;
+    if (!mounted) return;
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    await _showNextPopup();
+  }
+
+  Future<void> _handlePopupTap(CommonDynamicPopup popup) async {
+    final url = (popup.url ?? '').trim();
+    if (url.isEmpty) return;
+
+    switch (popup.action) {
+      case 0:
+        if (url.startsWith('/')) {
+          Get.toNamed(url);
+          return;
+        }
+        final uri = Uri.tryParse(url);
+        if (uri == null) return;
+        if (uri.hasScheme &&
+            (uri.scheme == 'bitowi' || uri.scheme == 'http' || uri.scheme == 'https')) {
+          await DeepLinkService.instance.handleIncomingLink(
+            uri,
+            isLoggedIn: true,
+          );
+          return;
+        }
+        return;
+      case 1:
+      case 2:
+        final uri = Uri.tryParse(url);
+        if (uri != null) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+        return;
+      case 3:
+      default:
+        return;
+    }
   }
 
   @override
@@ -164,6 +240,11 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _navIndex,
           onTap: (index) {
             setState(() => _navIndex = index);
+            if (index == 0) {
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                await _showNextPopup();
+              });
+            }
             if (index == 3) {
               // Profile index
               Get.find<UserController>().fetchNotificationCount();

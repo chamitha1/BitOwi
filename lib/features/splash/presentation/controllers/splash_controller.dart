@@ -1,5 +1,6 @@
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
+import 'package:BitOwi/core/services/deep_link_service.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,7 @@ class SplashController extends GetxController {
 
         await UserController.to.initIMForCurrentUser();
 
-        Get.offAllNamed(Routes.home);
+        await DeepLinkService.instance.routeAppOnLaunch();
         return;
       } else {
         // Token expired, clear it safely (optional but good practice)
