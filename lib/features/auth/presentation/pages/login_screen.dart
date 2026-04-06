@@ -1,7 +1,6 @@
 import 'package:BitOwi/config/api_client.dart';
 import 'package:BitOwi/config/routes.dart';
 import 'package:BitOwi/core/storage/storage_service.dart';
-import 'package:BitOwi/core/services/deep_link_service.dart';
 import 'package:BitOwi/core/widgets/custom_loader.dart';
 import 'package:BitOwi/core/widgets/custom_snackbar.dart';
 import 'package:BitOwi/features/auth/presentation/controllers/user_controller.dart';
@@ -9,6 +8,7 @@ import 'package:BitOwi/features/auth/presentation/pages/forgot_password_screen.d
 import 'package:BitOwi/features/auth/presentation/pages/signup_screen.dart';
 import 'package:BitOwi/features/home/presentation/pages/home_screen.dart';
 import 'package:BitOwi/features/rich_text_config.dart';
+import 'package:BitOwi/utils/app_error_handler.dart';
 import 'package:BitOwi/utils/app_logger.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -124,16 +124,18 @@ class _LoginScreenState extends State<LoginScreen> {
         await AnalyticsService.login("email");
         await AnalyticsService.setUserType("standard");
 
-        await DeepLinkService.instance.onLoginSuccess();
+        Get.offAllNamed(Routes.home);
       } else {
         throw 'Login failed: ${data['errorMsg'] ?? 'Unknown'}';
       }
     } catch (e) {
       AppLogger.d('Login error: $e');
-      final msg = _extractBackendError(e);
+      // final msg = _extractBackendError(e);
+      // // CustomSnackbar.showError(title: 'Login Failed', message: msg);
+      // await AnalyticsService.errorEvent(msg);
       // CustomSnackbar.showError(title: 'Login Failed', message: msg);
-      await AnalyticsService.errorEvent(msg);
-      CustomSnackbar.showError(title: 'Login Failed', message: msg);
+        await AnalyticsService.errorEvent(e.toString());
+        AppErrorHandler.handle(e, title: 'Login Failed');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
